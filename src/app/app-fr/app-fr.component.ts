@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ViewChild, NgModule, ChangeDetectionStrategy, OnInit} from '@angular/core';
-import { RouterOutlet, RouterModule } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import {JsonPipe} from '@angular/common';
 import {AsyncPipe} from '@angular/common';
 import {MatTabsModule} from '@angular/material/tabs';
@@ -11,8 +11,8 @@ import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
-import {LineGraphComponent} from './line-graph/line-graph.component';
-import {HorizontalBarGraphComponent } from './horizontal-bar-graph/horizontal-bar-graph.component';
+import {LineGraphComponent} from '../line-graph/line-graph.component';
+import {HorizontalBarGraphComponent } from '../horizontal-bar-graph/horizontal-bar-graph.component';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {MatButtonModule} from '@angular/material/button';
 import {provideNativeDateAdapter} from '@angular/material/core';
@@ -21,20 +21,15 @@ import {MatSort, Sort, MatSortModule} from '@angular/material/sort';
 import {LiveAnnouncer} from '@angular/cdk/a11y';
 import {HotTableModule } from '@handsontable/angular';
 import {registerAllModules } from 'handsontable/registry';
-import {DataTableComponent } from './data-table/data-table.component'; 
-import {DataTableDatasetComponent} from './data-table-dataset/data-table-dataset.component'; 
-import {DataTableFileComponent} from './data-table-file/data-table-file.component'; 
+import {DataTableComponent } from '../data-table/data-table.component'; 
+import {DataTableDatasetComponent} from '../data-table-dataset/data-table-dataset.component'; 
+import {DataTableFileComponent} from '../data-table-file/data-table-file.component'; 
 import {MatDatepickerModule} from '@angular/material/datepicker';
-import { PostsComponent } from './posts/posts.component';
-
-registerAllModules();
 
 @Component({
-  selector: 'app-root',
+  selector: 'app-app-fr',
   standalone: true,
-  providers: [provideNativeDateAdapter()],
-  imports: [
-    MatTabsModule,
+  imports: [MatTabsModule,
     MatFormFieldModule, 
     MatSelectModule,
     MatInputModule, 
@@ -56,16 +51,11 @@ registerAllModules();
     DataTableDatasetComponent,
     DataTableFileComponent,
     ReactiveFormsModule,
-    MatDatepickerModule,
-    RouterModule,
-    RouterOutlet,
-    PostsComponent
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+    MatDatepickerModule],
+  templateUrl: './app-fr.component.html',
+  styleUrl: './app-fr.component.css'
 })
-export class AppComponent implements AfterViewInit, OnInit{
+export class AppFrComponent implements AfterViewInit, OnInit{
 
   myControl = new FormControl('');
   options: string[] = ['One', 'Two', 'Three'];
@@ -212,3 +202,4 @@ const ELEMENT_DATA: Element[] = [
   {name: 'UofZ', views: 13213, downloads: 300, citations: 10},
 
 ];
+
