@@ -15,11 +15,9 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
       [colHeaders]="true"
       [rowHeaders]="true"
       height="auto"
+      [columnSorting]="true"
+      [columns]="columns"
       licenseKey="non-commercial-and-evaluation">
-        <hot-column data="name" [readOnly]="true" title="collection"></hot-column>
-        <hot-column data="views" [readOnly]="true" title="views"></hot-column>
-        <hot-column data="downloads" [readOnly]="true" title="downloads"></hot-column>
-        <hot-column data="citations" [readOnly]="true" title="citations"></hot-column>
     </hot-table>
   </div>
   `,
@@ -54,5 +52,12 @@ export class DataTableComponent {
     {name: 'UofY', views: 323232, downloads: 300, citations: 10},
     {name: 'UofZ', views: 13213, downloads: 300, citations: 10},
   ];
+
+  columns: any[] = [
+    {data: "name", readOnly: "true", title: "Collection"},
+    {data: "views", readOnly: "true", title: "Views"},
+    {data: "downloads", readOnly: "true", title: "Downloads"},
+    {data: "citations", readOnly: "true", title: "Citations"},
+  ]
 
 }

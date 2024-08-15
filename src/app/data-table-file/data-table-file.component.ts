@@ -16,13 +16,8 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
       [rowHeaders]="true"
       height="auto"
       [columnSorting]="true"
+      [columns]="columns"
       licenseKey="non-commercial-and-evaluation">
-        <hot-column data="dataverse" [readOnly]="true" title="dataverse name"></hot-column>
-        <hot-column data="dataset" [readOnly]="true" title="dataset name"></hot-column>
-        <hot-column data="author" [readOnly]="true" title="dataset author"></hot-column>
-        <hot-column data="description" [readOnly]="true" title="file description"></hot-column>
-        <hot-column data="filename" [readOnly]="true" title="filename"></hot-column>
-        <hot-column data="actions" [readOnly]="true" title="file count"></hot-column>
     </hot-table>
   </div>
   `,
@@ -63,5 +58,14 @@ export class DataTableFileComponent {
     {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
     {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
   ];
+
+  columns: any[] = [
+    {data: "dataverse", readOnly: "true", title: "dataverse name"},
+    {data: "dataset", readOnly: "true", title: "dataset name"},
+    {data: "author", readOnly: "true", title: "dataset author"},
+    {data: "description", readOnly: "true", title: "file description"},
+    {data: "filename", readOnly: "true", title: "filename"},
+    {data: "actions", readOnly: "true", title: "file count"}
+  ]
 
 }
