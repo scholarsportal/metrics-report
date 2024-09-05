@@ -1,3 +1,5 @@
+<app-posts (messageEvent)="getData($event)"></app-posts>
+
 <h1> Borealis Metrics Report 
   <div style="float:right;">
     <button mat-button disabled> English </button>
@@ -6,7 +8,7 @@
 </h1>
 
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-  <mat-tab label="Overview"> 
+  <mat-tab label="Collections"> 
     <ng-template matTabContent>
 
       <mat-form-field class="example-full-width">
@@ -73,8 +75,8 @@
 
       <div style="display: flex; flex-grow: grow; gap: 50px;"></div>
       
-      <div style="position:relative; width:500px; display: inline-block; height:500px; padding: 20px;">
-        <app-data-table></app-data-table>
+      <div style="position:relative; width:700px; display: inline-block; height:200px; padding: 20px;">
+        <app-data-table [item]="table_data"></app-data-table>
       </div>
 
       <div style="display: inline-block; vertical-align:top; padding: 20px;">
@@ -86,7 +88,7 @@
 
     </ng-template>
   </mat-tab>
-  <mat-tab label="By Dataset"> <ng-template matTabContent> 
+  <mat-tab label="Datasets"> <ng-template matTabContent> 
 
     <mat-form-field class="example-full-width">
         <mat-label>Collection</mat-label>
@@ -152,7 +154,7 @@
   </ng-template> 
   
   </mat-tab>
-  <mat-tab label="By File"> <ng-template matTabContent>
+  <mat-tab label="Files"> <ng-template matTabContent>
     <mat-form-field class="example-full-width">
       <mat-label>Collection</mat-label>
         <input type="text"

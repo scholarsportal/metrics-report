@@ -71,6 +71,35 @@ export class AppComponent implements AfterViewInit, OnInit{
   options: string[] = ['One', 'Two', 'Three'];
   filteredOptions: Observable<string[]>;
 
+  table_data = [];
+  graph_data: Array<any> = [];
+  barChartDataDownloads_data: Array<number> = [];
+  barChartDataDownloads:Array<any> = [];
+  barChartLabelsDownloads: Array<any> = [];
+  getData(newItem: any) {
+    this.table_data = newItem['table_data'];
+    this.graph_data = newItem['graph_data'];
+    this.barChartDataDownloads_data = this.graph_data.map(x => x.count);
+    this.barChartLabelsDownloads = this.graph_data.map(x => x.month);
+    console.log("it's here")
+    console.log(this.barChartDataDownloads_data)
+    console.log(this.barChartLabelsDownloads)
+
+    this.barChartDataDownloads = [
+      { // grey
+        data: this.barChartDataDownloads_data,
+        label: 'Dataverse Downloads By Month',
+        tension: 0,
+        backgroundColor: 'rgb(102, 0, 102, 0.5)',
+        borderColor: 'rgb(102, 0, 102, 0.5)',
+        pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
+      }
+    ];
+  }
+
   ngOnInit() {
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
@@ -115,22 +144,6 @@ export class AppComponent implements AfterViewInit, OnInit{
 
 }
 
-barChartLabelsDownloads:Array<any> = ['Jun 2023', 'Jul 2023', 'Aug 2023', 'Sep 2023', 'Oct 2023', 'Nov 2023', 
-  'Dec 2023', 'Jan 2024','Feb 2024', 'Mar 2024', 'Apr 2024', 'May 2024'];
-barChartDataDownloads:Array<any> = [
-    { // grey
-      data: [70, 59, 80, 81, 56, 55, 40, 65, 59, 80, 81, 56], 
-      label: 'Dataverse Downloads By Month',
-      tension: 0,
-      backgroundColor: 'rgb(102, 0, 102, 0.5)',
-      borderColor: 'rgb(102, 0, 102, 0.5)',
-      pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
-    }
-  ];
-
 barChartLabelsNumDatasets:Array<any> = ['Jun 2023', 'Jul 2023', 'Aug 2023', 'Sep 2023', 'Oct 2023', 'Nov 2023', 
   'Dec 2023', 'Jan 2024','Feb 2024', 'Mar 2024', 'Apr 2024', 'May 2024'];
 barChartDataNumDatasets:Array<any> = [
@@ -149,7 +162,7 @@ barChartDataNumDatasets:Array<any> = [
 
 barChartLabelsSize:Array<any> = ['Jun 2023', 'Jul 2023', 'Aug 2023', 'Sep 2023', 'Oct 2023', 'Nov 2023', 
   'Dec 2023', 'Jan 2024','Feb 2024', 'Mar 2024', 'Apr 2024', 'May 2024'];
-barChartDataSize:Array<any> = [
+barChartDataSize: Array<any> = [
     { // grey
       data: [70, 59, 80, 81, 56, 55, 40, 65, 59, 80, 81, 56], 
       label: 'Size of Dataverse Collections',
