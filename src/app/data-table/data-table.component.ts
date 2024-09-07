@@ -16,7 +16,7 @@ import { AppComponent } from '../app.component';
       [colHeaders]="true"
       [colWidths]="[400,70,70,70]"
       [rowHeaders]="true"
-      height="1100px"
+      height="1000px"
       [columnSorting]="true"
       [columns]="columns"
       licenseKey="non-commercial-and-evaluation">

@@ -72,23 +72,41 @@ export class AppComponent implements AfterViewInit, OnInit{
   filteredOptions: Observable<string[]>;
 
   table_data = [];
-  graph_data: Array<any> = [];
+  downloads_graph_data: Array<any> = [];
+  datasets_graph_data: Array<any> = [];
+  files_graph_data: Array<any> = [];
+
   barChartDataDownloads_data: Array<number> = [];
   barChartDataDownloads:Array<any> = [];
+
+  barChartDataDatasets_data: Array<number> = [];
+  barChartDataDatasets:Array<any> = [];
+  
+  barChartDataFiles_data: Array<number> = [];
+  barChartDataFiles :Array<any> = [];
+
+
   barChartLabelsDownloads: Array<any> = [];
+  barChartLabelsDatasets: Array<any> = [];
+  barChartLabelsFiles: Array<any> = [];
+
+
   getData(newItem: any) {
     this.table_data = newItem['table_data'];
-    this.graph_data = newItem['graph_data'];
-    this.barChartDataDownloads_data = this.graph_data.map(x => x.count);
-    this.barChartLabelsDownloads = this.graph_data.map(x => x.month);
-    console.log("it's here")
-    console.log(this.barChartDataDownloads_data)
-    console.log(this.barChartLabelsDownloads)
+    this.downloads_graph_data = newItem['downloads_graph_data'];
+    this.datasets_graph_data = newItem['datasets_graph_data'];
+    this.files_graph_data = newItem['files_graph_data'];
+    this.barChartDataDownloads_data = this.downloads_graph_data.map(x => x.count);
+    this.barChartLabelsDownloads = this.downloads_graph_data.map(x => x.month);
+    this.barChartDataDatasets_data = this.datasets_graph_data.map(x => x.count);
+    this.barChartLabelsDatasets = this.datasets_graph_data.map(x => x.month);
+    this.barChartDataFiles_data = this.files_graph_data.map(x => x.count);
+    this.barChartLabelsFiles = this.files_graph_data.map(x => x.month);
 
     this.barChartDataDownloads = [
       { // grey
         data: this.barChartDataDownloads_data,
-        label: 'Dataverse Downloads By Month',
+        label: 'Total Dataverse Downloads',
         tension: 0,
         backgroundColor: 'rgb(102, 0, 102, 0.5)',
         borderColor: 'rgb(102, 0, 102, 0.5)',
@@ -98,6 +116,36 @@ export class AppComponent implements AfterViewInit, OnInit{
         pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
       }
     ];
+
+    this.barChartDataDatasets = [
+      { // grey
+        data: this.barChartDataDatasets_data, 
+        label: 'Total Number of Datasets',
+        tension: 0,
+        backgroundColor: 'rgb(0, 100, 255, 0.5)',
+        borderColor: 'rgb(0, 100, 255, 0.5)',
+        pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
+      }
+    ];
+
+    this.barChartDataFiles = [
+      { // grey
+        data: this.barChartDataFiles_data, 
+        label: 'Total Number of Files',
+        tension: 0,
+        backgroundColor: 'rgb(0, 189, 0, 0.5)',
+        borderColor: 'rgb(0, 189, 0, 0.5)',
+        pointBackgroundColor: 'rgb(0, 189, 0, 0.5)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(0, 189, 0, 0.5)'
+      }
+    ];
+  
+    
   }
 
   ngOnInit() {
@@ -143,38 +191,6 @@ export class AppComponent implements AfterViewInit, OnInit{
     }
 
 }
-
-barChartLabelsNumDatasets:Array<any> = ['Jun 2023', 'Jul 2023', 'Aug 2023', 'Sep 2023', 'Oct 2023', 'Nov 2023', 
-  'Dec 2023', 'Jan 2024','Feb 2024', 'Mar 2024', 'Apr 2024', 'May 2024'];
-barChartDataNumDatasets:Array<any> = [
-    { // grey
-      data: [70, 59, 80, 81, 56, 55, 40, 65, 59, 80, 81, 56], 
-      label: 'Number of Datasets by Dataverse Collection',
-      tension: 0,
-      backgroundColor: 'rgb(0, 100, 255, 0.5)',
-      borderColor: 'rgb(0, 100, 255, 0.5)',
-      pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
-    }
-  ];
-
-barChartLabelsSize:Array<any> = ['Jun 2023', 'Jul 2023', 'Aug 2023', 'Sep 2023', 'Oct 2023', 'Nov 2023', 
-  'Dec 2023', 'Jan 2024','Feb 2024', 'Mar 2024', 'Apr 2024', 'May 2024'];
-barChartDataSize: Array<any> = [
-    { // grey
-      data: [70, 59, 80, 81, 56, 55, 40, 65, 59, 80, 81, 56], 
-      label: 'Size of Dataverse Collections',
-      tension: 0,
-      backgroundColor: 'rgb(0, 189, 0, 0.5)',
-      borderColor: 'rgb(0, 189, 0, 0.5)',
-      pointBackgroundColor: 'rgb(0, 189, 0, 0.5)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgb(0, 189, 0, 0.5)'
-    }
-  ];
 
 }
 

@@ -16,9 +16,15 @@ export class PostsComponent {
   public data: Array<any> = [];
   public months: Array<any> = [];
   public monthsDate: Array<any> = [];
+  
   public dataverseCollectionsURL: string = '';
-  public monthsDateURLS: Array<any> = [];
+  public monthsDownloadsDateURLS: Array<any> = [];
+  public monthsDatasetsDateURLS: Array<any> = [];
+  public monthsFilesDateURLS: Array<any> = [];
+  
   public monthlyDownloads: Array<any> = []; 
+  public monthlyDatasets: Array<any> = []; 
+  public monthlyFiles: Array<any> = [];
   public observables: Array<any> = [];
 
   public dataversesDataTree: Array<any> = [];
@@ -32,14 +38,25 @@ export class PostsComponent {
 
     this.dataverseCollectionsURL = 'https://borealisdata.ca/api/info/metrics/tree'; 
     this.populateMonths();
-    for (let i = 0; i <= 11; i++){
-      this.monthsDateURLS.push('https://borealisdata.ca/api/info/metrics/downloads/toMonth/' + this.months[i])
+    for (let i = 0; i <= 23; i++){
+      this.monthsDownloadsDateURLS.push('https://borealisdata.ca/api/info/metrics/downloads/toMonth/' + this.months[i])
+    }
+    for (let i = 0; i <= 23; i++){
+      this.monthsDatasetsDateURLS.push('https://borealisdata.ca/api/info/metrics/datasets/toMonth/' + this.months[i])
+    }
+    for (let i = 0; i <= 23; i++){
+      this.monthsFilesDateURLS.push('https://borealisdata.ca/api/info/metrics/files/toMonth/' + this.months[i])
     }
 
     this.observables.push(this.httpClient.get<[]>(this.dataverseCollectionsURL));
-    var $monthsDateOb: Array<any> = [];
-    for (let i = 0; i <= 11; i++){
-      this.observables.push(this.httpClient.get<[]>(this.monthsDateURLS[i]))
+    for (let i = 0; i <= 23; i++){
+      this.observables.push(this.httpClient.get<[]>(this.monthsDownloadsDateURLS[i]))
+    }
+    for (let i = 0; i <= 23; i++){
+      this.observables.push(this.httpClient.get<[]>(this.monthsDatasetsDateURLS[i]))
+    }
+    for (let i = 0; i <= 23; i++){
+      this.observables.push(this.httpClient.get<[]>(this.monthsFilesDateURLS[i]))
     }
 
     console.log(this.observables)
@@ -60,8 +77,14 @@ export class PostsComponent {
               }
             )
           }
-          for (let i = 0; i <= 11; i++){
+          for (let i = 0; i <= 23; i++){
             this.monthlyDownloads.push({month: this.months[i], count: responses[i+1]['data']['count']});
+          }
+          for (let i = 24; i <= 47; i++){
+            this.monthlyDatasets.push({month: this.months[i-24], count: responses[i+1]['data']['count']});
+          }
+          for (let i = 48; i <= 71; i++){
+            this.monthlyFiles.push({month: this.months[i-48], count: responses[i+1]['data']['count']});
           }
           this.sendData();
       },
@@ -120,13 +143,16 @@ export class PostsComponent {
   sendData() {
     var DataverseTabData = {
         table_data: this.dataverseCollections,
-        graph_data: this.monthlyDownloads    
+        downloads_graph_data: this.monthlyDownloads, 
+        datasets_graph_data: this.monthlyDatasets,
+        files_graph_data: this.monthlyFiles     
     }
+    console.log(DataverseTabData)
     this.messageEvent.emit(DataverseTabData);
   }
 
   populateMonths(){
-    for (let i = 0; i <=11; i++){
+    for (let i = 0; i <=23; i++){
       if (i != 0){
         this.mm = this.mm - 1;
       }
@@ -142,26 +168,6 @@ export class PostsComponent {
 
       this.months.push(date); 
     }
-  }
-
-  async getCollections(){
-    /*
-    .subscribe({
-      next: (data: any) => {
-        this.data = data['data'];
-        this.dataversesDataTree = data['data']['children']
-        for (let i = 0; i < this.dataversesDataTree.length; i++){
-          this.dataverseCollections.push(
-            {name: this.dataversesDataTree[i]['name'],
-             views: (Math.floor(Math.random() * 5000)) + 20,
-             downloads: (Math.floor(Math.random() * 300)) + 2,
-             citations: (Math.floor(Math.random() * 20))
-        })
-        }
-        this.sendData();
-      }, error: (err) => console.log(err) 
-    });
-    */
   }
 
   async getMontlyDataverseN(n: number){

@@ -42,31 +42,6 @@
           <mat-error>Invalid end date</mat-error>
         }
       </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Data type</mat-label>
-        <mat-select>
-          <mat-option value="one">(All)</mat-option>
-          <mat-option value="two">Open</mat-option>
-          <mat-option value="two">Licensed</mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Dataverse</mat-label>
-        <mat-select>
-          <mat-option value="one">First option</mat-option>
-          <mat-option value="two">Second option</mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>File action type</mat-label>
-        <mat-select>
-          <mat-option value="one">First option</mat-option>
-          <mat-option value="two">Second option</mat-option>
-        </mat-select>
-      </mat-form-field>
       
       <button mat-button style="color:black; float:right;">
         <i class="material-icons">download</i>
@@ -80,10 +55,9 @@
       </div>
 
       <div style="display: inline-block; vertical-align:top; padding: 20px;">
-        <app-line-graph></app-line-graph>
         <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsDownloads" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
-        <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsNumDatasets" [barChartData]= "barChartDataNumDatasets"></app-horizontal-bar-graph> 
-        <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsSize" [barChartData]= "barChartDataSize"></app-horizontal-bar-graph>    
+        <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsDatasets" [barChartData]= "barChartDataDatasets"></app-horizontal-bar-graph> 
+        <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsFiles" [barChartData]= "barChartDataFiles"></app-horizontal-bar-graph>    
       </div>
 
     </ng-template>
