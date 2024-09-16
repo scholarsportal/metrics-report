@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ViewChild, NgModule, ChangeDetectionStrategy, OnInit} from '@angular/core';
+import {AfterViewInit, Component, ViewChild, NgModule, ChangeDetectionStrategy, ElementRef,OnInit} from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import {JsonPipe} from '@angular/common';
 import {AsyncPipe} from '@angular/common';
@@ -8,7 +8,7 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {MatInputModule} from '@angular/material/input';
-import {MatSelectModule} from '@angular/material/select';
+import {MatSelectChange, MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {LineGraphComponent} from './line-graph/line-graph.component';
@@ -24,10 +24,26 @@ import {registerAllModules } from 'handsontable/registry';
 import {DataTableComponent } from './data-table/data-table.component'; 
 import {DataTableDatasetComponent} from './data-table-dataset/data-table-dataset.component'; 
 import {DataTableFileComponent} from './data-table-file/data-table-file.component'; 
-import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatDatepickerModule, MatDatepicker} from '@angular/material/datepicker';
 import { PostsComponent } from './posts/posts.component';
+import * as _moment from 'moment';
+// tslint:disable-next-line:no-duplicate-imports
+import {default as _rollupMoment, Moment} from 'moment';
 
 registerAllModules();
+
+const moment = _rollupMoment || _moment;
+export const MY_FORMATS = {
+  parse: {
+    dateInput: 'MM/YYYY',
+  },
+  display: {
+    dateInput: 'MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
 @Component({
   selector: 'app-root',
@@ -57,24 +73,36 @@ registerAllModules();
     DataTableFileComponent,
     ReactiveFormsModule,
     MatDatepickerModule,
+    MatDatepicker,
     RouterModule,
     RouterOutlet,
     PostsComponent
-  ],
+    ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent implements AfterViewInit, OnInit{
 
-  myControl = new FormControl('');
-  options: string[] = ['One', 'Two', 'Three'];
+  readonly date = new FormControl(moment());
+
+  setMonthAndYear(normalizedMonthAndYear: Moment, datepicker: MatDatepicker<Moment>) {
+    const ctrlValue = this.date.value ?? moment();
+    ctrlValue.month(normalizedMonthAndYear.month());
+    ctrlValue.year(normalizedMonthAndYear.year());
+    this.date.setValue(ctrlValue);
+    datepicker.close();
+  }
+
+  options: string[] = ["(All)"];
   filteredOptions: Observable<string[]>;
 
   table_data = [];
+  alias_data = [];
   downloads_graph_data: Array<any> = [];
   datasets_graph_data: Array<any> = [];
   files_graph_data: Array<any> = [];
+  name_dropdown_data: Array<any> = [];
 
   barChartDataDownloads_data: Array<number> = [];
   barChartDataDownloads:Array<any> = [];
@@ -90,12 +118,16 @@ export class AppComponent implements AfterViewInit, OnInit{
   barChartLabelsDatasets: Array<any> = [];
   barChartLabelsFiles: Array<any> = [];
 
+  selectedCollection_Current:String = "(All)";
+  selectedCollection_Activate:String = "(All)";
 
   getData(newItem: any) {
     this.table_data = newItem['table_data'];
+    this.alias_data = newItem['alias_data'];
     this.downloads_graph_data = newItem['downloads_graph_data'];
     this.datasets_graph_data = newItem['datasets_graph_data'];
     this.files_graph_data = newItem['files_graph_data'];
+    this.options = this.options.concat(newItem['name_dropdown_data']);
     this.barChartDataDownloads_data = this.downloads_graph_data.map(x => x.count);
     this.barChartLabelsDownloads = this.downloads_graph_data.map(x => x.month);
     this.barChartDataDatasets_data = this.datasets_graph_data.map(x => x.count);
@@ -149,28 +181,40 @@ export class AppComponent implements AfterViewInit, OnInit{
   }
 
   ngOnInit() {
-    this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value || '')),
-    );
   }
 
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
+  selectedCollection(event: MatSelectChange) {
+    if (event.value == "(All)"){
+      this.selectedCollection_Current = "(All)"
+    }
+    else {
+    for (let i = 0; i <= this.alias_data.length; i++){
+      if (this.alias_data[i]['name'] == event.value){
+        this.selectedCollection_Current = this.alias_data[i]['alias']
+      }
+    }
+    }
+    console.log(event.value);
+  }
 
-    return this.options.filter(option => option.toLowerCase().includes(filterValue));
+  selectedDate(eventData: any, dp?:any) {
+    console.log(eventData);
+    console.log(dp)
+  }
+
+  CollectionDataButtonActivate(){
+    this.selectedCollection_Activate = this.selectedCollection_Current;
+    console.log(this.selectedCollection_Activate);
   }
 
   @ViewChild(MatSort) sort: MatSort;
 
   displayedColumns: string[] = ['name', 'views', 'downloads', 'citations'];
-  dataSource = new MatTableDataSource(ELEMENT_DATA);
   title = 'metrics-app';
 
   constructor(private _liveAnnouncer: LiveAnnouncer) {}
 
   ngAfterViewInit() {
-    this.dataSource.sort = this.sort;
   }
 
   readonly range = new FormGroup({
@@ -193,51 +237,3 @@ export class AppComponent implements AfterViewInit, OnInit{
 }
 
 }
-
-export interface Element {
-  name: string;
-  views: number;
-  downloads: number;
-  citations: number;
-}
-
-const dataset: any[] = [
-  {id: 1, name: 'Ted Right', address: 'Wall Street'},
-  {id: 2, name: 'Frank Honest', address: 'Pennsylvania Avenue'},
-  {id: 3, name: 'Joan Well', address: 'Broadway'},
-  {id: 4, name: 'Gail Polite', address: 'Bourbon Street'},
-  {id: 5, name: 'Michael Fair', address: 'Lombard Street'},
-  {id: 6, name: 'Mia Fair', address: 'Rodeo Drive'},
-  {id: 7, name: 'Cora Fair', address: 'Sunset Boulevard'},
-  {id: 8, name: 'Jack Right', address: 'Michigan Avenue'},
-];
-
-const ELEMENT_DATA: Element[] = [
-  {name: 'UofA', views: 15000, downloads: 300, citations: 10},
-  {name: 'UofB', views: 3223, downloads: 300, citations: 10},
-  {name: 'UofC', views: 432432, downloads: 300, citations: 10},
-  {name: 'UofD', views: 132231, downloads: 300, citations: 10},
-  {name: 'UofE', views: 3434, downloads: 300, citations: 10},
-  {name: 'UofF', views: 15435, downloads: 300, citations: 10},
-  {name: 'UofG', views: 5435, downloads: 300, citations: 10},
-  {name: 'UofH', views: 3231, downloads: 300, citations: 10},
-  {name: 'UofI', views: 99434, downloads: 300, citations: 10},
-  {name: 'UofJ', views: 434, downloads: 300, citations: 10},
-  {name: 'UofK', views: 432, downloads: 300, citations: 10},
-  {name: 'UofL', views: 4324, downloads: 300, citations: 10},
-  {name: 'UofO', views: 4324234, downloads: 300, citations: 10},
-  {name: 'UofM', views: 15000, downloads: 300, citations: 10},
-  {name: 'UofN', views: 432, downloads: 300, citations: 10},
-  {name: 'UofP', views: 432, downloads: 300, citations: 10},
-  {name: 'UofQ', views: 15000, downloads: 300, citations: 10},
-  {name: 'UofR', views: 5545, downloads: 300, citations: 10},
-  {name: 'UofS', views: 432, downloads: 300, citations: 10},
-  {name: 'UofT', views: 7547, downloads: 300, citations: 10},
-  {name: 'UofU', views: 53532, downloads: 300, citations: 10},
-  {name: 'UofV', views: 94981, downloads: 300, citations: 10},
-  {name: 'UofW', views: 43241, downloads: 300, citations: 10},
-  {name: 'UofX', views: 432409, downloads: 300, citations: 10},
-  {name: 'UofY', views: 323232, downloads: 300, citations: 10},
-  {name: 'UofZ', views: 13213, downloads: 300, citations: 10},
-
-];

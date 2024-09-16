@@ -14,11 +14,13 @@ import { AppComponent } from '../app.component';
     <hot-table
       [data]="item"
       [colHeaders]="true"
-      [colWidths]="[400,70,70,70]"
+      [colWidths]="[390,85,115,105]"
       [rowHeaders]="true"
       height="1000px"
       [columnSorting]="true"
       [columns]="columns"
+      [dropdownMenu]="['filter_by_value', 'filter_action_bar']"
+      [filters]="true"
       licenseKey="non-commercial-and-evaluation">
     </hot-table>
   </div>
@@ -29,7 +31,7 @@ export class DataTableComponent {
   @Input() item = [];
 
   columns: any[] = [
-    {data: "name", readOnly: "true", title: "Collection"},
+    {data: "name", readOnly: "true", title: "Collection / Dataverses"},
     {data: "views", readOnly: "true", type: "numeric", title: "Views"},
     {data: "downloads", readOnly: "true", type: "numeric", title: "Downloads"},
     {data: "citations", readOnly: "true", type: "numeric", title: "Citations"}

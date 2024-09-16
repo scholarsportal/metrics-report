@@ -1,56 +1,48 @@
-<app-posts (messageEvent)="getData($event)"></app-posts>
+<app-posts (messageEvent)="getData($event)" [collectionSelected]="selectedCollection_Activate"></app-posts>
 
-<h1> Borealis Metrics Report 
+<h2 style="padding:20px;"> Borealis Metrics Report 
   <div style="float:right;">
     <button mat-button disabled> English </button>
     <button mat-button> Français </button>
 </div>
-</h1>
+</h2>
+
+<div style=" position: relative; top:35px; max-width: fit-content;
+  margin-left: auto;
+  margin-right: auto;">
+
+<mat-form-field appearance="outline">
+  <mat-label>Collection</mat-label>
+  <mat-select (selectionChange)="selectedCollection($event)" name="food">
+    @for (option of options; track option) {
+      <mat-option [value]="option">{{option}}</mat-option>
+    }
+  </mat-select>
+</mat-form-field>
+
+<mat-form-field appearance="outline" style="padding: 10px;">
+  <mat-label>Month and Year</mat-label>
+  <input matInput [matDatepicker]="dp" [formControl]="date">
+  <mat-hint>MM/YYYY</mat-hint>
+  <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+  <mat-datepicker #dp
+                  startView="multi-year"
+                  (monthSelected)="selectedDate($event, dp)"
+                  panelClass="example-month-picker">
+  </mat-datepicker>
+</mat-form-field>
+
+<button (click)="CollectionDataButtonActivate()" mat-button> <mat-icon style="transform: scale(2);"> sync</mat-icon> </button>
+</div>
+
 
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
   <mat-tab label="Collections"> 
     <ng-template matTabContent>
 
-      <mat-form-field class="example-full-width">
-        <mat-label>Collection</mat-label>
-          <input type="text"
-            placeholder="Pick one"
-            aria-label="Number"
-            matInput
-            [formControl]="myControl"
-            [matAutocomplete]="auto">
-          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-            @for (option of filteredOptions | async; track option) {
-            <mat-option [value]="option">{{option}}</mat-option>
-            }
-        </mat-autocomplete>
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Enter a date range</mat-label>
-        <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
-          <input matStartDate formControlName="start" placeholder="Start date">
-          <input matEndDate formControlName="end" placeholder="End date">
-        </mat-date-range-input>
-        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-date-range-picker #picker></mat-date-range-picker>
-      
-        @if (range.controls.start.hasError('matStartDateInvalid')) {
-          <mat-error>Invalid start date</mat-error>
-        }
-        @if (range.controls.end.hasError('matEndDateInvalid')) {
-          <mat-error>Invalid end date</mat-error>
-        }
-      </mat-form-field>
-      
-      <button mat-button style="color:black; float:right;">
-        <i class="material-icons">download</i>
-        Download
-      </button>
-
       <div style="display: flex; flex-grow: grow; gap: 50px;"></div>
       
-      <div style="position:relative; width:700px; display: inline-block; height:200px; padding: 20px;">
+      <div style="position:relative; width:750px; display: inline-block; height:200px; padding: 20px;">
         <app-data-table [item]="table_data"></app-data-table>
       </div>
 
@@ -64,64 +56,7 @@
   </mat-tab>
   <mat-tab label="Datasets"> <ng-template matTabContent> 
 
-    <mat-form-field class="example-full-width">
-        <mat-label>Collection</mat-label>
-          <input type="text"
-            placeholder="Pick one"
-            aria-label="Number"
-            matInput
-            [formControl]="myControl"
-            [matAutocomplete]="auto">
-          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-            @for (option of filteredOptions | async; track option) {
-            <mat-option [value]="option">{{option}}</mat-option>
-            }
-        </mat-autocomplete>
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Enter a date range</mat-label>
-        <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
-          <input matStartDate formControlName="start" placeholder="Start date">
-          <input matEndDate formControlName="end" placeholder="End date">
-        </mat-date-range-input>
-        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-date-range-picker #picker></mat-date-range-picker>
-      
-        @if (range.controls.start.hasError('matStartDateInvalid')) {
-          <mat-error>Invalid start date</mat-error>
-        }
-        @if (range.controls.end.hasError('matEndDateInvalid')) {
-          <mat-error>Invalid end date</mat-error>
-        }
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Data type</mat-label>
-        <mat-select>
-          <mat-option value="one">(All)</mat-option>
-          <mat-option value="two">Open</mat-option>
-          <mat-option value="two">Licensed</mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Dataverse</mat-label>
-        <mat-select>
-          <mat-option value="one">First option</mat-option>
-          <mat-option value="two">Second option</mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>File action type</mat-label>
-        <mat-select>
-          <mat-option value="one">First option</mat-option>
-          <mat-option value="two">Second option</mat-option>
-        </mat-select>
-      </mat-form-field>
-
-    <div style="position:relative; width:500px; display: inline-block; height:500px; padding: 20px;">
+    <div style="position:relative; width:550px; display: inline-block; height:500px; padding: 10px;">
       <app-data-table-dataset></app-data-table-dataset>
     </div>
 
@@ -129,62 +64,6 @@
   
   </mat-tab>
   <mat-tab label="Files"> <ng-template matTabContent>
-    <mat-form-field class="example-full-width">
-      <mat-label>Collection</mat-label>
-        <input type="text"
-          placeholder="Pick one"
-          aria-label="Number"
-          matInput
-          [formControl]="myControl"
-          [matAutocomplete]="auto">
-        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-          @for (option of filteredOptions | async; track option) {
-          <mat-option [value]="option">{{option}}</mat-option>
-          }
-      </mat-autocomplete>
-    </mat-form-field>
-
-    <mat-form-field>
-      <mat-label>Enter a date range</mat-label>
-      <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
-        <input matStartDate formControlName="start" placeholder="Start date">
-        <input matEndDate formControlName="end" placeholder="End date">
-      </mat-date-range-input>
-      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-date-range-picker #picker></mat-date-range-picker>
-    
-      @if (range.controls.start.hasError('matStartDateInvalid')) {
-        <mat-error>Invalid start date</mat-error>
-      }
-      @if (range.controls.end.hasError('matEndDateInvalid')) {
-        <mat-error>Invalid end date</mat-error>
-      }
-    </mat-form-field>
-
-    <mat-form-field>
-      <mat-label>Data type</mat-label>
-      <mat-select>
-        <mat-option value="one">(All)</mat-option>
-        <mat-option value="two">Open</mat-option>
-        <mat-option value="two">Licensed</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field>
-      <mat-label>Dataverse</mat-label>
-      <mat-select>
-        <mat-option value="one">First option</mat-option>
-        <mat-option value="two">Second option</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field>
-      <mat-label>File action type</mat-label>
-      <mat-select>
-        <mat-option value="one">First option</mat-option>
-        <mat-option value="two">Second option</mat-option>
-      </mat-select>
-    </mat-form-field>
 
     <div style="position:relative; width:800px; display: inline-block; height:500px; padding: 20px;">
       <app-data-table-file></app-data-table-file>
