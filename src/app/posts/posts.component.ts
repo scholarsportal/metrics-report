@@ -27,6 +27,10 @@ export class PostsComponent {
   public monthsDatasetsDateURLS: Array<any> = [];
   public monthsFilesDateURLS: Array<any> = [];
   public parentAlias: String = "";
+
+  public datasetURL: string = '';
+  public datasetsContents: Array<any> = [];
+  public datasets: Array<any> = []; 
   
   public monthlyDownloads: Array<any> = []; 
   public monthlyDatasets: Array<any> = []; 
@@ -61,6 +65,9 @@ export class PostsComponent {
     if (this.collectionSelected != "(All)"){
       this.parentAlias = "?parentAlias=" + this.collectionSelected;
     }
+    else {
+      this.parentAlias = "";
+    }
     for (let i = 0; i <= 23; i++){
       this.monthsDownloadsDateURLS.push('https://borealisdata.ca/api/info/metrics/downloads/toMonth/' + this.months[i] + this.parentAlias)
     }
@@ -69,6 +76,9 @@ export class PostsComponent {
     }
     for (let i = 0; i <= 23; i++){
       this.monthsFilesDateURLS.push('https://borealisdata.ca/api/info/metrics/files/toMonth/' + this.months[i] + this.parentAlias)
+    }
+    if (this.collectionSelected != "(All)"){
+      this.datasetURL = "https://borealisdata.ca/api/search?q=*&type=dataset&subtree=" + this.collectionSelected + "&per_page=100";
     }
 
     this.observables.push(this.httpClient.get<[]>(this.dataverseCollectionsURL));
@@ -80,6 +90,9 @@ export class PostsComponent {
     }
     for (let i = 0; i <= 23; i++){
       this.observables.push(this.httpClient.get<[]>(this.monthsFilesDateURLS[i]))
+    }
+    if (this.collectionSelected != "(All)"){
+      this.observables.push(this.httpClient.get<[]>(this.datasetURL));
     }
 
     console.log(this.observables)
@@ -133,10 +146,30 @@ export class PostsComponent {
           for (let i = 48; i <= 71; i++){
             this.monthlyFiles.push({month: this.months[i-48], count: responses[i+1]['data']['count']});
           }
+          if (this.collectionSelected != "(All)"){
+            this.datasetsContents = responses[responses.length-1]['data']['items']
+            for (let i = 0; i < this.datasetsContents.length; i++){
+              console.log(this.datasetsContents[i])
+              if (this.datasetsContents[i].hasOwnProperty("authors")){
+              this.datasets.push({
+                name: this.datasetsContents[i]['name'],
+                author: this.datasetsContents[i]['authors'].join(),
+                dataverse_name: this.datasetsContents[i]['name_of_dataverse'], 
+                subject: this.datasetsContents[i]['subjects'].join(), 
+                date: this.datasetsContents[i]['published_at'].split("T")[0], 
+                id: this.datasetsContents[i]['global_id'], 
+                views: (Math.floor(Math.random() * 5000)) + 20, 
+                downloads: (Math.floor(Math.random() * 300)) + 2, 
+                citations: (Math.floor(Math.random() * 20))
+              })
+            }
+          }
+          }
           this.sendData();
       },
       err => console.error(err)
    );
+
    this.isLoading = false;
    this.firstAPIGet = false;
   }
@@ -152,8 +185,12 @@ export class PostsComponent {
         files_graph_data: this.monthlyFiles,
         name_dropdown_data: this.dataverseCollectionsDropDown     
     }
+    var DatasetTabData = {
+      table_data: this.datasets
+    }
     console.log(DataverseTabData)
-    this.messageEvent.emit(DataverseTabData);
+    console.log(DatasetTabData)
+    this.messageEvent.emit({"DataverseTabData": DataverseTabData, "DatasetTabData": DatasetTabData});
   }
 
   populateMonths(){
@@ -200,6 +237,11 @@ export class PostsComponent {
 
     this.dataversesDataTree = [];
     this.dataverseCollections = [];
+
+    this.datasetURL = '';
+    this.datasetsContents = [];
+    this.datasets = []; 
+  
   }
 
   findAliasRow(arr: Array<any>, target: String){

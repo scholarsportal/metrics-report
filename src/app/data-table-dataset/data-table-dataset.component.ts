@@ -11,53 +11,34 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
   template: `
   <div>
     <hot-table
-      [data]="dataset"
+      [data]="item"
       [colHeaders]="true"
+      [colWidths]="[390,150,150,150,140,180,85,115,105]"
       [rowHeaders]="true"
-      height="auto"
+      height="10000px"
+      [columnSorting]="true"
+      [columns]="columns"
+      [dropdownMenu]="['filter_by_value', 'filter_action_bar']"
+      [filters]="true"
       licenseKey="non-commercial-and-evaluation">
-        <hot-column data="dataset" [readOnly]="true" title="dataset name"></hot-column>
-        <hot-column data="dataverse" [readOnly]="true" title="dataverse name"></hot-column>
-        <hot-column data="actions" [readOnly]="true" title="file actions"></hot-column>
-        <hot-column data="count" [readOnly]="true" title="file count"></hot-column>
     </hot-table>
   </div>
   `,
 })
 export class DataTableDatasetComponent {
 
-  dataset: any[] = [
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10},
-    {dataset: 'UofA', dataverse: 15000, actions: 300, count: 10}
-  ];
+  @Input() item = [];
+
+  columns: any[] = [
+    {data: "name", readOnly: "true", title: "Title"},
+    {data: "author", readOnly: "true", title: "Author"},
+    {data: "dataverse_name", readOnly: "true", title: "Dataverse"},
+    {data: "subject", readOnly: "true", title: "Subject"},
+    {data: "date", readOnly: "true", title: "Published Date"},
+    {data: "id", readOnly: "true", title: "ID"},
+    {data: "views", readOnly: "true", type: "numeric", title: "Views"},
+    {data: "downloads", readOnly: "true", type: "numeric", title: "Downloads"},
+    {data: "citations", readOnly: "true", type: "numeric", title: "Citations"}
+  ]
 
 }

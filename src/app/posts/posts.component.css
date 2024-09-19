@@ -1,0 +1,7 @@
+.transparent .mat-mdc-dialog-container {
+    --mdc-dialog-container-color: rgba(0, 0, 0, 0.0);
+}
+
+.transparent .mat-mdc-dialog-surface {
+    box-shadow: none !important;
+}

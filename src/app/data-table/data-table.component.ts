@@ -16,7 +16,7 @@ import { AppComponent } from '../app.component';
       [colHeaders]="true"
       [colWidths]="[390,85,115,105]"
       [rowHeaders]="true"
-      height="1000px"
+      height="5000px"
       [columnSorting]="true"
       [columns]="columns"
       [dropdownMenu]="['filter_by_value', 'filter_action_bar']"

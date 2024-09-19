@@ -113,7 +113,6 @@ export class AppComponent implements AfterViewInit, OnInit{
   barChartDataFiles_data: Array<number> = [];
   barChartDataFiles :Array<any> = [];
 
-
   barChartLabelsDownloads: Array<any> = [];
   barChartLabelsDatasets: Array<any> = [];
   barChartLabelsFiles: Array<any> = [];
@@ -121,19 +120,23 @@ export class AppComponent implements AfterViewInit, OnInit{
   selectedCollection_Current:String = "(All)";
   selectedCollection_Activate:String = "(All)";
 
+  dataset_table_data = [];
+
   getData(newItem: any) {
-    this.table_data = newItem['table_data'];
-    this.alias_data = newItem['alias_data'];
-    this.downloads_graph_data = newItem['downloads_graph_data'];
-    this.datasets_graph_data = newItem['datasets_graph_data'];
-    this.files_graph_data = newItem['files_graph_data'];
-    this.options = this.options.concat(newItem['name_dropdown_data']);
+    this.table_data = newItem["DataverseTabData"]['table_data'];
+    this.alias_data = newItem["DataverseTabData"]['alias_data'];
+    this.downloads_graph_data = newItem["DataverseTabData"]['downloads_graph_data'];
+    this.datasets_graph_data = newItem["DataverseTabData"]['datasets_graph_data'];
+    this.files_graph_data = newItem["DataverseTabData"]['files_graph_data'];
+    this.options = this.options.concat(newItem["DataverseTabData"]['name_dropdown_data']);
     this.barChartDataDownloads_data = this.downloads_graph_data.map(x => x.count);
     this.barChartLabelsDownloads = this.downloads_graph_data.map(x => x.month);
     this.barChartDataDatasets_data = this.datasets_graph_data.map(x => x.count);
     this.barChartLabelsDatasets = this.datasets_graph_data.map(x => x.month);
     this.barChartDataFiles_data = this.files_graph_data.map(x => x.count);
     this.barChartLabelsFiles = this.files_graph_data.map(x => x.month);
+
+    this.dataset_table_data = newItem["DatasetTabData"]['table_data'];
 
     this.barChartDataDownloads = [
       { // grey
