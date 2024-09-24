@@ -121,6 +121,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   selectedCollection_Activate:String = "(All)";
 
   dataset_table_data = [];
+  file_table_data = [];
 
   getData(newItem: any) {
     this.table_data = newItem["DataverseTabData"]['table_data'];
@@ -137,6 +138,8 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.barChartLabelsFiles = this.files_graph_data.map(x => x.month);
 
     this.dataset_table_data = newItem["DatasetTabData"]['table_data'];
+
+    this.file_table_data = newItem["FileTabData"]['table_data'];
 
     this.barChartDataDownloads = [
       { // grey

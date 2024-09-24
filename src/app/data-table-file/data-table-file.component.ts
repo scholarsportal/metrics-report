@@ -11,12 +11,15 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
   template: `
   <div>
     <hot-table
-      [data]="dataset"
+      [data]="item"
       [colHeaders]="true"
+      [colWidths]="[390,150,150,150,140,180,100,85,115,105]"
       [rowHeaders]="true"
-      height="auto"
+      height="10000px"
       [columnSorting]="true"
       [columns]="columns"
+      [dropdownMenu]="['filter_by_value', 'filter_action_bar']"
+      [filters]="true"
       licenseKey="non-commercial-and-evaluation">
     </hot-table>
   </div>
@@ -24,48 +27,19 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 })
 export class DataTableFileComponent {
 
-  dataset: any[] = [
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-    {dataverse: 'UofA', dataset: 'sample test', author: 'John Smith', description: 'This is a sample test', filename: 'sample file', actions: 123},
-  ];
+  @Input() item = [];
 
   columns: any[] = [
-    {data: "dataverse", readOnly: "true", title: "dataverse name"},
-    {data: "dataset", readOnly: "true", title: "dataset name"},
-    {data: "author", readOnly: "true", title: "dataset author"},
-    {data: "description", readOnly: "true", title: "file description"},
-    {data: "filename", readOnly: "true", title: "filename"},
-    {data: "actions", readOnly: "true", title: "file count"}
+    {data: "name", readOnly: "true", title: "Name"},
+    {data: "file_type", readOnly: "true", title: "File Type"},
+    {data: "reference", readOnly: "true", title: "Citation"},
+    {data: "dataset_name", readOnly: "true", title: "Dataset name"},
+    {data: "id", readOnly: "true", title: "Dataset id"},
+    {data: "date", readOnly: "true", title: "Published Date"},
+    {data: "size", readOnly: "true", type: "numeric", title: "Size(B)"},
+    {data: "views", readOnly: "true", type: "numeric", title: "Views"},
+    {data: "downloads", readOnly: "true", type: "numeric", title: "Downloads"},
+    {data: "citations", readOnly: "true", type: "numeric", title: "Citations"}
   ]
 
 }

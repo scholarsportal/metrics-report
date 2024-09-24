@@ -31,6 +31,10 @@ export class PostsComponent {
   public datasetURL: string = '';
   public datasetsContents: Array<any> = [];
   public datasets: Array<any> = []; 
+
+  public fileURL: string = '';
+  public filesContents: Array<any> = [];
+  public files: Array<any> = []; 
   
   public monthlyDownloads: Array<any> = []; 
   public monthlyDatasets: Array<any> = []; 
@@ -78,7 +82,10 @@ export class PostsComponent {
       this.monthsFilesDateURLS.push('https://borealisdata.ca/api/info/metrics/files/toMonth/' + this.months[i] + this.parentAlias)
     }
     if (this.collectionSelected != "(All)"){
-      this.datasetURL = "https://borealisdata.ca/api/search?q=*&type=dataset&subtree=" + this.collectionSelected + "&per_page=100";
+      this.datasetURL = "https://borealisdata.ca/api/search?q=*&type=dataset&subtree=" + this.collectionSelected + "&per_page=1000";
+    }
+    if (this.collectionSelected != "(All)"){
+      this.fileURL = "https://borealisdata.ca/api/search?q=*&type=file&subtree=" + this.collectionSelected + "&per_page=1000";
     }
 
     this.observables.push(this.httpClient.get<[]>(this.dataverseCollectionsURL));
@@ -93,6 +100,9 @@ export class PostsComponent {
     }
     if (this.collectionSelected != "(All)"){
       this.observables.push(this.httpClient.get<[]>(this.datasetURL));
+    }
+    if (this.collectionSelected != "(All)"){
+      this.observables.push(this.httpClient.get<[]>(this.fileURL));
     }
 
     console.log(this.observables)
@@ -147,7 +157,7 @@ export class PostsComponent {
             this.monthlyFiles.push({month: this.months[i-48], count: responses[i+1]['data']['count']});
           }
           if (this.collectionSelected != "(All)"){
-            this.datasetsContents = responses[responses.length-1]['data']['items']
+            this.datasetsContents = responses[responses.length-2]['data']['items']
             for (let i = 0; i < this.datasetsContents.length; i++){
               console.log(this.datasetsContents[i])
               if (this.datasetsContents[i].hasOwnProperty("authors")){
@@ -163,7 +173,23 @@ export class PostsComponent {
                 citations: (Math.floor(Math.random() * 20))
               })
             }
-          }
+            }
+            this.filesContents = responses[responses.length-1]['data']['items']
+            for (let i = 0; i < this.filesContents.length; i++){
+              console.log(this.filesContents[i])
+              this.files.push({
+                name: this.filesContents[i]['name'],
+                file_type: this.filesContents[i]['file_content_type'],
+                reference: this.filesContents[i]['dataset_citation'],
+                dataset_name: this.filesContents[i]['dataset_name'], 
+                id: this.filesContents[i]['dataset_persistent_id'], 
+                date: this.filesContents[i]['published_at'].split("T")[0], 
+                size: this.filesContents[i]['size_in_bytes'], 
+                views: (Math.floor(Math.random() * 5000)) + 20, 
+                downloads: (Math.floor(Math.random() * 300)) + 2, 
+                citations: (Math.floor(Math.random() * 20))
+              })
+            }
           }
           this.sendData();
       },
@@ -188,9 +214,13 @@ export class PostsComponent {
     var DatasetTabData = {
       table_data: this.datasets
     }
+    var FileTabData = {
+      table_data: this.files
+    }
     console.log(DataverseTabData)
     console.log(DatasetTabData)
-    this.messageEvent.emit({"DataverseTabData": DataverseTabData, "DatasetTabData": DatasetTabData});
+    console.log(FileTabData)
+    this.messageEvent.emit({"DataverseTabData": DataverseTabData, "DatasetTabData": DatasetTabData, "FileTabData":FileTabData});
   }
 
   populateMonths(){
