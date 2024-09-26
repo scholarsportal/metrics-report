@@ -1,4 +1,4 @@
-import { HttpClient, HttpClientModule} from '@angular/common/http';
+import { HttpClient, HttpClientModule, HttpHeaders} from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule} from '@angular/common';  
 import { Component, inject, EventEmitter, Output, Input} from '@angular/core';
@@ -81,6 +81,9 @@ export class PostsComponent {
     for (let i = 0; i <= 23; i++){
       this.monthsFilesDateURLS.push('https://borealisdata.ca/api/info/metrics/files/toMonth/' + this.months[i] + this.parentAlias)
     }
+    for (let i = 0; i <= 23; i++){
+      this.monthsFilesDateURLS.push('https://borealisdata.ca/api/info/metrics/files/toMonth/' + this.months[i] + this.parentAlias)
+    }
     if (this.collectionSelected != "(All)"){
       this.datasetURL = "https://borealisdata.ca/api/search?q=*&type=dataset&subtree=" + this.collectionSelected + "&per_page=1000";
     }
@@ -98,6 +101,10 @@ export class PostsComponent {
     for (let i = 0; i <= 23; i++){
       this.observables.push(this.httpClient.get<[]>(this.monthsFilesDateURLS[i]))
     }
+    const httpHeaders: HttpHeaders = new HttpHeaders({
+      'X-Dataverse-key': 'fd4c70ad-9384-463d-a0f9-c83c1c0c6d7c'
+    });
+    //this.observables.push(this.httpClient.get<[]>("https://borealisdata.ca/api/dataverses/macewan/storagesize", { headers: httpHeaders}))
     if (this.collectionSelected != "(All)"){
       this.observables.push(this.httpClient.get<[]>(this.datasetURL));
     }
@@ -156,6 +163,7 @@ export class PostsComponent {
           for (let i = 48; i <= 71; i++){
             this.monthlyFiles.push({month: this.months[i-48], count: responses[i+1]['data']['count']});
           }
+          console.log(responses[responses.length-3])
           if (this.collectionSelected != "(All)"){
             this.datasetsContents = responses[responses.length-2]['data']['items']
             for (let i = 0; i < this.datasetsContents.length; i++){

@@ -1,10 +1,20 @@
 <app-posts (messageEvent)="getData($event)" [collectionSelected]="selectedCollection_Activate"></app-posts>
 
 <h2 style="padding:20px;"> Borealis Metrics Report 
-  <div style="float:right;">
-    <button mat-button disabled> English </button>
-    <button mat-button> Français </button>
-</div>
+  <div style="float:right; align-items: center;">
+    <div style="float:right;">
+      <button mat-button disabled> English </button>
+      |
+      <button mat-button> Français </button>
+    </div>
+    <div  style="clear:both;">
+      <button style="min-width: 1%;" class="mat-small" mat-button> About </button>
+      | 
+      <button style="min-width: 1%;" class="mat-small" mat-button> Terms of Conditions </button>
+      |
+      <button style="min-width: 1%;" class="mat-small" mat-button> FAQ </button>
+    </div>
+  </div>
 </h2>
 
 <div style=" position: relative; top:35px; max-width: fit-content;
@@ -21,15 +31,14 @@
 </mat-form-field>
 
 <mat-form-field appearance="outline" style="padding: 10px;">
-  <mat-label>Month and Year</mat-label>
-  <input matInput [matDatepicker]="dp" [formControl]="date">
-  <mat-hint>MM/YYYY</mat-hint>
-  <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
-  <mat-datepicker #dp
-                  startView="multi-year"
-                  (monthSelected)="selectedDate($event, dp)"
-                  panelClass="example-month-picker">
-  </mat-datepicker>
+    <mat-label>Enter a date range</mat-label>
+    <mat-date-range-input [rangePicker]="picker">
+      <input matStartDate placeholder="Start date">
+      <input matEndDate placeholder="End date">
+    </mat-date-range-input>
+    <mat-hint>MM/YYYY – MM/YYYY</mat-hint>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-date-range-picker #picker></mat-date-range-picker>
 </mat-form-field>
 
 <button (click)="CollectionDataButtonActivate()" mat-button> <mat-icon style="transform: scale(2);"> sync</mat-icon> </button>
@@ -39,17 +48,28 @@
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
   <mat-tab label="Collections"> 
     <ng-template matTabContent>
+      
 
       <div style="display: flex; flex-grow: grow; gap: 50px;"></div>
       
-      <div style="position:relative; width:760px; display: inline-block; height:1000px; padding: 20px;">
-        <app-data-table [item]="table_data"></app-data-table>
+      <div style="position:relative; width:800px; display: inline-block; height:1000px; padding: 20px;">
+        <ng-container *ngIf="table_data.length!=0;else empty_table">
+          <app-data-table [item]="table_data"></app-data-table>
+        </ng-container>
+        <ng-template #empty_table> No Dataverses within this collection </ng-template>
       </div>
 
       <div style="display: inline-block; vertical-align:top; padding: 20px;">
-        <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsDownloads" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
-        <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsDatasets" [barChartData]= "barChartDataDatasets"></app-horizontal-bar-graph> 
-        <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsFiles" [barChartData]= "barChartDataFiles"></app-horizontal-bar-graph>    
+        <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+          <mat-tab label="Standard Data"> </mat-tab>    
+          <mat-tab label="Cumulative Data"> 
+            <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsDownloads" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
+            <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsDatasets" [barChartData]= "barChartDataDatasets"></app-horizontal-bar-graph> 
+            <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsFiles" [barChartData]= "barChartDataFiles"></app-horizontal-bar-graph>
+          </mat-tab>    
+          <mat-tab label="Content Data"> </mat-tab>    
+          <mat-tab label="Storage Data"> </mat-tab>    
+        </mat-tab-group> 
       </div>
 
     </ng-template>

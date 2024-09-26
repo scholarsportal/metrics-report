@@ -1,7 +1,6 @@
 import {AfterViewInit, Component, ViewChild, NgModule, ChangeDetectionStrategy, ElementRef,OnInit} from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
-import {JsonPipe} from '@angular/common';
-import {AsyncPipe} from '@angular/common';
+import {JsonPipe, AsyncPipe, CommonModule} from '@angular/common';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -76,7 +75,8 @@ export const MY_FORMATS = {
     MatDatepicker,
     RouterModule,
     RouterOutlet,
-    PostsComponent
+    PostsComponent,
+    CommonModule
     ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.component.html',
@@ -140,6 +140,8 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.dataset_table_data = newItem["DatasetTabData"]['table_data'];
 
     this.file_table_data = newItem["FileTabData"]['table_data'];
+
+    console.log("I NEED THIS RN", this.table_data)
 
     this.barChartDataDownloads = [
       { // grey
