@@ -12,6 +12,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {LineGraphComponent} from './line-graph/line-graph.component';
 import {HorizontalBarGraphComponent } from './horizontal-bar-graph/horizontal-bar-graph.component';
+import { PieGraphComponent } from './pie-graph/pie-graph.component';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {MatButtonModule} from '@angular/material/button';
 import {provideNativeDateAdapter} from '@angular/material/core';
@@ -59,6 +60,7 @@ export const MY_FORMATS = {
     MatTableModule,
     LineGraphComponent,
     HorizontalBarGraphComponent,
+    PieGraphComponent,
     MatGridListModule,
     MatButtonModule,
     MatIconModule,
@@ -117,6 +119,10 @@ export class AppComponent implements AfterViewInit, OnInit{
   barChartLabelsDatasets: Array<any> = [];
   barChartLabelsFiles: Array<any> = [];
 
+  pieChartDataSubject_data: Array<number> = [];
+  pieChartLabelsSubject: Array<String> = [];
+  pieChartDataSubject: Array<any> = [];
+
   selectedCollection_Current:String = "(All)";
   selectedCollection_Activate:String = "(All)";
 
@@ -126,10 +132,12 @@ export class AppComponent implements AfterViewInit, OnInit{
   getData(newItem: any) {
     this.table_data = newItem["DataverseTabData"]['table_data'];
     this.alias_data = newItem["DataverseTabData"]['alias_data'];
+    
     this.downloads_graph_data = newItem["DataverseTabData"]['downloads_graph_data'];
     this.datasets_graph_data = newItem["DataverseTabData"]['datasets_graph_data'];
     this.files_graph_data = newItem["DataverseTabData"]['files_graph_data'];
     this.options = this.options.concat(newItem["DataverseTabData"]['name_dropdown_data']);
+    
     this.barChartDataDownloads_data = this.downloads_graph_data.map(x => x.count);
     this.barChartLabelsDownloads = this.downloads_graph_data.map(x => x.month);
     this.barChartDataDatasets_data = this.datasets_graph_data.map(x => x.count);
@@ -137,11 +145,12 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.barChartDataFiles_data = this.files_graph_data.map(x => x.count);
     this.barChartLabelsFiles = this.files_graph_data.map(x => x.month);
 
-    this.dataset_table_data = newItem["DatasetTabData"]['table_data'];
+    this.pieChartLabelsSubject = newItem["DataverseTabData"]['subject_label_data'];
+    this.pieChartDataSubject_data = newItem["DataverseTabData"]['subject_data'];
 
-    this.file_table_data = newItem["FileTabData"]['table_data'];
-
-    console.log("I NEED THIS RN", this.table_data)
+    this.dataset_table_data = newItem["DatasetTabData"]['table_data']
+    this.file_table_data = newItem["FileTabData"]['table_data']
+    console.log("quick", this.pieChartLabelsSubject, this.pieChartDataSubject_data); 
 
     this.barChartDataDownloads = [
       { // grey
@@ -184,7 +193,15 @@ export class AppComponent implements AfterViewInit, OnInit{
         pointHoverBorderColor: 'rgb(0, 189, 0, 0.5)'
       }
     ];
-  
+
+    this.pieChartDataSubject = [
+        {
+          data: this.pieChartDataSubject_data, 
+          label: 'My First Dataset'
+        }
+    ];
+
+    console.log(this.pieChartDataSubject);
     
   }
 

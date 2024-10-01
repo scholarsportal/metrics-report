@@ -35,6 +35,11 @@ export class PostsComponent {
   public fileURL: string = '';
   public filesContents: Array<any> = [];
   public files: Array<any> = []; 
+
+  public subjectURL: string = '';
+  public subjectContents: Array<any> = []; 
+  public subjectLabels: Array<any> = []; 
+  public subjectData: Array<any> = []; 
   
   public monthlyDownloads: Array<any> = []; 
   public monthlyDatasets: Array<any> = []; 
@@ -84,6 +89,7 @@ export class PostsComponent {
     for (let i = 0; i <= 23; i++){
       this.monthsFilesDateURLS.push('https://borealisdata.ca/api/info/metrics/files/toMonth/' + this.months[i] + this.parentAlias)
     }
+    this.subjectURL = "https://borealisdata.ca/api/info/metrics/datasets/bySubject" + this.parentAlias
     if (this.collectionSelected != "(All)"){
       this.datasetURL = "https://borealisdata.ca/api/search?q=*&type=dataset&subtree=" + this.collectionSelected + "&per_page=1000";
     }
@@ -101,6 +107,7 @@ export class PostsComponent {
     for (let i = 0; i <= 23; i++){
       this.observables.push(this.httpClient.get<[]>(this.monthsFilesDateURLS[i]))
     }
+    this.observables.push(this.httpClient.get<[]>("https://borealisdata.ca/api/info/metrics/dataverses/bySubject"))
     const httpHeaders: HttpHeaders = new HttpHeaders({
       'X-Dataverse-key': 'fd4c70ad-9384-463d-a0f9-c83c1c0c6d7c'
     });
@@ -163,7 +170,10 @@ export class PostsComponent {
           for (let i = 48; i <= 71; i++){
             this.monthlyFiles.push({month: this.months[i-48], count: responses[i+1]['data']['count']});
           }
-          console.log(responses[responses.length-3])
+          for (let i = 0; i < responses[73]['data'].length; i++){
+            this.subjectLabels.push(responses[73]['data'][i]['subject'])
+            this.subjectData.push(responses[73]['data'][i]['count'])
+          }
           if (this.collectionSelected != "(All)"){
             this.datasetsContents = responses[responses.length-2]['data']['items']
             for (let i = 0; i < this.datasetsContents.length; i++){
@@ -217,6 +227,8 @@ export class PostsComponent {
         downloads_graph_data: this.monthlyDownloads, 
         datasets_graph_data: this.monthlyDatasets,
         files_graph_data: this.monthlyFiles,
+        subject_label_data: this.subjectLabels,
+        subject_data: this.subjectData,
         name_dropdown_data: this.dataverseCollectionsDropDown     
     }
     var DatasetTabData = {

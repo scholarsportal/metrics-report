@@ -67,7 +67,9 @@
             <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsDatasets" [barChartData]= "barChartDataDatasets"></app-horizontal-bar-graph> 
             <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsFiles" [barChartData]= "barChartDataFiles"></app-horizontal-bar-graph>
           </mat-tab>    
-          <mat-tab label="Content Data"> </mat-tab>    
+          <mat-tab label="Content Data">
+            <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject"></app-pie-graph>    
+          </mat-tab> 
           <mat-tab label="Storage Data"> </mat-tab>    
         </mat-tab-group> 
       </div>

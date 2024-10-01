@@ -21,7 +21,7 @@ export class HorizontalBarGraphComponent {
       y: {
         position: 'left',
       }
-    },
+    }
   }
 
   public barChartLegend:boolean = true;
