@@ -15,10 +15,19 @@ export class PieGraphComponent {
   @Input() pieChartData: Array<any>;
   
   public pieChartOptions: ChartConfiguration['options'] = {
+    devicePixelRatio: 1,
     responsive: false,
     plugins: {
+      title: {
+        display: true,
+        text: 'Custom Chart Title',
+    },
       legend: {
-        position: "right"
+        position: "right",
+        labels: { 
+          textAlign: "left",
+          padding: 1,
+        }
     }
   }
 }

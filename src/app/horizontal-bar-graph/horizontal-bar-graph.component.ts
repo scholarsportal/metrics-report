@@ -19,8 +19,11 @@ export class HorizontalBarGraphComponent {
     scales: {
       // We use this empty structure as a placeholder for dynamic theming.
       y: {
-        position: 'left',
-      }
+        stacked: true,
+      },
+      x: {
+        stacked: false,
+      },
     }
   }
 

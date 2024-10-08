@@ -26,6 +26,7 @@ import {DataTableDatasetComponent} from './data-table-dataset/data-table-dataset
 import {DataTableFileComponent} from './data-table-file/data-table-file.component'; 
 import {MatDatepickerModule, MatDatepicker} from '@angular/material/datepicker';
 import { PostsComponent } from './posts/posts.component';
+import {MatCardModule} from '@angular/material/card';
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
 import {default as _rollupMoment, Moment} from 'moment';
@@ -78,7 +79,8 @@ export const MY_FORMATS = {
     RouterModule,
     RouterOutlet,
     PostsComponent,
-    CommonModule
+    CommonModule,
+    MatCardModule
     ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.component.html',
@@ -119,9 +121,17 @@ export class AppComponent implements AfterViewInit, OnInit{
   barChartLabelsDatasets: Array<any> = [];
   barChartLabelsFiles: Array<any> = [];
 
+  barChartDataDownloadsAgg_data: Array<number> = []; 
+  barChartDataDatasetsAgg_data: Array<number> = [];
+  barChartDataFiles_Aggdata: Array<number> = [];
+
   pieChartDataSubject_data: Array<number> = [];
   pieChartLabelsSubject: Array<String> = [];
   pieChartDataSubject: Array<any> = [];
+
+  pieChartDataFile_data: Array<number> = [];
+  pieChartLabelsFile: Array<String> = [];
+  pieChartDataFile: Array<any> = [];
 
   selectedCollection_Current:String = "(All)";
   selectedCollection_Activate:String = "(All)";
@@ -136,6 +146,9 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.downloads_graph_data = newItem["DataverseTabData"]['downloads_graph_data'];
     this.datasets_graph_data = newItem["DataverseTabData"]['datasets_graph_data'];
     this.files_graph_data = newItem["DataverseTabData"]['files_graph_data'];
+    this.downloads_graph_data = newItem["DataverseTabData"]['downloads_graph_data'];
+    this.datasets_graph_data = newItem["DataverseTabData"]['datasets_graph_data'];
+    this.files_graph_data = newItem["DataverseTabData"]['files_graph_data'];
     this.options = this.options.concat(newItem["DataverseTabData"]['name_dropdown_data']);
     
     this.barChartDataDownloads_data = this.downloads_graph_data.map(x => x.count);
@@ -145,17 +158,24 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.barChartDataFiles_data = this.files_graph_data.map(x => x.count);
     this.barChartLabelsFiles = this.files_graph_data.map(x => x.month);
 
+    this.barChartDataDownloadsAgg_data = newItem["DataverseTabData"]['downloads_graph_agg_data'].map((x: { count: any; }) => x.count);
+    this.barChartDataDatasetsAgg_data = newItem["DataverseTabData"]['datasets_graph_agg_data'].map((x: { count: any; }) => x.count);
+    this.barChartDataFiles_Aggdata = newItem["DataverseTabData"]['files_graph_agg_data'].map((x: { count: any; }) => x.count);
+
     this.pieChartLabelsSubject = newItem["DataverseTabData"]['subject_label_data'];
     this.pieChartDataSubject_data = newItem["DataverseTabData"]['subject_data'];
 
+    this.pieChartLabelsFile = newItem["DataverseTabData"]['file_content_label_data'];
+    this.pieChartDataFile_data = newItem["DataverseTabData"]['file_content_data'];
+
     this.dataset_table_data = newItem["DatasetTabData"]['table_data']
     this.file_table_data = newItem["FileTabData"]['table_data']
-    console.log("quick", this.pieChartLabelsSubject, this.pieChartDataSubject_data); 
+    console.log("quick", this.barChartDataDownloads_data, this.barChartDataDownloadsAgg_data); 
 
     this.barChartDataDownloads = [
       { // grey
-        data: this.barChartDataDownloads_data,
-        label: 'Total Dataverse Downloads',
+        data: this.barChartDataDownloadsAgg_data,
+        label: 'Monthly Downloads',
         tension: 0,
         backgroundColor: 'rgb(102, 0, 102, 0.5)',
         borderColor: 'rgb(102, 0, 102, 0.5)',
@@ -163,13 +183,35 @@ export class AppComponent implements AfterViewInit, OnInit{
         pointBorderColor: '#fff',
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
+      },
+      { // grey
+        data: this.barChartDataDownloads_data,
+        label: 'Cumulative Downloads',
+        tension: 0,
+        backgroundColor: 'rgb(0, 100, 255, 0.5)',
+        borderColor: 'rgb(0, 100, 255, 0.5)',
+        pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
       }
     ];
 
     this.barChartDataDatasets = [
       { // grey
-        data: this.barChartDataDatasets_data, 
-        label: 'Total Number of Datasets',
+        data: this.barChartDataDatasetsAgg_data,
+        label: 'Monthly Datasets Published',
+        tension: 0,
+        backgroundColor: 'rgb(102, 0, 102, 0.5)',
+        borderColor: 'rgb(102, 0, 102, 0.5)',
+        pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
+      },
+      { // grey
+        data: this.barChartDataDatasets_data,
+        label: 'Cumulative Datasets Published',
         tension: 0,
         backgroundColor: 'rgb(0, 100, 255, 0.5)',
         borderColor: 'rgb(0, 100, 255, 0.5)',
@@ -182,24 +224,42 @@ export class AppComponent implements AfterViewInit, OnInit{
 
     this.barChartDataFiles = [
       { // grey
-        data: this.barChartDataFiles_data, 
-        label: 'Total Number of Files',
+        data: this.barChartDataFiles_Aggdata,
+        label: 'Monthly Files Published',
         tension: 0,
-        backgroundColor: 'rgb(0, 189, 0, 0.5)',
-        borderColor: 'rgb(0, 189, 0, 0.5)',
-        pointBackgroundColor: 'rgb(0, 189, 0, 0.5)',
+        backgroundColor: 'rgb(102, 0, 102, 0.5)',
+        borderColor: 'rgb(102, 0, 102, 0.5)',
+        pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
         pointBorderColor: '#fff',
         pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(0, 189, 0, 0.5)'
+        pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
+      },
+      { // grey
+        data: this.barChartDataFiles_data,
+        label: 'Cumulative Files Published',
+        tension: 0,
+        backgroundColor: 'rgb(0, 100, 255, 0.5)',
+        borderColor: 'rgb(0, 100, 255, 0.5)',
+        pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
       }
     ];
 
     this.pieChartDataSubject = [
         {
           data: this.pieChartDataSubject_data, 
-          label: 'My First Dataset'
+          label: 'Subject Breakdown',
         }
     ];
+
+    this.pieChartDataFile = [
+      {
+        data: this.pieChartDataFile_data, 
+        label: 'File Content Breakdown'
+      }
+  ];
 
     console.log(this.pieChartDataSubject);
     

@@ -46,36 +46,88 @@
 
 
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-  <mat-tab label="Collections"> 
+  <mat-tab label="Overview"> 
     <ng-template matTabContent>
-      
 
-      <div style="display: flex; flex-grow: grow; gap: 50px;"></div>
+      <div style="margin: auto;
+      width: 50%; 
+      display: flex;">
       
-      <div style="position:relative; width:800px; display: inline-block; height:1000px; padding: 20px;">
-        <ng-container *ngIf="table_data.length!=0;else empty_table">
-          <app-data-table [item]="table_data"></app-data-table>
-        </ng-container>
-        <ng-template #empty_table> No Dataverses within this collection </ng-template>
+      <div style="vertical-align:top; margin-top: 50px; ">
+        <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+          <mat-card-header>
+            <mat-card-title-group>
+              <mat-card-title> Collections </mat-card-title>
+              <mat-card-subtitle> </mat-card-subtitle>
+            </mat-card-title-group>
+          </mat-card-header>
+          <mat-card-content>
+            <h1 style="text-align: right; color:DimGray;"> <b>1,000</b> </h1>
+          </mat-card-content>
+        </mat-card>
+
+          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title> Datasets </mat-card-title>
+                <mat-card-subtitle> </mat-card-subtitle>
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              <h1 style="text-align: right; color:DimGray;"> <b>1,000</b> </h1>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title> Downloads </mat-card-title>
+                <mat-card-subtitle> </mat-card-subtitle>
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              <h1 style="text-align: right; color:DimGray;"> <b>1,000</b> </h1>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title> Users </mat-card-title>
+                <mat-card-subtitle> </mat-card-subtitle>
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              <h1 style="text-align: right; color:DimGray;"> <b>1,000</b> </h1>
+            </mat-card-content>
+          </mat-card>
+      </div> 
+            
+      <div style="width:800px; display: inline-block; height:1000px; padding: 20px;">
+            Number of Downloads
+            <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsDownloads" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
+            Number of Datasets 
+            <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsDatasets" [barChartData]= "barChartDataDatasets"></app-horizontal-bar-graph> 
+            Number of Files
+            <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsFiles" [barChartData]= "barChartDataFiles"></app-horizontal-bar-graph>
       </div>
 
-      <div style="display: inline-block; vertical-align:top; padding: 20px;">
-        <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-          <mat-tab label="Standard Data"> </mat-tab>    
-          <mat-tab label="Cumulative Data"> 
-            <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsDownloads" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
-            <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsDatasets" [barChartData]= "barChartDataDatasets"></app-horizontal-bar-graph> 
-            <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsFiles" [barChartData]= "barChartDataFiles"></app-horizontal-bar-graph>
-          </mat-tab>    
-          <mat-tab label="Content Data">
-            <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject"></app-pie-graph>    
-          </mat-tab> 
-          <mat-tab label="Storage Data"> </mat-tab>    
-        </mat-tab-group> 
       </div>
 
     </ng-template>
   </mat-tab>
+  
+  <mat-tab label="Content"> <ng-template matTabContent>  
+    <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject"></app-pie-graph>
+    <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile"></app-pie-graph> 
+  </ng-template> 
+  </mat-tab>
+
+  <mat-tab label="Storage"> <ng-template matTabContent>  
+
+  </ng-template> 
+  </mat-tab>
+
   <mat-tab [disabled]="selectedCollection_Activate == '(All)'" label="Datasets"> <ng-template matTabContent> 
 
     <div style="position:relative; width:1550px; display: inline-block; height:2000px; padding: 10px;">
