@@ -53,7 +53,7 @@
       width: 50%; 
       display: flex;">
       
-      <div style="vertical-align:top; margin-top: 50px; ">
+      <div style="vertical-align:top; margin-top: 50px; margin-left: -60px;">
         <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
           <mat-card-header>
             <mat-card-title-group>
@@ -62,7 +62,7 @@
             </mat-card-title-group>
           </mat-card-header>
           <mat-card-content>
-            <h1 style="text-align: right; color:DimGray;"> <b>1,000</b> </h1>
+            <h1 style="text-align: right; color:DimGray;"> <b>{{total_collections_num}}</b> </h1>
           </mat-card-content>
         </mat-card>
 
@@ -74,7 +74,7 @@
               </mat-card-title-group>
             </mat-card-header>
             <mat-card-content>
-              <h1 style="text-align: right; color:DimGray;"> <b>1,000</b> </h1>
+              <h1 style="text-align: right; color:DimGray;"> <b>{{total_datasets_num}}</b> </h1>
             </mat-card-content>
           </mat-card>
 
@@ -86,7 +86,7 @@
               </mat-card-title-group>
             </mat-card-header>
             <mat-card-content>
-              <h1 style="text-align: right; color:DimGray;"> <b>1,000</b> </h1>
+              <h1 style="text-align: right; color:DimGray;"> <b>{{total_downloads_num}}</b> </h1>
             </mat-card-content>
           </mat-card>
 
@@ -98,18 +98,20 @@
               </mat-card-title-group>
             </mat-card-header>
             <mat-card-content>
-              <h1 style="text-align: right; color:DimGray;"> <b>1,000</b> </h1>
+              <h1 style="text-align: right; color:DimGray;"> <b>{{total_users_num}}</b> </h1>
             </mat-card-content>
           </mat-card>
       </div> 
             
-      <div style="width:800px; display: inline-block; height:1000px; padding: 20px;">
+      <div style="width:800px; display: inline-block; height:1500px; padding: 20px;">
             Number of Downloads
             <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsDownloads" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
             Number of Datasets 
             <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsDatasets" [barChartData]= "barChartDataDatasets"></app-horizontal-bar-graph> 
             Number of Files
             <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsFiles" [barChartData]= "barChartDataFiles"></app-horizontal-bar-graph>
+            Number of Users
+            <app-horizontal-bar-graph [barChartLabels]= "barChartLabelsUsers" [barChartData]= "barChartDataUsers"></app-horizontal-bar-graph>
       </div>
 
       </div>

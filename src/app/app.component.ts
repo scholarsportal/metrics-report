@@ -106,6 +106,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   downloads_graph_data: Array<any> = [];
   datasets_graph_data: Array<any> = [];
   files_graph_data: Array<any> = [];
+  users_graph_data: Array<any> = [];
   name_dropdown_data: Array<any> = [];
 
   barChartDataDownloads_data: Array<number> = [];
@@ -115,15 +116,20 @@ export class AppComponent implements AfterViewInit, OnInit{
   barChartDataDatasets:Array<any> = [];
   
   barChartDataFiles_data: Array<number> = [];
-  barChartDataFiles :Array<any> = [];
+  barChartDataFiles:Array<any> = [];
+
+  barChartDataUsers_data: Array<number> = [];
+  barChartDataUsers:Array<any> = [];
 
   barChartLabelsDownloads: Array<any> = [];
   barChartLabelsDatasets: Array<any> = [];
   barChartLabelsFiles: Array<any> = [];
+  barChartLabelsUsers: Array<any> = [];
 
   barChartDataDownloadsAgg_data: Array<number> = []; 
   barChartDataDatasetsAgg_data: Array<number> = [];
   barChartDataFiles_Aggdata: Array<number> = [];
+  barChartDataUsers_Aggdata: Array<number> = [];
 
   pieChartDataSubject_data: Array<number> = [];
   pieChartLabelsSubject: Array<String> = [];
@@ -136,6 +142,11 @@ export class AppComponent implements AfterViewInit, OnInit{
   selectedCollection_Current:String = "(All)";
   selectedCollection_Activate:String = "(All)";
 
+  total_collections_num: String = "-";
+  total_datasets_num: String = "-";
+  total_downloads_num: String = "-";
+  total_users_num: String = "-";
+
   dataset_table_data = [];
   file_table_data = [];
 
@@ -146,9 +157,8 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.downloads_graph_data = newItem["DataverseTabData"]['downloads_graph_data'];
     this.datasets_graph_data = newItem["DataverseTabData"]['datasets_graph_data'];
     this.files_graph_data = newItem["DataverseTabData"]['files_graph_data'];
-    this.downloads_graph_data = newItem["DataverseTabData"]['downloads_graph_data'];
-    this.datasets_graph_data = newItem["DataverseTabData"]['datasets_graph_data'];
-    this.files_graph_data = newItem["DataverseTabData"]['files_graph_data'];
+    this.users_graph_data = newItem["DataverseTabData"]['users_graph_data'];
+    
     this.options = this.options.concat(newItem["DataverseTabData"]['name_dropdown_data']);
     
     this.barChartDataDownloads_data = this.downloads_graph_data.map(x => x.count);
@@ -157,10 +167,13 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.barChartLabelsDatasets = this.datasets_graph_data.map(x => x.month);
     this.barChartDataFiles_data = this.files_graph_data.map(x => x.count);
     this.barChartLabelsFiles = this.files_graph_data.map(x => x.month);
+    this.barChartDataUsers_data = this.users_graph_data.map(x => x.count);
+    this.barChartLabelsUsers = this.users_graph_data.map(x => x.month);
 
     this.barChartDataDownloadsAgg_data = newItem["DataverseTabData"]['downloads_graph_agg_data'].map((x: { count: any; }) => x.count);
     this.barChartDataDatasetsAgg_data = newItem["DataverseTabData"]['datasets_graph_agg_data'].map((x: { count: any; }) => x.count);
     this.barChartDataFiles_Aggdata = newItem["DataverseTabData"]['files_graph_agg_data'].map((x: { count: any; }) => x.count);
+    this.barChartDataUsers_Aggdata = newItem["DataverseTabData"]['users_graph_agg_data'].map((x: { count: any; }) => x.count);
 
     this.pieChartLabelsSubject = newItem["DataverseTabData"]['subject_label_data'];
     this.pieChartDataSubject_data = newItem["DataverseTabData"]['subject_data'];
@@ -171,6 +184,11 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.dataset_table_data = newItem["DatasetTabData"]['table_data']
     this.file_table_data = newItem["FileTabData"]['table_data']
     console.log("quick", this.barChartDataDownloads_data, this.barChartDataDownloadsAgg_data); 
+
+    this.total_collections_num = newItem["DataverseTabData"]['name_dropdown_data'].length.toString(); 
+    this.total_datasets_num = this.barChartDataDatasets_data[0].toString();
+    this.total_downloads_num = this.barChartDataDownloads_data[0].toString();
+    this.total_users_num = this.barChartDataUsers_data[0].toString();
 
     this.barChartDataDownloads = [
       { // grey
@@ -237,6 +255,31 @@ export class AppComponent implements AfterViewInit, OnInit{
       { // grey
         data: this.barChartDataFiles_data,
         label: 'Cumulative Files Published',
+        tension: 0,
+        backgroundColor: 'rgb(0, 100, 255, 0.5)',
+        borderColor: 'rgb(0, 100, 255, 0.5)',
+        pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
+      }
+    ];
+
+    this.barChartDataUsers = [
+      { // grey
+        data: this.barChartDataUsers_Aggdata,
+        label: 'Monthly Users Joined',
+        tension: 0,
+        backgroundColor: 'rgb(102, 0, 102, 0.5)',
+        borderColor: 'rgb(102, 0, 102, 0.5)',
+        pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
+      },
+      { // grey
+        data: this.barChartDataUsers_data,
+        label: 'Cumulative Users Joined',
         tension: 0,
         backgroundColor: 'rgb(0, 100, 255, 0.5)',
         borderColor: 'rgb(0, 100, 255, 0.5)',

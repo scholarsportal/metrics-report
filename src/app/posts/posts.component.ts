@@ -26,6 +26,7 @@ export class PostsComponent {
   public monthsDownloadsDateURLS: Array<any> = [];
   public monthsDatasetsDateURLS: Array<any> = [];
   public monthsFilesDateURLS: Array<any> = [];
+  public monthsUsersDateURLS: Array<any> = [];
   public parentAlias: String = "";
 
   public datasetURL: string = '';
@@ -49,10 +50,12 @@ export class PostsComponent {
   public monthlyDownloads: Array<any> = []; 
   public monthlyDatasets: Array<any> = []; 
   public monthlyFiles: Array<any> = [];
+  public monthlyUsers: Array<any> = []; 
 
   public monthlyAggDownloads: Array<any> = []; 
   public monthlyAggDatasets: Array<any> = []; 
   public monthlyAggFiles: Array<any> = [];
+  public monthlyAggUsers: Array<any> = [];
 
   public observables: Array<any> = [];
 
@@ -97,10 +100,12 @@ export class PostsComponent {
       this.monthsFilesDateURLS.push('https://borealisdata.ca/api/info/metrics/files/toMonth/' + this.months[i] + this.parentAlias)
     }
     for (let i = 0; i <= 24; i++){
-      this.monthsFilesDateURLS.push('https://borealisdata.ca/api/info/metrics/files/toMonth/' + this.months[i] + this.parentAlias)
+      this.monthsUsersDateURLS.push('https://borealisdata.ca/api/info/metrics/accounts/toMonth/' + this.months[i])
     }
+    
     this.subjectURL = "https://borealisdata.ca/api/info/metrics/datasets/bySubject" + this.parentAlias
     this.fileContentURL = "https://borealisdata.ca/api/info/metrics/files/byType" + this.parentAlias
+    
     if (this.collectionSelected != "(All)"){
       this.datasetURL = "https://borealisdata.ca/api/search?q=*&type=dataset&subtree=" + this.collectionSelected + "&per_page=1000";
     }
@@ -117,6 +122,9 @@ export class PostsComponent {
     }
     for (let i = 0; i <= 24; i++){
       this.observables.push(this.httpClient.get<[]>(this.monthsFilesDateURLS[i]))
+    }
+    for (let i = 0; i <= 24; i++){
+      this.observables.push(this.httpClient.get<[]>(this.monthsUsersDateURLS[i]))
     }
     this.observables.push(this.httpClient.get<[]>(this.subjectURL))
     this.observables.push(this.httpClient.get<[]>(this.fileContentURL))
@@ -179,21 +187,25 @@ export class PostsComponent {
           }
           for (let i = 25; i <= 48; i++){
             this.monthlyDatasets.push({month: this.months[i-25], count: responses[i+1]['data']['count']});
-            this.monthlyAggDatasets.push({month: this.months[i], count: responses[i+1]['data']['count'] - responses[i+2]['data']['count']})
+            this.monthlyAggDatasets.push({month: this.months[i-25], count: responses[i+1]['data']['count'] - responses[i+2]['data']['count']})
           }
           for (let i = 50; i <= 73; i++){
             this.monthlyFiles.push({month: this.months[i-50], count: responses[i+1]['data']['count']});
-            this.monthlyAggFiles.push({month: this.months[i], count: responses[i+1]['data']['count'] - responses[i+2]['data']['count']})
+            this.monthlyAggFiles.push({month: this.months[i-50], count: responses[i+1]['data']['count'] - responses[i+2]['data']['count']})
+          }
+          for (let i = 75; i <= 98; i++){
+            this.monthlyUsers.push({month: this.months[i-75], count: responses[i+1]['data']['count']});
+            this.monthlyAggUsers.push({month: this.months[i-75], count: responses[i+1]['data']['count'] - responses[i+2]['data']['count']})
           }
 
-          for (let i = 0; i < responses[76]['data'].length; i++){
-            this.subjectLabels.push(responses[76]['data'][i]['subject'])
-            this.subjectData.push(responses[76]['data'][i]['count'])
+          for (let i = 0; i < responses[101]['data'].length; i++){
+            this.subjectLabels.push(responses[101]['data'][i]['subject'])
+            this.subjectData.push(responses[101]['data'][i]['count'])
           }
 
-          for (let i = 0; i < responses[77]['data'].length; i++){
-            let contentType = (responses[77]['data'][i]['contenttype'].split('/')[0]); 
-            let count = responses[77]['data'][i]['count']; 
+          for (let i = 0; i < responses[102]['data'].length; i++){
+            let contentType = (responses[102]['data'][i]['contenttype'].split('/')[0]); 
+            let count = responses[102]['data'][i]['count']; 
             if (this.fileContentHash.hasOwnProperty(contentType)){
               this.fileContentHash[contentType] = this.fileContentHash[contentType] + count;
             }
@@ -259,9 +271,11 @@ export class PostsComponent {
         downloads_graph_data: this.monthlyDownloads, 
         datasets_graph_data: this.monthlyDatasets,
         files_graph_data: this.monthlyFiles,
+        users_graph_data: this.monthlyUsers,
         downloads_graph_agg_data: this.monthlyAggDownloads, 
         datasets_graph_agg_data: this.monthlyAggDatasets,
         files_graph_agg_data: this.monthlyAggFiles,
+        users_graph_agg_data: this.monthlyAggUsers,
         subject_label_data: this.subjectLabels,
         subject_data: this.subjectData,
         file_content_label_data: this.fileContentLabels,
@@ -312,14 +326,19 @@ export class PostsComponent {
   }
 
   cleanTempData(){
+    
+    this.dataverseCollectionsDropDown = [];
+
     this.dataverseCollectionsURL = '';
     this.monthsDownloadsDateURLS = [];
     this.monthsDatasetsDateURLS = [];
-    this.monthsFilesDateURLS= [];
+    this.monthsFilesDateURLS = [];
+    this.monthsUsersDateURLS = [];
 
     this.monthlyDownloads = []; 
     this.monthlyDatasets = []; 
     this.monthlyFiles = [];
+    this.monthlyUsers = []; 
     this.observables = [];
 
     this.dataversesDataTree = [];
@@ -338,6 +357,11 @@ export class PostsComponent {
     this.fileContentHash= {}; 
     this.fileContentLabels= []; 
     this.fileContentData = []; 
+
+    this.monthlyAggDownloads = []; 
+    this.monthlyAggDatasets = []; 
+    this.monthlyAggFiles = [];
+    this.monthlyAggUsers = []; 
   }
 
   findAliasRow(arr: Array<any>, target: String){
