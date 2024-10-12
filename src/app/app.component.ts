@@ -121,10 +121,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   barChartDataUsers_data: Array<number> = [];
   barChartDataUsers:Array<any> = [];
 
-  barChartLabelsDownloads: Array<any> = [];
-  barChartLabelsDatasets: Array<any> = [];
-  barChartLabelsFiles: Array<any> = [];
-  barChartLabelsUsers: Array<any> = [];
+  months = [];
 
   barChartDataDownloadsAgg_data: Array<number> = []; 
   barChartDataDatasetsAgg_data: Array<number> = [];
@@ -154,26 +151,19 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.table_data = newItem["DataverseTabData"]['table_data'];
     this.alias_data = newItem["DataverseTabData"]['alias_data'];
     
-    this.downloads_graph_data = newItem["DataverseTabData"]['downloads_graph_data'];
-    this.datasets_graph_data = newItem["DataverseTabData"]['datasets_graph_data'];
-    this.files_graph_data = newItem["DataverseTabData"]['files_graph_data'];
-    this.users_graph_data = newItem["DataverseTabData"]['users_graph_data'];
-    
     this.options = this.options.concat(newItem["DataverseTabData"]['name_dropdown_data']);
-    
-    this.barChartDataDownloads_data = this.downloads_graph_data.map(x => x.count);
-    this.barChartLabelsDownloads = this.downloads_graph_data.map(x => x.month);
-    this.barChartDataDatasets_data = this.datasets_graph_data.map(x => x.count);
-    this.barChartLabelsDatasets = this.datasets_graph_data.map(x => x.month);
-    this.barChartDataFiles_data = this.files_graph_data.map(x => x.count);
-    this.barChartLabelsFiles = this.files_graph_data.map(x => x.month);
-    this.barChartDataUsers_data = this.users_graph_data.map(x => x.count);
-    this.barChartLabelsUsers = this.users_graph_data.map(x => x.month);
 
-    this.barChartDataDownloadsAgg_data = newItem["DataverseTabData"]['downloads_graph_agg_data'].map((x: { count: any; }) => x.count);
-    this.barChartDataDatasetsAgg_data = newItem["DataverseTabData"]['datasets_graph_agg_data'].map((x: { count: any; }) => x.count);
-    this.barChartDataFiles_Aggdata = newItem["DataverseTabData"]['files_graph_agg_data'].map((x: { count: any; }) => x.count);
-    this.barChartDataUsers_Aggdata = newItem["DataverseTabData"]['users_graph_agg_data'].map((x: { count: any; }) => x.count);
+    this.months = newItem["DataverseTabData"]['months'];
+    
+    this.barChartDataDownloads_data = newItem["DataverseTabData"]['downloads_graph_data'];
+    this.barChartDataDatasets_data = newItem["DataverseTabData"]['datasets_graph_data'];
+    this.barChartDataFiles_data = newItem["DataverseTabData"]['files_graph_data'];
+    this.barChartDataUsers_data = newItem["DataverseTabData"]['users_graph_data'];
+
+    this.barChartDataDownloadsAgg_data = newItem["DataverseTabData"]['downloads_graph_agg_data']
+    this.barChartDataDatasetsAgg_data = newItem["DataverseTabData"]['datasets_graph_agg_data']
+    this.barChartDataFiles_Aggdata = newItem["DataverseTabData"]['files_graph_agg_data']
+    this.barChartDataUsers_Aggdata = newItem["DataverseTabData"]['users_graph_agg_data']
 
     this.pieChartLabelsSubject = newItem["DataverseTabData"]['subject_label_data'];
     this.pieChartDataSubject_data = newItem["DataverseTabData"]['subject_data'];
