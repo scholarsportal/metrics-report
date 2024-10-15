@@ -8,7 +8,7 @@
       <button mat-button> Français </button>
     </div>
     <div  style="clear:both;">
-      <button style="min-width: 1%;" class="mat-small" mat-button> About </button>
+      <button (click)="openAboutDialog()" style="min-width: 1%;" class="mat-small" mat-button> About </button>
       | 
       <button style="min-width: 1%;" class="mat-small" mat-button> Terms of Conditions </button>
       |
@@ -57,7 +57,8 @@
         <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
           <mat-card-header>
             <mat-card-title-group>
-              <mat-card-title> Collections </mat-card-title>
+              <mat-card-title> <div *ngIf="selectedCollection_Activate=='(All)'"> Collections </div> 
+                <div *ngIf="selectedCollection_Activate!='(All)'"> Dataverses </div> </mat-card-title>
               <mat-card-subtitle> </mat-card-subtitle>
             </mat-card-title-group>
           </mat-card-header>
@@ -101,6 +102,22 @@
               <h1 style="text-align: right; color:DimGray;"> <b>{{total_users_num}}</b> </h1>
             </mat-card-content>
           </mat-card>
+          
+          <div style="margin-left: 10px; margin-top: 10px;">
+          <app-generic-table 
+          [data]="table_data"
+          [colHeaders]="true"
+          [colWidths]="[350]"
+          [rowHeaders]="true"
+          [height]="780"
+          [columnSorting]="true"
+          [columns]="generic_columns"
+          [dropdownMenu]="[]"
+          [filters]="false"
+          licenseKey="non-commercial-and-evaluation"> 
+          </app-generic-table>
+          </div>
+
       </div> 
             
       <div style="width:800px; display: inline-block; height:1500px; padding: 20px;">
@@ -119,9 +136,46 @@
     </ng-template>
   </mat-tab>
   
-  <mat-tab label="Content"> <ng-template matTabContent>  
-    <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject"></app-pie-graph>
-    <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile"></app-pie-graph> 
+  <mat-tab label="Content"> <ng-template matTabContent> 
+    <div style="padding: 20px;"> Subject Breakdown </div>
+
+    <div style="padding: 20px; overflow: hidden;">
+    
+    <div style="float:left; width: 550px">
+      <app-generic-table 
+      [data]="subject_table"
+      [colHeaders]="true"
+      [colWidths]="[300, 100, 100]"
+      [rowHeaders]="true"
+      [height]="400"
+      width="100%"
+      [columnSorting]="true"
+      [columns]="subject_columns"
+      [filters]="false"
+      licenseKey="non-commercial-and-evaluation"> 
+      </app-generic-table>
+    </div>
+
+    <div style="overflow: hidden;">
+      <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; max-height: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
+      justify-content: center; padding: 20px;">
+        <mat-card-content>
+          <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject"></app-pie-graph>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    </div>
+
+    <div style="float: left;">
+      <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; max-height: 500px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
+      justify-content: center; padding: 20px;">
+        <mat-card-content>
+          <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile"></app-pie-graph> 
+        </mat-card-content>
+      </mat-card>
+    </div>
+
   </ng-template> 
   </mat-tab>
 

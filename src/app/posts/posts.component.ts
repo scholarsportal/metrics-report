@@ -52,11 +52,13 @@ export class PostsComponent {
   public subjectContents: Array<any> = []; 
   public subjectLabels: Array<any> = []; 
   public subjectData: Array<any> = []; 
+  public subjectContentFullData: Array<any> = []; 
 
   public fileContentURL: string = '';
   public fileContentHash: any = {}; 
   public fileContentLabels: Array<any> = []; 
   public fileContentData: Array<any> = []; 
+  public fileContentFullData: Array<any> = []; 
   
   public monthlyDownloads: Array<any> = []; 
   public monthlyDatasets: Array<any> = []; 
@@ -163,10 +165,7 @@ export class PostsComponent {
 
           for (let i = 0; i < this.dataversesDataTree.length; i++){
             this.dataverseCollections.push(
-              {name: this.dataversesDataTree[i]['name'],
-                views: (Math.floor(Math.random() * 5000)) + 20,
-                downloads: (Math.floor(Math.random() * 300)) + 2,
-                citations: (Math.floor(Math.random() * 20))
+              {name: this.dataversesDataTree[i]['name']
               }
             )
             console.log(this.dataverseCollections);
@@ -195,10 +194,26 @@ export class PostsComponent {
             this.monthlyAggUsers.push(this.users_rsp.find(x=>x.date==this.months[i])['count'] - this.users_rsp.find(x=>x.date==this.months[i+1])['count']);
           }
           
+          
+          let subject_overall_count = 0;
+          for (let i = 0; i < this.subject_rsp.length; i++){
+            subject_overall_count += this.subject_rsp[i]['count']
+          }
+          for (let i = 0; i < this.subject_rsp.length; i++){
+            this.subjectContentFullData.push({subject: this.subject_rsp[i]['subject'], count: this.subject_rsp[i]['count'], percent: (this.subject_rsp[i]['count'] / subject_overall_count).toFixed(4)})
+          }
+
           this.subjectLabels = this.subject_rsp.map((x: { subject: any; }) => x.subject);
           this.subjectData = this.subject_rsp.map((x: { count: any; }) => x.count);
-        
+          
+          let filecount_overall_count = 0;
           for (let i = 0; i < this.filecontent_rsp.length; i++){
+            filecount_overall_count += this.filecontent_rsp[i]['count']
+          }
+          for (let i = 0; i < this.filecontent_rsp.length; i++){
+
+            this.fileContentFullData.push({contenttype: this.filecontent_rsp[i]['contenttype'], count: this.filecontent_rsp[i]['count'], percent: (this.filecontent_rsp[i]['count'] / filecount_overall_count).toFixed(4)})
+
             let contentType = (this.filecontent_rsp[i]['contenttype'].split('/')[0]); 
             let count = this.filecontent_rsp[i]['count']; 
             if (this.fileContentHash.hasOwnProperty(contentType)){
@@ -275,8 +290,10 @@ export class PostsComponent {
         users_graph_agg_data: this.monthlyAggUsers,
         subject_label_data: this.subjectLabels,
         subject_data: this.subjectData,
+        subject_full_data: this.subjectContentFullData,
         file_content_label_data: this.fileContentLabels,
         file_content_data: this.fileContentData,
+        file_content_full_data: this.fileContentFullData,
         name_dropdown_data: this.dataverseCollectionsDropDown,     
         months: this.months
     }

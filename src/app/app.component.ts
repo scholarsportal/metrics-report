@@ -27,6 +27,8 @@ import {DataTableFileComponent} from './data-table-file/data-table-file.componen
 import {MatDatepickerModule, MatDatepicker} from '@angular/material/datepicker';
 import { PostsComponent } from './posts/posts.component';
 import {MatCardModule} from '@angular/material/card';
+import {MatDialog} from '@angular/material/dialog';
+import { GenericTableComponent } from './generic-table/generic-table.component';
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
 import {default as _rollupMoment, Moment} from 'moment';
@@ -80,7 +82,8 @@ export const MY_FORMATS = {
     RouterOutlet,
     PostsComponent,
     CommonModule,
-    MatCardModule
+    MatCardModule,
+    GenericTableComponent
     ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.component.html',
@@ -103,6 +106,7 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   table_data = [];
   alias_data = [];
+  subject_table = [];
   downloads_graph_data: Array<any> = [];
   datasets_graph_data: Array<any> = [];
   files_graph_data: Array<any> = [];
@@ -147,9 +151,20 @@ export class AppComponent implements AfterViewInit, OnInit{
   dataset_table_data = [];
   file_table_data = [];
 
+  generic_columns: any[] = [
+    {data: "name", readOnly: "true", title: "Collection / Dataverses"},
+  ]
+  subject_columns: any[] = [
+    {data: "subject", readOnly: "true", title: "Subject"},
+    {data: "count", readOnly: "true", title: "Count"},
+    {data: "percent", readOnly: "true", title: "Distribution"},
+  ]
+
   getData(newItem: any) {
     this.table_data = newItem["DataverseTabData"]['table_data'];
     this.alias_data = newItem["DataverseTabData"]['alias_data'];
+
+    this.subject_table = newItem["DataverseTabData"]['subject_full_data'];
     
     this.options = this.options.concat(newItem["DataverseTabData"]['name_dropdown_data']);
 
@@ -330,7 +345,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   displayedColumns: string[] = ['name', 'views', 'downloads', 'citations'];
   title = 'metrics-app';
 
-  constructor(private _liveAnnouncer: LiveAnnouncer) {}
+  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog) {}
 
   ngAfterViewInit() {
   }
@@ -352,6 +367,17 @@ export class AppComponent implements AfterViewInit, OnInit{
       this._liveAnnouncer.announce('Sorting cleared');
     }
 
-}
+  } 
+
+  openAboutDialog() {
+    this.dialog.open(AboutDialog);
+  }
 
 }
+
+@Component({
+  selector: 'about-dialog-popup',
+  templateUrl: 'about-dialog-popup.html',
+})
+
+export class AboutDialog {}

@@ -19,7 +19,7 @@ export class PieGraphComponent {
     responsive: false,
     plugins: {
       title: {
-        display: true,
+        display: false,
         text: 'Custom Chart Title',
     },
       legend: {
