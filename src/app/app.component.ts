@@ -107,6 +107,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   table_data = [];
   alias_data = [];
   subject_table = [];
+  file_content_table = [];
   downloads_graph_data: Array<any> = [];
   datasets_graph_data: Array<any> = [];
   files_graph_data: Array<any> = [];
@@ -160,11 +161,18 @@ export class AppComponent implements AfterViewInit, OnInit{
     {data: "percent", readOnly: "true", title: "Distribution"},
   ]
 
+  file_content_columns: any[] = [
+    {data: "contenttype", readOnly: "true", title: "File Type"},
+    {data: "count", readOnly: "true", title: "Count"},
+    {data: "percent", readOnly: "true", title: "Distribution"},
+  ]
+
   getData(newItem: any) {
     this.table_data = newItem["DataverseTabData"]['table_data'];
     this.alias_data = newItem["DataverseTabData"]['alias_data'];
 
     this.subject_table = newItem["DataverseTabData"]['subject_full_data'];
+    this.file_content_table = newItem["DataverseTabData"]['file_content_full_data'];
     
     this.options = this.options.concat(newItem["DataverseTabData"]['name_dropdown_data']);
 

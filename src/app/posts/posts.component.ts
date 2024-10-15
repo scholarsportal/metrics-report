@@ -370,6 +370,9 @@ export class PostsComponent {
     this.monthlyAggFiles = [];
     this.monthlyAggUsers = []; 
 
+    this.subjectContentFullData = [];
+    this.fileContentFullData = [];
+
     this.months = [];
   }
 

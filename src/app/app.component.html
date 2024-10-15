@@ -107,7 +107,7 @@
           <app-generic-table 
           [data]="table_data"
           [colHeaders]="true"
-          [colWidths]="[350]"
+          [colWidths]="[335]"
           [rowHeaders]="true"
           [height]="780"
           [columnSorting]="true"
@@ -147,7 +147,7 @@
       [colHeaders]="true"
       [colWidths]="[300, 100, 100]"
       [rowHeaders]="true"
-      [height]="400"
+      [height]="350"
       width="100%"
       [columnSorting]="true"
       [columns]="subject_columns"
@@ -156,25 +156,47 @@
       </app-generic-table>
     </div>
 
-    <div style="overflow: hidden;">
-      <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; max-height: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
+    <div style="overflow: hidden; margin-top: -10px;">
+      <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; max-height: 350px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
       justify-content: center; padding: 20px;">
         <mat-card-content>
-          <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject"></app-pie-graph>
+          <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject" width=1000 height=1000></app-pie-graph>
         </mat-card-content>
       </mat-card>
     </div>
 
     </div>
 
-    <div style="float: left;">
-      <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; max-height: 500px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
+    <div style="padding: 20px;"> File Content Breakdown </div>
+
+    <div style="padding: 20px;">
+
+    <div style="float:left; width: 575px">
+      <app-generic-table 
+      [data]="file_content_table"
+      [colHeaders]="true"
+      [colWidths]="[300, 100, 100]"
+      [rowHeaders]="true"
+      [height]="350"
+      width="100%"
+      [columnSorting]="true"
+      [columns]="file_content_columns"
+      [filters]="false"
+      licenseKey="non-commercial-and-evaluation"> 
+      </app-generic-table>
+    </div>
+
+    <div style="overflow: hidden; margin-top: -10px;">
+      <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; max-height: 350px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
       justify-content: center; padding: 20px;">
         <mat-card-content>
-          <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile"></app-pie-graph> 
+          <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile" width=300 height=300></app-pie-graph>
         </mat-card-content>
       </mat-card>
     </div>
+
+    </div>
+
 
   </ng-template> 
   </mat-tab>

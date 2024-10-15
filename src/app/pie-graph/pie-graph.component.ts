@@ -13,6 +13,8 @@ import { Output, EventEmitter } from '@angular/core';
 export class PieGraphComponent {
   @Input() pieChartLabels: Array<any>; 
   @Input() pieChartData: Array<any>;
+  @Input() width: any;
+  @Input() height: any; 
   
   public pieChartOptions: ChartConfiguration['options'] = {
     devicePixelRatio: 1,
