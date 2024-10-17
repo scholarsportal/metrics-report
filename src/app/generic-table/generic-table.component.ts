@@ -4,6 +4,8 @@ import { HotTableModule } from '@handsontable/angular';
 import { registerAllModules } from 'handsontable/registry';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
+registerAllModules();
+
 @Component({
   selector: 'app-generic-table',
   standalone: true,
@@ -12,6 +14,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
   styleUrl: './generic-table.component.css'
 })
 export class GenericTableComponent {
+
   @Input() data: Array<any>; 
   @Input() colHeaders: boolean;
   @Input() colWidths: Array<number>; 

@@ -28,6 +28,7 @@
             ],
             "styles": [
               "@angular/material/prebuilt-themes/azure-blue.css",
+              "handsontable/dist/handsontable.full.min.css",
               "src/styles.css"
             ],
             "scripts": [],
@@ -92,6 +93,7 @@
             ],
             "styles": [
               "@angular/material/prebuilt-themes/azure-blue.css",
+              "handsontable/dist/handsontable.full.css",
               "src/styles.css"
             ],
             "scripts": []

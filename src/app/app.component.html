@@ -23,7 +23,7 @@
 
 <mat-form-field appearance="outline">
   <mat-label>Collection</mat-label>
-  <mat-select (selectionChange)="selectedCollection($event)" name="food">
+  <mat-select (selectionChange)="selectedCollection($event)" value="(All)">
     @for (option of options; track option) {
       <mat-option [value]="option">{{option}}</mat-option>
     }
@@ -52,13 +52,19 @@
       <div style="margin: auto;
       width: 50%; 
       display: flex;">
-      
+
       <div style="vertical-align:top; margin-top: 50px; margin-left: -60px;">
+        
+        <div style="vertical-align:top; margin-left: 20px;">
+          <div><h1>Borealis&nbsp;(All)</h1></div>
+          <div style="margin-top: -20px;"><p><i>Current&nbsp;Date</i></p></div>
+        </div>
+        
         <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
           <mat-card-header>
             <mat-card-title-group>
               <mat-card-title> <div *ngIf="selectedCollection_Activate=='(All)'"> Collections </div> 
-                <div *ngIf="selectedCollection_Activate!='(All)'"> Dataverses </div> </mat-card-title>
+                <div *ngIf="selectedCollection_Activate!='(All)'"> Sub Collections </div> </mat-card-title>
               <mat-card-subtitle> </mat-card-subtitle>
             </mat-card-title-group>
           </mat-card-header>
@@ -103,13 +109,13 @@
             </mat-card-content>
           </mat-card>
           
-          <div style="margin-left: 10px; margin-top: 10px;">
-          <app-generic-table 
+          <div id="hot" style="margin-left: 10px; margin-top: 10px; ">
+          <app-generic-table
           [data]="table_data"
           [colHeaders]="true"
           [colWidths]="[335]"
           [rowHeaders]="true"
-          [height]="780"
+          [height]="1500"
           [columnSorting]="true"
           [columns]="generic_columns"
           [dropdownMenu]="[]"
@@ -120,7 +126,7 @@
 
       </div> 
             
-      <div style="width:800px; display: inline-block; height:1500px; padding: 20px;">
+      <div style="width:800px; display: inline-block; height:3000px; padding: 20px; padding-top: 100px">
             Number of Downloads
             <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
             Number of Datasets 
@@ -129,6 +135,51 @@
             <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataFiles"></app-horizontal-bar-graph>
             Number of Users
             <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataUsers"></app-horizontal-bar-graph>
+            Subject Breakdown
+            <div style="overflow: hidden;">
+                <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+                <mat-tab label="Visual"> 
+                  <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; min-height: 400px; max-height: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
+                  justify-content: center; padding: 20px;">
+                    <mat-card-content>
+                      <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject" width=1000 height=1000></app-pie-graph>
+                    </mat-card-content>
+                  </mat-card>
+                </mat-tab> 
+              
+                <mat-tab label="Table">
+                  <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; min-height: 400px; max-height: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
+                  justify-content: center; padding: 20px;">
+                    <mat-card-content>
+                       <div style="width: 550px">
+                  <app-generic-table 
+                  [data]="subject_table"
+                  [colHeaders]="true"
+                  [colWidths]="[250, 75, 100]"
+                  [rowHeaders]="true"
+                  [height]="350"
+                  width="100%"
+                  [columnSorting]="true"
+                  [columns]="subject_columns"
+                  [filters]="false"
+                  licenseKey="non-commercial-and-evaluation"> 
+                  </app-generic-table>
+                </div>
+                    </mat-card-content>
+                  </mat-card>
+              </mat-tab>
+             </mat-tab-group>
+
+            </div>
+            File Content Breakdown
+            <div style="overflow: hidden;">
+              <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; max-height: 350px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
+              justify-content: center; padding: 20px;">
+                <mat-card-content>
+                  <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile" width=300 height=300></app-pie-graph>
+                </mat-card-content>
+              </mat-card>
+            </div>
       </div>
 
       </div>
@@ -139,7 +190,7 @@
   <mat-tab label="Content"> <ng-template matTabContent> 
     <div style="padding: 20px;"> Subject Breakdown </div>
 
-    <div style="padding: 20px; overflow: hidden;">
+    <div style="padding: 20px; overflow-y:hidden">
     
     <div style="float:left; width: 550px">
       <app-generic-table 
@@ -156,22 +207,13 @@
       </app-generic-table>
     </div>
 
-    <div style="overflow: hidden; margin-top: -10px;">
-      <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; max-height: 350px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
-      justify-content: center; padding: 20px;">
-        <mat-card-content>
-          <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject" width=1000 height=1000></app-pie-graph>
-        </mat-card-content>
-      </mat-card>
-    </div>
-
     </div>
 
     <div style="padding: 20px;"> File Content Breakdown </div>
 
     <div style="padding: 20px;">
 
-    <div style="float:left; width: 575px">
+    <div style="float:left; width: 575px; overflow-y:hidden">
       <app-generic-table 
       [data]="file_content_table"
       [colHeaders]="true"
@@ -184,15 +226,6 @@
       [filters]="false"
       licenseKey="non-commercial-and-evaluation"> 
       </app-generic-table>
-    </div>
-
-    <div style="overflow: hidden; margin-top: -10px;">
-      <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; max-height: 350px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
-      justify-content: center; padding: 20px;">
-        <mat-card-content>
-          <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile" width=300 height=300></app-pie-graph>
-        </mat-card-content>
-      </mat-card>
     </div>
 
     </div>

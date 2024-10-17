@@ -152,6 +152,9 @@ export class AppComponent implements AfterViewInit, OnInit{
   dataset_table_data = [];
   file_table_data = [];
 
+  subjectTableOn = false;
+  fileContentTableOn = false; 
+
   generic_columns: any[] = [
     {data: "name", readOnly: "true", title: "Collection / Dataverses"},
   ]
@@ -206,7 +209,7 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.barChartDataDownloads = [
       { // grey
         data: this.barChartDataDownloadsAgg_data,
-        label: 'Monthly Downloads',
+        label: 'Monthly File Downloads',
         tension: 0,
         backgroundColor: 'rgb(102, 0, 102, 0.5)',
         borderColor: 'rgb(102, 0, 102, 0.5)',
@@ -217,7 +220,7 @@ export class AppComponent implements AfterViewInit, OnInit{
       },
       { // grey
         data: this.barChartDataDownloads_data,
-        label: 'Cumulative Downloads',
+        label: 'Cumulative File Downloads',
         tension: 0,
         backgroundColor: 'rgb(0, 100, 255, 0.5)',
         borderColor: 'rgb(0, 100, 255, 0.5)',
@@ -379,6 +382,11 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   openAboutDialog() {
     this.dialog.open(AboutDialog);
+  }
+
+  subjectToggle() {
+    if (this.subjectTableOn){this.subjectTableOn = false}
+    else {this.subjectTableOn = true} 
   }
 
 }
