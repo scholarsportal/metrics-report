@@ -23,3 +23,11 @@ body .handsontable .even{
   text-overflow: ellipsis;
   white-space: nowrap !important;
 }
+
+.example-month-picker .mat-calendar-period-button {
+  pointer-events: none;
+}
+
+.example-month-picker .mat-calendar-arrow {
+  display: none;
+}

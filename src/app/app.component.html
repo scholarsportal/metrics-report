@@ -1,4 +1,4 @@
-<app-posts (messageEvent)="getData($event)" [collectionSelected]="selectedCollection_Activate"></app-posts>
+<app-posts (messageEvent)="getData($event)" [collectionSelected]="selectedCollection_Activate" [startDate]="date_start_activate" [endDate]="date_end_activate" [start_on]="start_on"></app-posts>
 
 <h2 style="padding:20px;"> Borealis Metrics Report 
   <div style="float:right; align-items: center;">
@@ -21,29 +21,42 @@
   margin-left: auto;
   margin-right: auto;">
 
-<mat-form-field appearance="outline">
+<mat-form-field appearance="outline" style="margin-left: 10px;">
   <mat-label>Collection</mat-label>
   <mat-select (selectionChange)="selectedCollection($event)" value="(All)">
     @for (option of options; track option) {
       <mat-option [value]="option">{{option}}</mat-option>
-    }
+    }S
   </mat-select>
 </mat-form-field>
 
-<mat-form-field appearance="outline" style="padding: 10px;">
-    <mat-label>Enter a date range</mat-label>
-    <mat-date-range-input [rangePicker]="picker">
-      <input matStartDate placeholder="Start date">
-      <input matEndDate placeholder="End date">
-    </mat-date-range-input>
-    <mat-hint>MM/YYYY – MM/YYYY</mat-hint>
-    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-    <mat-date-range-picker #picker></mat-date-range-picker>
+<mat-form-field appearance="outline" style="margin-left: 10px;"> 
+  <mat-label>Start Date</mat-label>
+  <input matInput *ngIf="!start_on" disabled> 
+  <input matInput *ngIf="start_on"[matDatepicker]="dp_s" [formControl]="date_start" [min]="minDate" [max]="todayDate"> 
+  <mat-datepicker-toggle *ngIf="start_on" matIconSuffix [for]="dp_s"> </mat-datepicker-toggle>
+  <mat-datepicker #dp_s 
+                  startView="multi-year"
+                  (monthSelected)="setStartMonthAndYear($event, dp_s)"
+                  panelClass="example-month-picker">
+  </mat-datepicker>
 </mat-form-field>
 
-<button (click)="CollectionDataButtonActivate()" mat-button> <mat-icon style="transform: scale(2);"> sync</mat-icon> </button>
-</div>
+<mat-checkbox [(ngModel)]="start_on" style="margin-left: 10px;"></mat-checkbox>
 
+<mat-form-field appearance="outline"style="margin-left: 10px;"> 
+  <mat-label>End Date</mat-label>
+  <input matInput [matDatepicker]="dp_e" [formControl]="date_end" [min]="minDate" [max]="todayDate">
+  <mat-datepicker-toggle matIconSuffix [for]="dp_e"></mat-datepicker-toggle>
+  <mat-datepicker #dp_e
+                  startView="multi-year"
+                  (monthSelected)="setEndMonthAndYear($event, dp_e)"
+                  panelClass="example-month-picker">
+  </mat-datepicker>
+</mat-form-field>
+
+<button (click)="CollectionDataButtonActivate()" mat-button extended style="margin-left: 10px;"> SUBMIT </button>
+</div>
 
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
   <mat-tab label="Overview"> 
@@ -56,14 +69,15 @@
       <div style="vertical-align:top; margin-top: 50px; margin-left: -60px;">
         
         <div style="vertical-align:top; margin-left: 20px;">
-          <div><h1>Borealis&nbsp;(All)</h1></div>
-          <div style="margin-top: -20px;"><p><i>Current&nbsp;Date</i></p></div>
+          <div *ngIf="selectedCollection_Activate=='(All)'"><h1>Borealis&nbsp;(All)</h1></div>
+          <div *ngIf="selectedCollection_Activate!='(All)'"><h1>{{selectedCollection_Activate_Name}}</h1></div>
+          <div style="margin-top: -20px;"><p><i>{{date_String}}</i></p></div>
         </div>
         
         <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
           <mat-card-header>
             <mat-card-title-group>
-              <mat-card-title> <div *ngIf="selectedCollection_Activate=='(All)'"> Collections </div> 
+              <mat-card-title> <div *ngIf="selectedCollection_Activate=='(All)'" style="margin-left: 10px;"> Collections </div> 
                 <div *ngIf="selectedCollection_Activate!='(All)'"> Sub Collections </div> </mat-card-title>
               <mat-card-subtitle> </mat-card-subtitle>
             </mat-card-title-group>
@@ -136,10 +150,10 @@
             Number of Users
             <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataUsers"></app-horizontal-bar-graph>
             Subject Breakdown
-            <div style="overflow: hidden;">
+            <div>
                 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
                 <mat-tab label="Visual"> 
-                  <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; min-height: 400px; max-height: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
+                  <mat-card class="example-card" appearance="outlined" style="min-width: 600px; max-width: 600px; min-height: 300px; max-height: 300px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
                   justify-content: center; padding: 20px;">
                     <mat-card-content>
                       <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject" width=1000 height=1000></app-pie-graph>
@@ -148,10 +162,7 @@
                 </mat-tab> 
               
                 <mat-tab label="Table">
-                  <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; min-height: 400px; max-height: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
-                  justify-content: center; padding: 20px;">
-                    <mat-card-content>
-                       <div style="width: 550px">
+                  <div style="padding: 20px; padding-top: 10px">
                   <app-generic-table 
                   [data]="subject_table"
                   [colHeaders]="true"
@@ -164,96 +175,52 @@
                   [filters]="false"
                   licenseKey="non-commercial-and-evaluation"> 
                   </app-generic-table>
-                </div>
-                    </mat-card-content>
-                  </mat-card>
+                  </div>
               </mat-tab>
              </mat-tab-group>
 
             </div>
             File Content Breakdown
-            <div style="overflow: hidden;">
-              <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; max-height: 350px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
-              justify-content: center; padding: 20px;">
-                <mat-card-content>
-                  <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile" width=300 height=300></app-pie-graph>
-                </mat-card-content>
-              </mat-card>
-            </div>
+            <div>
+              <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+              <mat-tab label="Visual"> 
+                <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; min-height: 300px; max-height: 300px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
+                justify-content: center; padding: 20px;">
+                  <mat-card-content>
+                    <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile" width=1000 height=1000></app-pie-graph>
+                  </mat-card-content>
+                </mat-card>
+              </mat-tab> 
+            
+              <mat-tab label="Table">
+              <div style="padding: 20px; padding-top: 10px">
+                <app-generic-table 
+                [data]="file_content_table"
+                [colHeaders]="true"
+                [colWidths]="[300, 100, 100]"
+                [rowHeaders]="true"
+                [height]="350"
+                width="100%"
+                [columnSorting]="true"
+                [columns]="file_content_columns"
+                [filters]="false"
+                licenseKey="non-commercial-and-evaluation"> 
+                </app-generic-table>
+              </div>
+            </mat-tab>
+           </mat-tab-group>
+          </div>
+            
       </div>
 
       </div>
 
     </ng-template>
   </mat-tab>
-  
-  <mat-tab label="Content"> <ng-template matTabContent> 
-    <div style="padding: 20px;"> Subject Breakdown </div>
 
-    <div style="padding: 20px; overflow-y:hidden">
-    
-    <div style="float:left; width: 550px">
-      <app-generic-table 
-      [data]="subject_table"
-      [colHeaders]="true"
-      [colWidths]="[300, 100, 100]"
-      [rowHeaders]="true"
-      [height]="350"
-      width="100%"
-      [columnSorting]="true"
-      [columns]="subject_columns"
-      [filters]="false"
-      licenseKey="non-commercial-and-evaluation"> 
-      </app-generic-table>
-    </div>
-
-    </div>
-
-    <div style="padding: 20px;"> File Content Breakdown </div>
-
-    <div style="padding: 20px;">
-
-    <div style="float:left; width: 575px; overflow-y:hidden">
-      <app-generic-table 
-      [data]="file_content_table"
-      [colHeaders]="true"
-      [colWidths]="[300, 100, 100]"
-      [rowHeaders]="true"
-      [height]="350"
-      width="100%"
-      [columnSorting]="true"
-      [columns]="file_content_columns"
-      [filters]="false"
-      licenseKey="non-commercial-and-evaluation"> 
-      </app-generic-table>
-    </div>
-
-    </div>
-
+  <mat-tab label="Make Data Count"> <ng-template matTabContent>  
 
   </ng-template> 
   </mat-tab>
 
-  <mat-tab label="Storage"> <ng-template matTabContent>  
-
-  </ng-template> 
-  </mat-tab>
-
-  <mat-tab [disabled]="selectedCollection_Activate == '(All)'" label="Datasets"> <ng-template matTabContent> 
-
-    <div style="position:relative; width:1550px; display: inline-block; height:2000px; padding: 10px;">
-      <app-data-table-dataset [item]="dataset_table_data"></app-data-table-dataset>
-    </div>
-
-  </ng-template> 
-  
-  </mat-tab>
-  <mat-tab [disabled]="selectedCollection_Activate == '(All)'" label="Files"> <ng-template matTabContent>
-
-    <div style="position:relative; width:1800px; display: inline-block; height:500px; padding: 20px;">
-      <app-data-table-file [item]="file_table_data"></app-data-table-file>
-    </div>
-
-  </ng-template> 
-  </mat-tab>
 </mat-tab-group>

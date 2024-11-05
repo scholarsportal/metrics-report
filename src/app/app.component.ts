@@ -1,9 +1,10 @@
-import {AfterViewInit, Component, ViewChild, NgModule, ChangeDetectionStrategy, ElementRef,OnInit} from '@angular/core';
+import {AfterViewInit, Component, ViewChild, NgModule, ChangeDetectionStrategy, ViewEncapsulation, ElementRef,OnInit,} from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import {JsonPipe, AsyncPipe, CommonModule} from '@angular/common';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {MatInputModule} from '@angular/material/input';
@@ -29,6 +30,7 @@ import { PostsComponent } from './posts/posts.component';
 import {MatCardModule} from '@angular/material/card';
 import {MatDialog} from '@angular/material/dialog';
 import { GenericTableComponent } from './generic-table/generic-table.component';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
 import {default as _rollupMoment, Moment} from 'moment';
@@ -38,10 +40,10 @@ registerAllModules();
 const moment = _rollupMoment || _moment;
 export const MY_FORMATS = {
   parse: {
-    dateInput: 'MM/YYYY',
+    dateInput: 'YYYY-MM',
   },
   display: {
-    dateInput: 'MM/YYYY',
+    dateInput: 'YYYY-MM',
     monthYearLabel: 'MMM YYYY',
     dateA11yLabel: 'LL',
     monthYearA11yLabel: 'MMMM YYYY',
@@ -51,7 +53,7 @@ export const MY_FORMATS = {
 @Component({
   selector: 'app-root',
   standalone: true,
-  providers: [provideNativeDateAdapter()],
+  providers: [provideMomentDateAdapter(MY_FORMATS)],
   imports: [
     MatTabsModule,
     MatFormFieldModule, 
@@ -83,7 +85,8 @@ export const MY_FORMATS = {
     PostsComponent,
     CommonModule,
     MatCardModule,
-    GenericTableComponent
+    GenericTableComponent,
+    MatCheckboxModule
     ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.component.html',
@@ -91,14 +94,69 @@ export const MY_FORMATS = {
 })
 export class AppComponent implements AfterViewInit, OnInit{
 
-  readonly date = new FormControl(moment());
+  start_on: boolean = false;
+  date_start = new FormControl(moment());
+  date_end = new FormControl(moment());
+  date_String: String = this.dateStringFormat();  
+  date_start_activate: string = "";
+  date_end_activate: string = "";
+  date_select_on = false; 
+  todayDate:Date = new Date();
+  minDate: Date = new Date("2016-02-01");
 
-  setMonthAndYear(normalizedMonthAndYear: Moment, datepicker: MatDatepicker<Moment>) {
-    const ctrlValue = this.date.value ?? moment();
+
+  setStartMonthAndYear(normalizedMonthAndYear: Moment, datepicker: MatDatepicker<Moment>) {
+    this.date_start = new FormControl(moment());    const ctrlValue = this.date_start.value ?? moment();
     ctrlValue.month(normalizedMonthAndYear.month());
     ctrlValue.year(normalizedMonthAndYear.year());
-    this.date.setValue(ctrlValue);
+    this.date_start.setValue(ctrlValue);
     datepicker.close();
+  }
+
+  setEndMonthAndYear(normalizedMonthAndYear: Moment, datepicker: MatDatepicker<Moment>) {
+    this.dateStringFormat()
+    const ctrlValue = this.date_end.value ?? moment();
+    ctrlValue.month(normalizedMonthAndYear.month());
+    ctrlValue.year(normalizedMonthAndYear.year());
+    this.date_end.setValue(ctrlValue);
+    datepicker.close();
+  }
+
+  submitDate(){
+    const ctrlValue_s = this.date_start.value ?? moment();
+    const ctrlValue_e = this.date_end.value ?? moment();
+    const date_s = ctrlValue_s.format('YYYY-MM');
+    const date_e = ctrlValue_e.format('YYYY-MM');
+
+    this.date_start_activate = date_s;
+    this.date_end_activate = date_e;
+    this.date_select_on = true; 
+  }
+
+  dateStringFormat(): String{
+
+    var monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"];
+
+    var dateString = ""; 
+
+  if (this.start_on){
+    const ctrlValue_s = this.date_start.value ?? moment();
+    const year_s = ctrlValue_s.format('YYYY');
+    const month_s = ctrlValue_s.format('MM');
+    console.log(ctrlValue_s.format('YYYY'), ctrlValue_s.format('MM')) 
+    const str_s = monthNames[parseInt(month_s)-1] + " " + year_s
+    dateString = str_s; 
+  }
+
+  const ctrlValue_e = this.date_end.value ?? moment();
+  const year_e = ctrlValue_e.format('YYYY');
+  const month_e = ctrlValue_e.format('MM');
+  console.log(ctrlValue_e.format('YYYY'), ctrlValue_e.format('MM')) 
+  const str_e = monthNames[parseInt(month_e)-1] + " " + year_e
+  
+  return(dateString = dateString + " - " + str_e);
+
   }
 
   options: string[] = ["(All)"];
@@ -141,8 +199,10 @@ export class AppComponent implements AfterViewInit, OnInit{
   pieChartLabelsFile: Array<String> = [];
   pieChartDataFile: Array<any> = [];
 
-  selectedCollection_Current:String = "(All)";
-  selectedCollection_Activate:String = "(All)";
+  selectedCollection_Current: string = "(All)";
+  selectedCollection_Activate: string = "(All)";
+  selectedCollection_Current_Name: string = "(All)";
+  selectedCollection_Activate_Name:String = "(All)";
 
   total_collections_num: String = "-";
   total_datasets_num: String = "-";
@@ -196,10 +256,6 @@ export class AppComponent implements AfterViewInit, OnInit{
 
     this.pieChartLabelsFile = newItem["DataverseTabData"]['file_content_label_data'];
     this.pieChartDataFile_data = newItem["DataverseTabData"]['file_content_data'];
-
-    this.dataset_table_data = newItem["DatasetTabData"]['table_data']
-    this.file_table_data = newItem["FileTabData"]['table_data']
-    console.log("quick", this.barChartDataDownloads_data, this.barChartDataDownloadsAgg_data); 
 
     this.total_collections_num = newItem["DataverseTabData"]['name_dropdown_data'].length.toString(); 
     this.total_datasets_num = this.barChartDataDatasets_data[0].toString();
@@ -328,6 +384,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   }
 
   selectedCollection(event: MatSelectChange) {
+    this.selectedCollection_Current_Name = event.value;
     if (event.value == "(All)"){
       this.selectedCollection_Current = "(All)"
     }
@@ -348,6 +405,9 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   CollectionDataButtonActivate(){
     this.selectedCollection_Activate = this.selectedCollection_Current;
+    this.selectedCollection_Activate_Name = this.selectedCollection_Current_Name;
+    this.submitDate();
+    this.date_String = this.dateStringFormat();  
     console.log(this.selectedCollection_Activate);
   }
 
@@ -387,6 +447,10 @@ export class AppComponent implements AfterViewInit, OnInit{
   subjectToggle() {
     if (this.subjectTableOn){this.subjectTableOn = false}
     else {this.subjectTableOn = true} 
+  }
+
+  defaultButton(){
+    window.location.reload();
   }
 
 }
