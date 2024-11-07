@@ -170,6 +170,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   datasets_graph_data: Array<any> = [];
   files_graph_data: Array<any> = [];
   users_graph_data: Array<any> = [];
+  size_graph_data: Array<any> = [];
   name_dropdown_data: Array<any> = [];
 
   barChartDataDownloads_data: Array<number> = [];
@@ -184,12 +185,16 @@ export class AppComponent implements AfterViewInit, OnInit{
   barChartDataUsers_data: Array<number> = [];
   barChartDataUsers:Array<any> = [];
 
+  barChartDataSize_data: Array<number> = [];
+  barChartDataSize:Array<any> = [];
+
   months = [];
 
   barChartDataDownloadsAgg_data: Array<number> = []; 
   barChartDataDatasetsAgg_data: Array<number> = [];
   barChartDataFiles_Aggdata: Array<number> = [];
   barChartDataUsers_Aggdata: Array<number> = [];
+  barChartDataSize_Aggdata: Array<number> = [];
 
   pieChartDataSubject_data: Array<number> = [];
   pieChartLabelsSubject: Array<String> = [];
@@ -208,6 +213,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   total_datasets_num: String = "-";
   total_downloads_num: String = "-";
   total_users_num: String = "-";
+  total_size_num: String = "-"
 
   dataset_table_data = [];
   file_table_data = [];
@@ -245,11 +251,13 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.barChartDataDatasets_data = newItem["DataverseTabData"]['datasets_graph_data'];
     this.barChartDataFiles_data = newItem["DataverseTabData"]['files_graph_data'];
     this.barChartDataUsers_data = newItem["DataverseTabData"]['users_graph_data'];
+    this.barChartDataSize_data = newItem["DataverseTabData"]['size_graph_data'];
 
     this.barChartDataDownloadsAgg_data = newItem["DataverseTabData"]['downloads_graph_agg_data']
     this.barChartDataDatasetsAgg_data = newItem["DataverseTabData"]['datasets_graph_agg_data']
     this.barChartDataFiles_Aggdata = newItem["DataverseTabData"]['files_graph_agg_data']
     this.barChartDataUsers_Aggdata = newItem["DataverseTabData"]['users_graph_agg_data']
+    this.barChartDataSize_Aggdata = newItem["DataverseTabData"]['size_graph_agg_data']
 
     this.pieChartLabelsSubject = newItem["DataverseTabData"]['subject_label_data'];
     this.pieChartDataSubject_data = newItem["DataverseTabData"]['subject_data'];
@@ -258,9 +266,18 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.pieChartDataFile_data = newItem["DataverseTabData"]['file_content_data'];
 
     this.total_collections_num = newItem["DataverseTabData"]['name_dropdown_data'].length.toString(); 
-    this.total_datasets_num = this.barChartDataDatasets_data[0].toString();
-    this.total_downloads_num = this.barChartDataDownloads_data[0].toString();
-    this.total_users_num = this.barChartDataUsers_data[0].toString();
+    if (this.date_start_activate!=""){
+      this.total_datasets_num = this.barChartDataDatasetsAgg_data.reduce((a, b) => a + b, 0).toString();
+      this.total_downloads_num = this.barChartDataDownloadsAgg_data.reduce((a, b) => a + b, 0).toString();
+      this.total_users_num = this.barChartDataUsers_Aggdata.reduce((a, b) => a + b, 0).toString();
+      this.total_size_num = this.barChartDataSize_Aggdata.reduce((a, b) => a + b, 0).toFixed(2) .toString()+ "GB";
+    }
+    else{
+      this.total_datasets_num = this.barChartDataDatasets_data[0].toString();
+      this.total_downloads_num = this.barChartDataDownloads_data[0].toString();
+      this.total_users_num = this.barChartDataUsers_data[0].toString();
+      this.total_size_num = this.barChartDataSize_data[0].toFixed(2) .toString() + "GB"; 
+    }
 
     this.barChartDataDownloads = [
       { // grey
@@ -352,6 +369,31 @@ export class AppComponent implements AfterViewInit, OnInit{
       { // grey
         data: this.barChartDataUsers_data,
         label: 'Cumulative Users Joined',
+        tension: 0,
+        backgroundColor: 'rgb(0, 100, 255, 0.5)',
+        borderColor: 'rgb(0, 100, 255, 0.5)',
+        pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
+      }
+    ];
+
+    this.barChartDataSize = [
+      { // grey
+        data: this.barChartDataSize_Aggdata,
+        label: 'Monthly Storage Used (GB)',
+        tension: 0,
+        backgroundColor: 'rgb(102, 0, 102, 0.5)',
+        borderColor: 'rgb(102, 0, 102, 0.5)',
+        pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
+      },
+      { // grey
+        data: this.barChartDataSize_data,
+        label: 'Cumulative Storage Used (GB)',
         tension: 0,
         backgroundColor: 'rgb(0, 100, 255, 0.5)',
         borderColor: 'rgb(0, 100, 255, 0.5)',

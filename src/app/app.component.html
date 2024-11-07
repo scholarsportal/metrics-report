@@ -122,6 +122,19 @@
               <h1 style="text-align: right; color:DimGray;"> <b>{{total_users_num}}</b> </h1>
             </mat-card-content>
           </mat-card>
+
+          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title> Storage Usage </mat-card-title>
+                <mat-card-subtitle> </mat-card-subtitle>
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              <h1 style="text-align: right; color:DimGray;"> <b>{{total_size_num}}</b> </h1>
+            </mat-card-content>
+          </mat-card>
+
           
           <div id="hot" style="margin-left: 10px; margin-top: 10px; ">
           <app-generic-table
@@ -149,6 +162,8 @@
             <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataFiles"></app-horizontal-bar-graph>
             Number of Users
             <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataUsers"></app-horizontal-bar-graph>
+            Storage Usage
+            <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataSize"></app-horizontal-bar-graph>
             Subject Breakdown
             <div>
                 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">

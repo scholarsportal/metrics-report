@@ -67,6 +67,11 @@ export class PostsComponent {
   public monthlyFiles: Array<any> = [];
   public monthlyUsers: Array<any> = []; 
 
+  public fileSizeHash: any = {}; 
+  public sizeLabels: Array<any> = []; 
+  public monthlySize: Array<any> = []; 
+  public monthlyAggSize: Array<any> = [];
+
   public monthlyAggDownloads: Array<any> = []; 
   public monthlyAggDatasets: Array<any> = []; 
   public monthlyAggFiles: Array<any> = [];
@@ -175,7 +180,9 @@ export class PostsComponent {
             this.dataverseCollectionsDropDown.push(this.dataversesDataTree[i]['name'])
             }
           }
+          
           console.log("look at the months,", this.months)
+          
           for (let i = 0; i <= this.months.length - 2 ; i++){
             this.monthlyDownloads.push(this.downloads_rsp.find(x=>x.date==this.months[i])['count']);
             this.monthlyAggDownloads.push(this.downloads_rsp.find(x=>x.date==this.months[i])['count'] - this.downloads_rsp.find(x=>x.date==this.months[i+1])['count']);
@@ -206,6 +213,38 @@ export class PostsComponent {
           for (let i = 0; i < this.filecontent_rsp.length; i++){
             filecount_overall_count += this.filecontent_rsp[i]['count']
           }
+
+          for (let i = 0; i < this.filecontent_rsp.length; i++){
+            let date = this.filecontent_rsp[i]['date']
+            if (this.fileSizeHash.hasOwnProperty(date)){
+              this.fileSizeHash[date] += parseFloat((this.filecontent_rsp[i]['size'] / Math.pow(1024, 3)).toFixed(4));
+            }
+            else{
+              this.fileSizeHash[date] = parseFloat((this.filecontent_rsp[i]['size'] / Math.pow(1024, 3)).toFixed(4));
+            }
+          }
+          
+          var fileSizeArrayAll = Object.keys(this.fileSizeHash).map((key) => [key, this.fileSizeHash[key]]);
+          var fileSizeArray: Array<any> = []; 
+          for (var i = 0; i < fileSizeArrayAll.length; i++){
+            if (this.months.includes(fileSizeArrayAll[i][0])){
+              fileSizeArray.push(fileSizeArrayAll[i])
+            }
+          }
+
+          console.log(fileSizeArray)
+
+          for (var i = 0; i < fileSizeArray.length - 1; i++){
+            this.sizeLabels.push(fileSizeArray[i][0]);
+            this.monthlySize.push(fileSizeArray[i][1]);
+            this.monthlyAggSize.push(fileSizeArray[i+1][1] - fileSizeArray[i][1]);
+          }
+          this.monthlySize = this.monthlySize.reverse();
+          this.monthlyAggSize = this.monthlyAggSize.reverse();
+          console.log("size stuff", this.monthlySize, this.monthlyAggSize)
+
+          //this.monthlyAggFiles.push(this.files_rsp.find(x=>x.date==this.months[i])['count'] - this.files_rsp.find(x=>x.date==this.months[i+1])['count']);
+
           for (let i = 0; i < this.filecontent_rsp.length; i++){
 
             this.fileContentFullData.push({contenttype: this.filecontent_rsp[i]['contenttype'], count: this.filecontent_rsp[i]['count'], percent: (this.filecontent_rsp[i]['count'] / filecount_overall_count).toFixed(4)})
@@ -247,10 +286,12 @@ export class PostsComponent {
         datasets_graph_data: this.monthlyDatasets,
         files_graph_data: this.monthlyFiles,
         users_graph_data: this.monthlyUsers,
+        size_graph_data: this.monthlySize,
         downloads_graph_agg_data: this.monthlyAggDownloads, 
         datasets_graph_agg_data: this.monthlyAggDatasets,
         files_graph_agg_data: this.monthlyAggFiles,
         users_graph_agg_data: this.monthlyAggUsers,
+        size_graph_agg_data: this.monthlyAggSize,
         subject_label_data: this.subjectLabels,
         subject_data: this.subjectData,
         subject_full_data: this.subjectContentFullData,
@@ -338,6 +379,7 @@ export class PostsComponent {
     this.monthlyDatasets = []; 
     this.monthlyFiles = [];
     this.monthlyUsers = []; 
+    this.monthlySize = []; 
     this.observables = [];
 
     this.dataversesDataTree = [];
@@ -361,6 +403,7 @@ export class PostsComponent {
     this.monthlyAggDatasets = []; 
     this.monthlyAggFiles = [];
     this.monthlyAggUsers = []; 
+    this.monthlyAggSize = []; 
 
     this.subjectContentFullData = [];
     this.fileContentFullData = [];
