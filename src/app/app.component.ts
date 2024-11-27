@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ViewChild, NgModule, ChangeDetectionStrategy, ViewEncapsulation, ElementRef,OnInit,} from '@angular/core';
+import {AfterViewInit, Component, ViewChild, NgModule, ChangeDetectionStrategy, ViewEncapsulation, ElementRef,OnInit, inject,} from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import {JsonPipe, AsyncPipe, CommonModule} from '@angular/common';
 import {MatTabsModule} from '@angular/material/tabs';
@@ -30,7 +30,11 @@ import { PostsComponent } from './posts/posts.component';
 import {MatCardModule} from '@angular/material/card';
 import {MatDialog} from '@angular/material/dialog';
 import { GenericTableComponent } from './generic-table/generic-table.component';
+import {TranslateModule, TranslateService, TranslateStore} from '@ngx-translate/core';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import {DownloadComponent} from './download/download.component'; 
+import {MatMenuModule} from '@angular/material/menu';
+import html2canvas from 'html2canvas';
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
 import {default as _rollupMoment, Moment} from 'moment';
@@ -86,7 +90,8 @@ export const MY_FORMATS = {
     CommonModule,
     MatCardModule,
     GenericTableComponent,
-    MatCheckboxModule
+    MatCheckboxModule, 
+    DownloadComponent
     ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.component.html',
@@ -164,6 +169,7 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   table_data = [];
   alias_data = [];
+  raw_table_data = {};
   subject_table = [];
   file_content_table = [];
   downloads_graph_data: Array<any> = [];
@@ -237,6 +243,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   ]
 
   getData(newItem: any) {
+    this.raw_table_data = newItem["DataverseTabData"];
     this.table_data = newItem["DataverseTabData"]['table_data'];
     this.alias_data = newItem["DataverseTabData"]['alias_data'];
 
@@ -422,7 +429,19 @@ export class AppComponent implements AfterViewInit, OnInit{
     
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
+    /*
+    const defaultLange = localStorage.getItem('language') || 'en'; 
+    this.translateService.setDefaultLang(defaultLange);
+    this.translateService.use(defaultLange);
+    */
+  }
+
+  changeLanguage(lang: string){
+    /*
+    this.translateService.use(lang)
+    localStorage.setItem('language', lang);
+    */
   }
 
   selectedCollection(event: MatSelectChange) {

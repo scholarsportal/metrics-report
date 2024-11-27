@@ -17,16 +17,20 @@
   </div>
 </h2>
 
-<div style=" position: relative; top:35px; max-width: fit-content;
+<div style="
+  top:35px; 
+  max-width: fit-content;
   margin-left: auto;
-  margin-right: auto;">
+  margin-right: auto;
+  padding-bottom: 0.8cm;
+  ">
 
 <mat-form-field appearance="outline" style="margin-left: 10px;">
   <mat-label>Collection</mat-label>
   <mat-select (selectionChange)="selectedCollection($event)" value="(All)">
     @for (option of options; track option) {
       <mat-option [value]="option">{{option}}</mat-option>
-    }S
+    }
   </mat-select>
 </mat-form-field>
 
@@ -55,12 +59,23 @@
   </mat-datepicker>
 </mat-form-field>
 
-<button (click)="CollectionDataButtonActivate()" mat-button extended style="margin-left: 10px;"> SUBMIT </button>
+  <button (click)="CollectionDataButtonActivate()" mat-button extended style="margin-left: 10px;"> SUBMIT </button>
 </div>
 
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+  <app-download #download [data]="raw_table_data"></app-download>
   <mat-tab label="Overview"> 
     <ng-template matTabContent>
+
+      <div style="position:absolute; top:10px; right:150px;">
+      <button class="mat-small"  (click)="download.generateExcel()" 
+        mat-button extended > 
+        DOWNLOAD EXCEL</button> | 
+
+      <button class="mat-small" 
+        mat-button extended (click)="download.generatePDF()"> 
+        DOWNLOAD PDF </button>
+      </div>
 
       <div style="margin: auto;
       width: 50%; 
@@ -153,7 +168,7 @@
 
       </div> 
             
-      <div style="width:800px; display: inline-block; height:3000px; padding: 20px; padding-top: 100px">
+      <div style="width:800px; display: inline-block; height:3000px; padding: 20px; padding-top: 100px" id='contentToConvert'>
             Number of Downloads
             <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
             Number of Datasets 
@@ -227,11 +242,11 @@
           </div>
             
       </div>
-
+      
       </div>
 
     </ng-template>
-  </mat-tab>
+    </mat-tab>
 
   <mat-tab label="Make Data Count"> <ng-template matTabContent>  
 
