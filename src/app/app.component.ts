@@ -35,6 +35,8 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {DownloadComponent} from './download/download.component'; 
 import {MatMenuModule} from '@angular/material/menu';
 import html2canvas from 'html2canvas';
+import { TranslocoModule } from '@ngneat/transloco';
+import { LanguageService } from './language.service';
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
 import {default as _rollupMoment, Moment} from 'moment';
@@ -91,7 +93,8 @@ export const MY_FORMATS = {
     MatCardModule,
     GenericTableComponent,
     MatCheckboxModule, 
-    DownloadComponent
+    DownloadComponent,
+    TranslocoModule
     ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.component.html',
@@ -477,7 +480,11 @@ export class AppComponent implements AfterViewInit, OnInit{
   displayedColumns: string[] = ['name', 'views', 'downloads', 'citations'];
   title = 'metrics-app';
 
-  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog) {}
+  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, private languageService: LanguageService) {}
+
+  switchLanguage(language: string) {
+    this.languageService.switchLanguage(language);
+  }
 
   ngAfterViewInit() {
   }

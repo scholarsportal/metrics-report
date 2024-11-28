@@ -1,11 +1,11 @@
 <app-posts (messageEvent)="getData($event)" [collectionSelected]="selectedCollection_Activate" [startDate]="date_start_activate" [endDate]="date_end_activate" [start_on]="start_on"></app-posts>
 
-<h2 style="padding:20px;"> Borealis Metrics Report 
+<h2 style="padding:20px;"> {{ 'Title' | transloco }}
   <div style="float:right; align-items: center;">
     <div style="float:right;">
-      <button mat-button disabled> English </button>
+      <button mat-button (click)="switchLanguage('en')" disabled> English </button>
       |
-      <button mat-button> Français </button>
+      <button mat-button (click)="switchLanguage('fr')"> Français </button>
     </div>
     <div  style="clear:both;">
       <button (click)="openAboutDialog()" style="min-width: 1%;" class="mat-small" mat-button> About </button>
@@ -168,7 +168,7 @@
 
       </div> 
             
-      <div style="width:800px; display: inline-block; height:3000px; padding: 20px; padding-top: 100px" id='contentToConvert'>
+      <div style="width:800px; display: inline-block; height:3000px; padding: 20px; padding-top: 100px">
             Number of Downloads
             <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
             Number of Datasets 
