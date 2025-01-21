@@ -69,19 +69,85 @@ export class DownloadComponent {
 
   generatePDF(){
     console.log('hefkdaskfdsokfsakfs');
-    var x = document.getElementById('contentToConvert')!;
-    console.log(x)
-    html2canvas(x).then(canvas => {
-      const imgWidth = 208;
-      const pageHeight = 295;
+    const pdf = new jsPDF('p', 'mm', 'a4'); // A4 size page of PDF
+    var a = document.getElementById('title_download')!;
+    var b = document.getElementById('title_date')!;
+    var c = document.getElementById('main_meteris')!;
+    var d = document.getElementById('contentToConvert')!;
+    var e = document.getElementById('subject_convert')!; 
+    var f = document.getElementById('file_convert')!;
+
+
+    html2canvas(a).then(canvas => {
+      const imgWidth = 100;
+      const pageHeight = 100;
       const imgHeight = canvas.height * imgWidth / canvas.width;
       const heightLeft = imgHeight;
 
       const contentDataURL = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4'); // A4 size page of PDF
 
-      let position = 0;
-      pdf.addImage(contentDataURL, 'PNG', 0, position, imgWidth, imgHeight);
+      let position = 5;
+      pdf.addImage(contentDataURL, 'PNG', 10, position, imgWidth, imgHeight);
+    });
+
+    html2canvas(b).then(canvas => {
+      const imgWidth = 100;
+      const pageHeight = 100;
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      const heightLeft = imgHeight;
+
+      const contentDataURL = canvas.toDataURL('image/png');
+
+      let position = 12;
+      pdf.addImage(contentDataURL, 'PNG', 10, position, imgWidth, imgHeight);
+    });
+
+    html2canvas(c).then(canvas => {
+      const imgWidth = 100;
+      const pageHeight = 100;
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      const heightLeft = imgHeight;
+
+      const contentDataURL = canvas.toDataURL('image/png');
+
+      let position = 20;
+      pdf.addImage(contentDataURL, 'PNG', 5, position, imgWidth, imgHeight);
+    });
+
+    html2canvas(d).then(canvas => {
+      const imgWidth = 100;
+      const pageHeight = 100;
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      const heightLeft = imgHeight;
+
+      const contentDataURL = canvas.toDataURL('image/png');
+
+      let position = 5;
+      pdf.addImage(contentDataURL, 'PNG', 110, position, imgWidth, imgHeight);
+    });
+
+    html2canvas(e).then(canvas => {
+      const imgWidth = 100;
+      const pageHeight = 100;
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      const heightLeft = imgHeight;
+
+      const contentDataURL = canvas.toDataURL('image/png');
+
+      let position = 155;
+      pdf.addImage(contentDataURL, 'PNG', 5, position, imgWidth, imgHeight);
+    });
+
+    html2canvas(f).then(canvas => {
+      const imgWidth = 100;
+      const pageHeight = 100;
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      const heightLeft = imgHeight;
+
+      const contentDataURL = canvas.toDataURL('image/png');
+
+      let position = 220;
+      pdf.addImage(contentDataURL, 'PNG', 5, position, imgWidth, imgHeight);
       pdf.save('dynamicData.pdf'); // Generated PDF
     });
   }

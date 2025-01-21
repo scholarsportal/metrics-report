@@ -433,20 +433,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   }
 
   ngOnInit(): void {
-    /*
-    const defaultLange = localStorage.getItem('language') || 'en'; 
-    this.translateService.setDefaultLang(defaultLange);
-    this.translateService.use(defaultLange);
-    */
   }
-
-  changeLanguage(lang: string){
-    /*
-    this.translateService.use(lang)
-    localStorage.setItem('language', lang);
-    */
-  }
-
   selectedCollection(event: MatSelectChange) {
     this.selectedCollection_Current_Name = event.value;
     if (event.value == "(All)"){
@@ -484,6 +471,10 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   switchLanguage(language: string) {
     this.languageService.switchLanguage(language);
+  }
+
+  getLanguage(){
+    return this.languageService.getLanguage();
   }
 
   ngAfterViewInit() {

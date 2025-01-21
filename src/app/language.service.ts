@@ -11,4 +11,8 @@ export class LanguageService {
   switchLanguage(language: string) {
     this.translocoService.setActiveLang(language);
   }
+
+  getLanguage(){
+    return this.translocoService.getActiveLang();
+  }
 }
