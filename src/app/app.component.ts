@@ -111,6 +111,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   date_select_on = false; 
   todayDate:Date = new Date();
   minDate: Date = new Date("2016-02-01");
+  bad_range: boolean = false;
 
 
   setStartMonthAndYear(normalizedMonthAndYear: Moment, datepicker: MatDatepicker<Moment>) {
@@ -133,12 +134,31 @@ export class AppComponent implements AfterViewInit, OnInit{
   submitDate(){
     const ctrlValue_s = this.date_start.value ?? moment();
     const ctrlValue_e = this.date_end.value ?? moment();
+    console.log(ctrlValue_s, ctrlValue_e)
     const date_s = ctrlValue_s.format('YYYY-MM');
     const date_e = ctrlValue_e.format('YYYY-MM');
 
-    this.date_start_activate = date_s;
-    this.date_end_activate = date_e;
-    this.date_select_on = true; 
+    if (!this.start_on){
+      this.date_start_activate = "";
+    }
+
+    this.bad_range = false;
+
+    if (this.start_on && date_s > date_e){
+      this.bad_range = true;
+    }
+
+    if (this.start_on && !this.bad_range){
+      this.date_start_activate = date_s;
+      this.date_end_activate = date_e;
+      this.date_select_on = true; 
+    }
+
+    if (!this.start_on && !this.bad_range){
+      this.date_end_activate = date_e;
+      this.date_select_on = true; 
+    }
+
   }
 
   dateStringFormat(): String{
@@ -277,6 +297,7 @@ export class AppComponent implements AfterViewInit, OnInit{
 
     this.total_collections_num = newItem["DataverseTabData"]['name_dropdown_data'].length.toString(); 
     if (this.date_start_activate!=""){
+      console.log("ds is activated here")
       this.total_datasets_num = this.barChartDataDatasetsAgg_data.reduce((a, b) => a + b, 0).toString();
       this.total_downloads_num = this.barChartDataDownloadsAgg_data.reduce((a, b) => a + b, 0).toString();
       this.total_users_num = this.barChartDataUsers_Aggdata.reduce((a, b) => a + b, 0).toString();

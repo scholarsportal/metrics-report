@@ -117,7 +117,7 @@ export class PostsComponent {
     this.monthsFilesDateURLS = 'https://borealisdata.ca/api/info/metrics/files/monthly/' + this.parentAlias
     this.monthsUsersDateURLS = 'https://borealisdata.ca/api/info/metrics/accounts/monthly/'
     
-    this.subjectURL = 'https://borealisdata.ca/api/info/metrics/datasets/bySubject/toMonth/' + this.months[1] + this.parentAlias
+    this.subjectURL = 'https://borealisdata.ca/api/info/metrics/datasets/bySubject/toMonth/' + this.months[0] + this.parentAlias
     this.fileContentURL = 'https://borealisdata.ca/api/info/metrics/files/byType/monthly/' + this.parentAlias
 
     this.observables.push(this.httpClient.get<[]>(this.dataverseCollectionsURL));
@@ -196,7 +196,9 @@ export class PostsComponent {
             this.monthlyUsers.push(this.users_rsp.find(x=>x.date==this.months[i])['count']);
             this.monthlyAggUsers.push(this.users_rsp.find(x=>x.date==this.months[i])['count'] - this.users_rsp.find(x=>x.date==this.months[i+1])['count']);
           }
-          
+
+          console.log(responses[5])
+          console.log(this.filecontent_rsp)
           
           let subject_overall_count = 0;
           for (let i = 0; i < this.subject_rsp.length; i++){
@@ -307,46 +309,64 @@ export class PostsComponent {
 
   populateMonths(){
 
-    if (this.start_on){
+    let date_diff = 24
+
+    console.log("this is the start", this.startDate, this.endDate)
+
+    if (this.start_on && this.startDate != ""){
       
-      let date_diff = monthDifference(this.startDate, this.endDate);
+      date_diff = monthDifference(this.startDate, this.endDate);
+      console.log("this is date_diff", date_diff)
 
     }
 
     var upperDate = new Date();
     
     if (this.endDate != ""){
-      let timestamp = Date.parse(this.endDate);
+      let timestamp = Date.parse(this.endDate.concat("-02"));
+      console.log(timestamp);
       var upperDate = new Date(timestamp);
+      console.log("this is the upper date?", upperDate)
     }
     
     let mm = upperDate.getMonth() + 1;
     let yyyy = upperDate.getFullYear()
 
-    for (let i = 0; i <=25; i++){
+    console.log(mm, yyyy);
+
+    for (let i = 0; i <=date_diff + 2; i++){
       if (i != 0){
+      
         mm = mm - 1;
-      }
 
       if (mm == 0){
         yyyy = yyyy - 1;
         mm = 12; 
       }
 
+    }
+
       var mm_s = String(mm).padStart(2, '0');
       var yyyy_s = String(yyyy);
       let date = yyyy_s + '-' + mm_s;
+      console.log(date)
 
+      console.log('here is the', date)
       this.months.push(date); 
 
       if (this.start_on){ 
         if (date === this.startDate){
-          break;
+          if (i == date_diff + 2){
+            break;
+          }
+          else{
+            i = date_diff + 1
+          }
         }
       } 
     }
     //temp 
-    this.months.shift(); 
+    //this.months.shift(); 
 
     function monthDifference(s1: string, s2: string){
       let timestamp_s = Date.parse(s1);

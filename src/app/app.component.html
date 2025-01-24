@@ -69,6 +69,8 @@
   <button (click)="CollectionDataButtonActivate()" mat-button extended style="margin-left: 10px;"> SUBMIT </button>
 </div>
 
+<div *ngIf="bad_range==true"> <h4 style="color:red; text-align: center;"> Invalid Date Range </h4> </div>
+
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
   <app-download #download [data]="raw_table_data"></app-download>
   <mat-tab label="Overview"> 
