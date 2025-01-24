@@ -196,29 +196,32 @@
               Subject Breakdown
                 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
                 <mat-tab label="Visual"> 
+                  <ng-template matTabContent>
                   <mat-card class="example-card" appearance="outlined" style="min-width: 600px; max-width: 600px; min-height: 300px; max-height: 300px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
                   justify-content: center; padding: 20px;">
                     <mat-card-content>
                       <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject" width=1000 height=1000></app-pie-graph>
                     </mat-card-content>
                   </mat-card>
+                </ng-template>
                 </mat-tab> 
               
                 <mat-tab label="Table">
+                  <ng-template matTabContent>
                   <div style="padding: 20px; padding-top: 10px">
                   <app-generic-table 
                   [data]="subject_table"
                   [colHeaders]="true"
                   [colWidths]="[250, 75, 100]"
                   [rowHeaders]="true"
-                  [height]="350"
-                  width="100%"
+                  [height]="300"
                   [columnSorting]="true"
                   [columns]="subject_columns"
                   [filters]="false"
                   licenseKey="non-commercial-and-evaluation"> 
                   </app-generic-table>
                   </div>
+                </ng-template>
               </mat-tab>
              </mat-tab-group>
 
@@ -226,30 +229,33 @@
             <div id="file_convert">
               File Content Breakdown
               <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-              <mat-tab label="Visual"> 
-                <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; min-height: 300px; max-height: 300px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
+              <mat-tab label="Visual">
+              <ng-template matTabContent>
+                <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; min-height: 300px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
                 justify-content: center; padding: 20px;">
                   <mat-card-content>
                     <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile" width=1000 height=1000></app-pie-graph>
                   </mat-card-content>
                 </mat-card>
+              </ng-template>
               </mat-tab> 
             
               <mat-tab label="Table">
-              <div style="padding: 20px; padding-top: 10px">
+              <ng-template matTabContent>
+              <div id="hot" style="padding: 20px; padding-top: 10px">
                 <app-generic-table 
                 [data]="file_content_table"
                 [colHeaders]="true"
-                [colWidths]="[300, 100, 100]"
+                [colWidths]="[100, 200, 100, 100]"
                 [rowHeaders]="true"
-                [height]="350"
-                width="100%"
+                [height]="300"
                 [columnSorting]="true"
                 [columns]="file_content_columns"
                 [filters]="false"
                 licenseKey="non-commercial-and-evaluation"> 
                 </app-generic-table>
               </div>
+            </ng-template>
             </mat-tab>
            </mat-tab-group>
           </div>

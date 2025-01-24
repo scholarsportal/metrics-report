@@ -260,7 +260,8 @@ export class AppComponent implements AfterViewInit, OnInit{
   ]
 
   file_content_columns: any[] = [
-    {data: "contenttype", readOnly: "true", title: "File Type"},
+    {data: "type", readOnly: "true", title: "File Type"},
+    {data: "contenttype", readOnly: "true", title: "Specific File Type"},
     {data: "count", readOnly: "true", title: "Count"},
     {data: "percent", readOnly: "true", title: "Distribution"},
   ]

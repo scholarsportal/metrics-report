@@ -2,8 +2,3 @@
   font-family: Verdana, Helvetica, Arial, FreeSans, sans-serif important!;
   font-size: 12px important!;
 }
-
-html {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}

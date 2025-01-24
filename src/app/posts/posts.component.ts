@@ -38,6 +38,7 @@ export class PostsComponent {
   public users_rsp: Array<any> = [];
   public subject_rsp: Array<any> = [];
   public filecontent_rsp: Array<any> = [];
+  public filecontent_rsp_date_range: Array<any> = [];
 
   public table_dataset_rsp: any= {};
   public table_file_rsp: any= {};
@@ -58,6 +59,7 @@ export class PostsComponent {
 
   public fileContentURL: string = '';
   public fileContentHash: any = {}; 
+  public fileContentDetailHash: any = {}; 
   public fileContentLabels: Array<any> = []; 
   public fileContentData: Array<any> = []; 
   public fileContentFullData: Array<any> = []; 
@@ -234,8 +236,6 @@ export class PostsComponent {
             }
           }
 
-          console.log(fileSizeArray)
-
           for (var i = 0; i < fileSizeArray.length - 1; i++){
             this.sizeLabels.push(fileSizeArray[i][0]);
             this.monthlySize.push(fileSizeArray[i][1]);
@@ -246,25 +246,63 @@ export class PostsComponent {
           console.log("size stuff", this.monthlySize, this.monthlyAggSize)
 
           //this.monthlyAggFiles.push(this.files_rsp.find(x=>x.date==this.months[i])['count'] - this.files_rsp.find(x=>x.date==this.months[i+1])['count']);
-
+          
+          if (this.start_on){
           for (let i = 0; i < this.filecontent_rsp.length; i++){
+            if (this.months.slice(0, -1).includes(this.filecontent_rsp[i]['date'])){
+              console.log(this.months, this.filecontent_rsp[i]['date'])
+              this.filecontent_rsp_date_range.push(this.filecontent_rsp[i])
+            }
+          }
+          }
+          else {
+            this.filecontent_rsp_date_range = this.filecontent_rsp
+          }
+          
+          console.log(this.filecontent_rsp_date_range)
+          
+          for (let i = 0; i < this.filecontent_rsp_date_range.length; i++){
 
-            this.fileContentFullData.push({contenttype: this.filecontent_rsp[i]['contenttype'], count: this.filecontent_rsp[i]['count'], percent: (this.filecontent_rsp[i]['count'] / filecount_overall_count).toFixed(4)})
+            //this.fileContentFullData.push({contenttype: this.filecontent_rsp_date_range[i]['contenttype'], count: this.filecontent_rsp_date_range[i]['count'], percent: (this.filecontent_rsp_date_range[i]['count'] / filecount_overall_count).toFixed(4)})
 
-            let contentType = (this.filecontent_rsp[i]['contenttype'].split('/')[0]); 
-            let count = this.filecontent_rsp[i]['count']; 
+            let contentType = (this.filecontent_rsp_date_range[i]['contenttype'].split('/')[0]); 
+            let count = this.filecontent_rsp_date_range[i]['count']; 
             if (this.fileContentHash.hasOwnProperty(contentType)){
               this.fileContentHash[contentType] = this.fileContentHash[contentType] + count;
             }
             else {
               this.fileContentHash[contentType] = count
             }
+
+            let contentDetailType = (this.filecontent_rsp_date_range[i]['contenttype']); 
+            let countDetail = this.filecontent_rsp_date_range[i]['count']; 
+            if (this.fileContentDetailHash.hasOwnProperty(contentDetailType)){
+              this.fileContentDetailHash[contentDetailType] = this.fileContentDetailHash[contentDetailType] + countDetail;
+            }
+            else {
+              this.fileContentDetailHash[contentDetailType] = countDetail
+            }
           }
+
+          let date_range_sum = 0
+          for (var key in this.fileContentHash){
+            date_range_sum += this.fileContentHash[key];
+          }
+          console.log('count', date_range_sum)
+
+          for (var key in this.fileContentDetailHash){
+            let main_type = key.split('/')[0];
+            this.fileContentFullData.push({type: main_type, contenttype: key, count: this.fileContentDetailHash[key], percent: (this.fileContentHash[main_type] / date_range_sum).toFixed(4)})
+          }
+
+          console.log(this.fileContentHash);
+          console.log(this.fileContentDetailHash);
         
           for (var key in this.fileContentHash){
             this.fileContentLabels.push(key)
             this.fileContentData.push(this.fileContentHash[key]);
           }
+
         
           
           this.months.pop()
@@ -418,6 +456,7 @@ export class PostsComponent {
     this.fileContentHash= {}; 
     this.fileContentLabels= []; 
     this.fileContentData = []; 
+    this.filecontent_rsp_date_range = [];
 
     this.monthlyAggDownloads = []; 
     this.monthlyAggDatasets = []; 
