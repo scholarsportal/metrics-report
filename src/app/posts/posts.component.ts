@@ -454,8 +454,10 @@ export class PostsComponent {
 
     this.fileContentURL = '';
     this.fileContentHash= {}; 
+    this.fileContentDetailHash= {}; 
     this.fileContentLabels= []; 
     this.fileContentData = []; 
+    this.filecontent_rsp = [];
     this.filecontent_rsp_date_range = [];
 
     this.monthlyAggDownloads = []; 

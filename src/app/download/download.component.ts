@@ -43,8 +43,8 @@ export class DownloadComponent {
     worksheet_subject.addRow(['subject', 'count', 'percent']);
 
     const worksheet_file = workbook.addWorksheet('File Breakdown');  
-    const headers_file = Object.keys(['file', 'count', 'percent']);
-    worksheet_file.addRow(['content type', 'count', 'percent']);
+    const headers_file = Object.keys(['file type', 'specific type', 'count', 'percent']);
+    worksheet_file.addRow(['type', 'content type', 'count', 'percent']);
 
     for (let i = 0; i < months.length - 1; i+=1){
       worksheet_downloads.addRow([months[i],this.data['downloads_graph_agg_data'][i]]); 
@@ -58,7 +58,7 @@ export class DownloadComponent {
     }
 
     for (let i = 0; i < this.data['file_content_full_data'].length - 1; i+=1){
-      worksheet_file.addRow([this.data['file_content_full_data'][i]['contenttype'], this.data['file_content_full_data'][i]['count'], this.data['file_content_full_data'][i]['percent'] ]); 
+      worksheet_file.addRow([this.data['file_content_full_data'][i]['type'], this.data['file_content_full_data'][i]['contenttype'], this.data['file_content_full_data'][i]['count'], this.data['file_content_full_data'][i]['percent']]); 
     }
 
     workbook.xlsx.writeBuffer().then((buffer: any) => {
