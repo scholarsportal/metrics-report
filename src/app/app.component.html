@@ -1,0 +1,275 @@
+<app-posts (messageEvent)="getData($event)" [collectionSelected]="selectedCollection_Activate" [startDate]="date_start_activate" [endDate]="date_end_activate" [start_on]="start_on"></app-posts>
+
+<div>
+<h2 style="padding:20px;"> 
+  <div style="float: left">
+  <img style="max-width: 100%; height:30px; position: absolute;" src="/assets/logo.png" alt="image">
+  <div style="position: relative; left:35px"> {{ 'Title' | transloco }} </div>
+  </div>
+  <div style="float:right; align-items: center;">
+    <div style="float:right; position: relative;">
+      <button mat-button (click)="switchLanguage('en')" [disabled]="getLanguage()=='en'"> English </button>
+      |
+      <button mat-button (click)="switchLanguage('fr')" [disabled]="getLanguage()=='fr'"> Français </button>
+    </div>
+    <div  style="clear:both;">
+      <button (click)="openAboutDialog()" style="min-width: 1%;" class="mat-small" mat-button> About </button>
+      | 
+      <button style="min-width: 1%;" class="mat-small" mat-button> Terms of Conditions </button>
+      |
+      <button style="min-width: 1%;" class="mat-small" mat-button> FAQ </button>
+    </div>
+  </div>
+</h2>
+</div>
+
+<div style="
+  padding:60px;
+  top:10px; 
+  max-width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 0.2cm;
+  ">
+
+<mat-form-field appearance="outline" style="margin-left: 10px;">
+  <mat-label>Collection</mat-label>
+  <mat-select (selectionChange)="selectedCollection($event)" value="(All)">
+    @for (option of options; track option) {
+      <mat-option [value]="option">{{option}}</mat-option>
+    }
+  </mat-select>
+</mat-form-field>
+
+<mat-form-field appearance="outline" style="margin-left: 10px;"> 
+  <mat-label>Start Date</mat-label>
+  <input matInput *ngIf="!start_on" disabled> 
+  <input matInput *ngIf="start_on"[matDatepicker]="dp_s" [formControl]="date_start" [min]="minDate" [max]="todayDate"> 
+  <mat-datepicker-toggle *ngIf="start_on" matIconSuffix [for]="dp_s"> </mat-datepicker-toggle>
+  <mat-datepicker #dp_s 
+                  startView="multi-year"
+                  (monthSelected)="setStartMonthAndYear($event, dp_s)"
+                  panelClass="example-month-picker">
+  </mat-datepicker>
+</mat-form-field>
+
+<mat-checkbox [(ngModel)]="start_on" style="margin-left: 10px;"></mat-checkbox>
+
+<mat-form-field appearance="outline"style="margin-left: 10px;"> 
+  <mat-label>End Date</mat-label>
+  <input matInput [matDatepicker]="dp_e" [formControl]="date_end" [min]="minDate" [max]="todayDate">
+  <mat-datepicker-toggle matIconSuffix [for]="dp_e"></mat-datepicker-toggle>
+  <mat-datepicker #dp_e
+                  startView="multi-year"
+                  (monthSelected)="setEndMonthAndYear($event, dp_e)"
+                  panelClass="example-month-picker">
+  </mat-datepicker>
+</mat-form-field>
+
+  <button (click)="CollectionDataButtonActivate()" mat-button extended style="margin-left: 10px;"> SUBMIT </button>
+</div>
+
+<div *ngIf="bad_range==true"> <h4 style="color:red; text-align: center;"> Invalid Date Range </h4> </div>
+
+<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+  <app-download #download [data]="raw_table_data"></app-download>
+  <mat-tab label="Overview"> 
+    <ng-template matTabContent>
+
+      <div style="position:absolute; top:10px; right:150px;">
+      <button class="mat-small"  (click)="download.generateExcel()" 
+        mat-button extended > 
+         EXCEL <mat-icon> download </mat-icon> </button> | 
+
+      <button class="mat-small" 
+        mat-button extended (click)="download.generatePDF()"> 
+         PDF <mat-icon> download </mat-icon> </button>
+      </div>
+
+      <div style="margin: auto;
+      width: 50%; 
+      display: flex;">
+
+      <div style="vertical-align:top; margin-top: 50px; margin-left: -60px;">
+        
+        <div style="vertical-align:top; margin-left: 20px;">
+          <div *ngIf="selectedCollection_Activate=='(All)'" id="title_download"><h1>Borealis&nbsp;(All)</h1></div>
+          <div *ngIf="selectedCollection_Activate!='(All)'" id="title_download"><h1>{{selectedCollection_Activate_Name}}</h1></div>
+          <div style="margin-top: -20px;" id="title_date"><p><i>{{date_String}}</i></p></div>
+        </div>
+        
+        <div id="main_meteris">
+        <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+          <mat-card-header>
+            <mat-card-title-group>
+              <mat-card-title> <div *ngIf="selectedCollection_Activate=='(All)'" style="margin-left: 10px;"> Collections </div> 
+                <div *ngIf="selectedCollection_Activate!='(All)'"> Sub Collections </div> </mat-card-title>
+              <mat-card-subtitle> </mat-card-subtitle>
+            </mat-card-title-group>
+          </mat-card-header>
+          <mat-card-content>
+            <h1 style="text-align: right; color:DimGray;"> <b>{{total_collections_num}}</b> </h1>
+          </mat-card-content>
+        </mat-card>
+
+          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title> Datasets </mat-card-title>
+                <mat-card-subtitle> </mat-card-subtitle>
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              <h1 style="text-align: right; color:DimGray;"> <b>{{total_datasets_num}}</b> </h1>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title> Downloads </mat-card-title>
+                <mat-card-subtitle> </mat-card-subtitle>
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              <h1 style="text-align: right; color:DimGray;"> <b>{{total_downloads_num}}</b> </h1>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title> Users </mat-card-title>
+                <mat-card-subtitle> </mat-card-subtitle>
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              <h1 style="text-align: right; color:DimGray;"> <b>{{total_users_num}}</b> </h1>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title> Storage Usage </mat-card-title>
+                <mat-card-subtitle> </mat-card-subtitle>
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              <h1 style="text-align: right; color:DimGray;"> <b>{{total_size_num}}</b> </h1>
+            </mat-card-content>
+          </mat-card>
+          </div>
+
+          
+          <div id="hot" style="margin-left: 10px; margin-top: 10px; ">
+          <app-generic-table
+          [data]="table_data"
+          [colHeaders]="true"
+          [colWidths]="[335]"
+          [rowHeaders]="true"
+          [height]="1500"
+          [columnSorting]="true"
+          [columns]="generic_columns"
+          [dropdownMenu]="[]"
+          [filters]="false"
+          licenseKey="non-commercial-and-evaluation"> 
+          </app-generic-table>
+          </div>
+
+      </div> 
+            
+      <div style="width:800px; display: inline-block; height:3000px; padding: 20px; padding-top: 100px">
+            <div id="contentToConvert">
+            Number of Downloads
+            <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
+            Number of Datasets 
+            <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataDatasets"></app-horizontal-bar-graph> 
+            Number of Files
+            <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataFiles"></app-horizontal-bar-graph>
+            Number of Users
+            <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataUsers"></app-horizontal-bar-graph>
+            Storage Usage
+            <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataSize"></app-horizontal-bar-graph>
+            </div>
+            <div id="subject_convert">
+              Subject Breakdown
+                <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+                <mat-tab label="Visual"> 
+                  <ng-template matTabContent>
+                  <mat-card class="example-card" appearance="outlined" style="min-width: 600px; max-width: 600px; min-height: 300px; max-height: 300px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
+                  justify-content: center; padding: 20px;">
+                    <mat-card-content>
+                      <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject" width=1000 height=1000></app-pie-graph>
+                    </mat-card-content>
+                  </mat-card>
+                </ng-template>
+                </mat-tab> 
+              
+                <mat-tab label="Table">
+                  <ng-template matTabContent>
+                  <div style="padding: 20px; padding-top: 10px">
+                  <app-generic-table 
+                  [data]="subject_table"
+                  [colHeaders]="true"
+                  [colWidths]="[250, 75, 100]"
+                  [rowHeaders]="true"
+                  [height]="300"
+                  [columnSorting]="true"
+                  [columns]="subject_columns"
+                  [filters]="false"
+                  licenseKey="non-commercial-and-evaluation"> 
+                  </app-generic-table>
+                  </div>
+                </ng-template>
+              </mat-tab>
+             </mat-tab-group>
+
+            </div>
+            <div id="file_convert">
+              File Content Breakdown
+              <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+              <mat-tab label="Visual">
+              <ng-template matTabContent>
+                <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; min-height: 300px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
+                justify-content: center; padding: 20px;">
+                  <mat-card-content>
+                    <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile" width=1000 height=1000></app-pie-graph>
+                  </mat-card-content>
+                </mat-card>
+              </ng-template>
+              </mat-tab> 
+            
+              <mat-tab label="Table">
+              <ng-template matTabContent>
+              <div id="hot" style="padding: 20px; padding-top: 10px">
+                <app-generic-table 
+                [data]="file_content_table"
+                [colHeaders]="true"
+                [colWidths]="[100, 200, 100, 100]"
+                [rowHeaders]="true"
+                [height]="300"
+                [columnSorting]="true"
+                [columns]="file_content_columns"
+                [filters]="false"
+                licenseKey="non-commercial-and-evaluation"> 
+                </app-generic-table>
+              </div>
+            </ng-template>
+            </mat-tab>
+           </mat-tab-group>
+          </div>
+            
+      </div>
+      
+      </div>
+
+    </ng-template>
+    </mat-tab>
+
+  <mat-tab label="Make Data Count"> <ng-template matTabContent>  
+
+  </ng-template> 
+  </mat-tab>
+
+</mat-tab-group>

@@ -1,0 +1,33 @@
+/* You can add global styles to this file, and also import other style files */
+@import 'handsontable/dist/handsontable.full.css';
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.handsontable .th{
+  background: red !important;
+  color: red !important;
+}
+  
+body .handsontable .even{
+  background: red !important;
+  color: red !important;
+}
+
+.handsontable td, .handsontable tr, .handsontable th {
+  font-size: 10px;
+  max-height: 10px !important;
+  min-height: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap !important;
+}
+
+.example-month-picker .mat-calendar-period-button {
+  pointer-events: none;
+}
+
+.example-month-picker .mat-calendar-arrow {
+  display: none;
+}
