@@ -29,4 +29,4 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 ## Demo
 
-https://hamidtam.github.io/metrics-report/index.html
+https://hamidtam.github.io/metrics-report/
