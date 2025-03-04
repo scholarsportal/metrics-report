@@ -15,14 +15,13 @@ export class HorizontalBarGraphComponent {
   @Input() barChartData: Array<any>;
 
   public barChartOptions: ChartConfiguration['options'] = {
-    indexAxis: 'y',
     scales: {
       // We use this empty structure as a placeholder for dynamic theming.
       y: {
-        stacked: true,
+        stacked: false,
       },
       x: {
-        stacked: false,
+        stacked: true,
       },
     }
   }

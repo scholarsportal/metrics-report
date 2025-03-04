@@ -32,9 +32,9 @@
   padding-bottom: 0.2cm;
   ">
 
-<mat-form-field appearance="outline" style="margin-left: 10px;">
-  <mat-label>Collection</mat-label>
-  <mat-select (selectionChange)="selectedCollection($event)" value="(All)">
+<mat-form-field appearance="outline" style="margin-left: 10px; width:400px;">
+  <mat-label >Collection</mat-label>
+  <mat-select panelWidth="400px" (selectionChange)="selectedCollection($event)" value="(All)">
     @for (option of options; track option) {
       <mat-option [value]="option">{{option}}</mat-option>
     }
@@ -53,7 +53,8 @@
   </mat-datepicker>
 </mat-form-field>
 
-<mat-checkbox [(ngModel)]="start_on" style="margin-left: 10px;"></mat-checkbox>
+
+<mat-checkbox [ngModel]="!start_on" (ngModelChange)="start_on = !$event" style="margin-left: 10px;"> All-Time </mat-checkbox>
 
 <mat-form-field appearance="outline"style="margin-left: 10px;"> 
   <mat-label>End Date</mat-label>
@@ -87,10 +88,10 @@
       </div>
 
       <div style="margin: auto;
-      width: 50%; 
+      width: 75%; 
       display: flex;">
 
-      <div style="vertical-align:top; margin-top: 50px; margin-left: -60px;">
+      <div style="vertical-align:top; margin-top: 50px; margin-left: -10px;">
         
         <div style="vertical-align:top; margin-left: 20px;">
           <div *ngIf="selectedCollection_Activate=='(All)'" id="title_download"><h1>Borealis&nbsp;(All)</h1></div>
@@ -99,12 +100,13 @@
         </div>
         
         <div id="main_meteris">
+        
+        <div>
         <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
           <mat-card-header>
             <mat-card-title-group>
-              <mat-card-title> <div *ngIf="selectedCollection_Activate=='(All)'" style="margin-left: 10px;"> Collections </div> 
+              <mat-card-title> <div *ngIf="selectedCollection_Activate=='(All)'"> Collections </div> 
                 <div *ngIf="selectedCollection_Activate!='(All)'"> Sub Collections </div> </mat-card-title>
-              <mat-card-subtitle> </mat-card-subtitle>
             </mat-card-title-group>
           </mat-card-header>
           <mat-card-content>
@@ -121,6 +123,20 @@
             </mat-card-header>
             <mat-card-content>
               <h1 style="text-align: right; color:DimGray;"> <b>{{total_datasets_num}}</b> </h1>
+              <h3 style="text-align: right; color:#2fad7b;"> <b>{{total_collections_change}}↑ This Month</b> </h3> 
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title> Files </mat-card-title>
+                <mat-card-subtitle> </mat-card-subtitle>
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              <h1 style="text-align: right; color:DimGray;"> <b>{{total_files_num}}</b> </h1>
             </mat-card-content>
           </mat-card>
 
@@ -179,97 +195,89 @@
 
       </div> 
             
-      <div style="width:800px; display: inline-block; height:3000px; padding: 20px; padding-top: 100px">
+      <div style="display: inline-block; height:200px; padding: 30px; padding-top: 100px">
             <div id="contentToConvert">
             Number of Downloads
-            <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
+            <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
             Number of Datasets 
-            <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataDatasets"></app-horizontal-bar-graph> 
+            <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataDatasets"></app-horizontal-bar-graph> 
             Number of Files
-            <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataFiles"></app-horizontal-bar-graph>
+            <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataFiles"></app-horizontal-bar-graph>
             Number of Users
-            <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataUsers"></app-horizontal-bar-graph>
+            <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataUsers"></app-horizontal-bar-graph>
             Storage Usage
-            <app-horizontal-bar-graph [barChartLabels]= "months" [barChartData]= "barChartDataSize"></app-horizontal-bar-graph>
+            <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataSize"></app-horizontal-bar-graph>
             </div>
-            <div id="subject_convert">
-              Subject Breakdown
-                <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-                <mat-tab label="Visual"> 
-                  <ng-template matTabContent>
-                  <mat-card class="example-card" appearance="outlined" style="min-width: 600px; max-width: 600px; min-height: 300px; max-height: 300px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
-                  justify-content: center; padding: 20px;">
-                    <mat-card-content>
-                      <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject" width=1000 height=1000></app-pie-graph>
-                    </mat-card-content>
-                  </mat-card>
-                </ng-template>
-                </mat-tab> 
-              
-                <mat-tab label="Table">
-                  <ng-template matTabContent>
-                  <div style="padding: 20px; padding-top: 10px">
-                  <app-generic-table 
-                  [data]="subject_table"
-                  [colHeaders]="true"
-                  [colWidths]="[250, 75, 100]"
-                  [rowHeaders]="true"
-                  [height]="300"
-                  [columnSorting]="true"
-                  [columns]="subject_columns"
-                  [filters]="false"
-                  licenseKey="non-commercial-and-evaluation"> 
-                  </app-generic-table>
-                  </div>
-                </ng-template>
-              </mat-tab>
-             </mat-tab-group>
-
-            </div>
-            <div id="file_convert">
-              File Content Breakdown
-              <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-              <mat-tab label="Visual">
-              <ng-template matTabContent>
-                <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 650px; min-height: 300px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; align-items: center; 
-                justify-content: center; padding: 20px;">
-                  <mat-card-content>
-                    <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile" width=1000 height=1000></app-pie-graph>
-                  </mat-card-content>
-                </mat-card>
-              </ng-template>
-              </mat-tab> 
-            
-              <mat-tab label="Table">
-              <ng-template matTabContent>
-              <div id="hot" style="padding: 20px; padding-top: 10px">
-                <app-generic-table 
-                [data]="file_content_table"
-                [colHeaders]="true"
-                [colWidths]="[100, 200, 100, 100]"
-                [rowHeaders]="true"
-                [height]="300"
-                [columnSorting]="true"
-                [columns]="file_content_columns"
-                [filters]="false"
-                licenseKey="non-commercial-and-evaluation"> 
-                </app-generic-table>
-              </div>
-            </ng-template>
-            </mat-tab>
-           </mat-tab-group>
-          </div>
+      </div>
             
       </div>
+
+      <div style="padding-top: 50px; height: 1000px">
+      
+      <div id="subject_convert" style="margin-top: 50px; margin: auto; width: 65%;">
+        Subject Breakdown
+            <div style="">
+            <mat-card class="example-card" appearance="outlined" style="min-width: 550px; max-width: 550px; min-height: 333px; max-height: 333px;
+            justify-content: center; float: left;">
+              <mat-card-content>
+                <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject" width=510 height=200></app-pie-graph>
+              </mat-card-content>
+            </mat-card>
+            </div>
+
+            <div id="hot" style="margin-left: -10px">
+              <app-generic-table 
+              [data]="subject_table"
+              [colHeaders]="true"
+              [colWidths]="[200, 60, 100]"
+              [rowHeaders]="true"
+              [height]="333"
+              [columnSorting]="true"
+              [columns]="subject_columns"
+              [filters]="false"
+              licenseKey="non-commercial-and-evaluation"> 
+              </app-generic-table>
+            </div>
+          
+      </div>
+
+      <div style="padding-top: 50px"> </div>
+      
+      <div id="file_convert" style="margin-top: 50px; margin: auto; width: 65%;">
+        File Content Breakdown
+          <div style="">
+          <mat-card class="example-card" appearance="outlined" style="min-width: 550px; max-width: 550px; min-height: 333px; max-height: 333px;; margin-bottom: 8px; 
+          justify-content: center; float: left;">
+            <mat-card-content>
+              <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile" width=380 height=200></app-pie-graph>
+            </mat-card-content>
+          </mat-card>
+          </div>
+
+          <div id="hot" style="">
+            <app-generic-table 
+            [data]="file_content_table"
+            [colHeaders]="true"
+            [colWidths]="[80, 190, 60, 80]"
+            [rowHeaders]="false"
+            [height]="333"
+            [columnSorting]="true"
+            [columns]="file_content_columns"
+            [filters]="false"
+            licenseKey="non-commercial-and-evaluation"> 
+            </app-generic-table>
+          </div>
+                          
+    </div>
       
       </div>
-
+    
     </ng-template>
     </mat-tab>
 
-  <mat-tab label="Make Data Count"> <ng-template matTabContent>  
-
-  </ng-template> 
+  <mat-tab label="Make Data Count"> 
+    <ng-template matTabContent>  
+    </ng-template> 
   </mat-tab>
 
 </mat-tab-group>

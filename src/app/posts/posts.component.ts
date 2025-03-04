@@ -185,7 +185,7 @@ export class PostsComponent {
           
           console.log("look at the months,", this.months)
           
-          for (let i = 0; i <= this.months.length - 2 ; i++){
+          for (let i = 1; i <= this.months.length - 2 ; i++){
             this.monthlyDownloads.push(this.downloads_rsp.find(x=>x.date==this.months[i])['count']);
             this.monthlyAggDownloads.push(this.downloads_rsp.find(x=>x.date==this.months[i])['count'] - this.downloads_rsp.find(x=>x.date==this.months[i+1])['count']);
         

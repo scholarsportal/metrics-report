@@ -240,9 +240,17 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   total_collections_num: String = "-";
   total_datasets_num: String = "-";
+  total_files_num: String = "-"; 
   total_downloads_num: String = "-";
   total_users_num: String = "-";
   total_size_num: String = "-"
+
+  total_collections_change: String = "-";
+  total_datasets_change: String = "-";
+  total_files_chnage: String = "-"; 
+  total_downloads_change: String = "-";
+  total_users_change: String = "-";
+  total_size_change: String = "-"
 
   dataset_table_data = [];
   file_table_data = [];
@@ -274,7 +282,7 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.subject_table = newItem["DataverseTabData"]['subject_full_data'];
     this.file_content_table = newItem["DataverseTabData"]['file_content_full_data'];
     
-    this.options = this.options.concat(newItem["DataverseTabData"]['name_dropdown_data']);
+    this.options = this.options.concat(newItem["DataverseTabData"]['name_dropdown_data'].sort());
 
     this.months = newItem["DataverseTabData"]['months'];
     
@@ -299,21 +307,32 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.total_collections_num = newItem["DataverseTabData"]['name_dropdown_data'].length.toString(); 
     if (this.date_start_activate!=""){
       console.log("ds is activated here")
-      this.total_datasets_num = this.barChartDataDatasetsAgg_data.reduce((a, b) => a + b, 0).toString();
-      this.total_downloads_num = this.barChartDataDownloadsAgg_data.reduce((a, b) => a + b, 0).toString();
-      this.total_users_num = this.barChartDataUsers_Aggdata.reduce((a, b) => a + b, 0).toString();
-      this.total_size_num = this.barChartDataSize_Aggdata.reduce((a, b) => a + b, 0).toFixed(2) .toString()+ "GB";
+      this.total_datasets_num = this.barChartDataDatasetsAgg_data.reduce((a, b) => a + b, 0).toLocaleString();
+      this.total_files_num = this.barChartDataFiles_Aggdata.reduce((a, b) => a + b, 0).toLocaleString();
+      this.total_downloads_num = this.barChartDataDownloadsAgg_data.reduce((a, b) => a + b, 0).toLocaleString();
+      this.total_users_num = this.barChartDataUsers_Aggdata.reduce((a, b) => a + b, 0).toLocaleString();
+      this.total_size_num = this.barChartDataSize_Aggdata.reduce((a, b) => a + b, 0).toFixed(2).toLocaleString(); + "GB";
     }
     else{
-      this.total_datasets_num = this.barChartDataDatasets_data[0].toString();
-      this.total_downloads_num = this.barChartDataDownloads_data[0].toString();
-      this.total_users_num = this.barChartDataUsers_data[0].toString();
-      this.total_size_num = this.barChartDataSize_data[0].toFixed(2) .toString() + "GB"; 
+      this.total_datasets_num = this.barChartDataDatasets_data[0].toLocaleString();
+      this.total_files_num = this.barChartDataFiles_data.reduce((a, b) => a + b, 0).toLocaleString();
+      this.total_downloads_num = this.barChartDataDownloads_data[0].toLocaleString();
+      this.total_users_num = this.barChartDataUsers_data[0].toLocaleString();
+      this.total_size_num = this.barChartDataSize_data[0].toFixed(2).toLocaleString() + "GB"; 
     }
+
+    this.total_collections_change = (((this.barChartDataDatasets_data[0] - this.barChartDataDatasets_data[1]) / this.barChartDataDatasets_data[1]) * 100).toFixed(2).toString() + "%"
+    //total_datasets_change: String = "-";
+    //total_files_chnage: String = "-"; 
+    //total_downloads_change: String = "-";
+    //total_users_change: String = "-";
+    //total_size_change: String = "-"
+
+
 
     this.barChartDataDownloads = [
       { // grey
-        data: this.barChartDataDownloadsAgg_data,
+        data: this.barChartDataDownloadsAgg_data.reverse(),
         label: 'Monthly File Downloads',
         tension: 0,
         backgroundColor: 'rgb(102, 0, 102, 0.5)',
@@ -324,7 +343,7 @@ export class AppComponent implements AfterViewInit, OnInit{
         pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
       },
       { // grey
-        data: this.barChartDataDownloads_data,
+        data: this.barChartDataDownloads_data.reverse(),
         label: 'Cumulative File Downloads',
         tension: 0,
         backgroundColor: 'rgb(0, 100, 255, 0.5)',
@@ -338,7 +357,7 @@ export class AppComponent implements AfterViewInit, OnInit{
 
     this.barChartDataDatasets = [
       { // grey
-        data: this.barChartDataDatasetsAgg_data,
+        data: this.barChartDataDatasetsAgg_data.reverse(),
         label: 'Monthly Datasets Published',
         tension: 0,
         backgroundColor: 'rgb(102, 0, 102, 0.5)',
@@ -349,7 +368,7 @@ export class AppComponent implements AfterViewInit, OnInit{
         pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
       },
       { // grey
-        data: this.barChartDataDatasets_data,
+        data: this.barChartDataDatasets_data.reverse(),
         label: 'Cumulative Datasets Published',
         tension: 0,
         backgroundColor: 'rgb(0, 100, 255, 0.5)',
@@ -363,7 +382,7 @@ export class AppComponent implements AfterViewInit, OnInit{
 
     this.barChartDataFiles = [
       { // grey
-        data: this.barChartDataFiles_Aggdata,
+        data: this.barChartDataFiles_Aggdata.reverse(),
         label: 'Monthly Files Published',
         tension: 0,
         backgroundColor: 'rgb(102, 0, 102, 0.5)',
@@ -374,7 +393,7 @@ export class AppComponent implements AfterViewInit, OnInit{
         pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
       },
       { // grey
-        data: this.barChartDataFiles_data,
+        data: this.barChartDataFiles_data.reverse(),
         label: 'Cumulative Files Published',
         tension: 0,
         backgroundColor: 'rgb(0, 100, 255, 0.5)',
@@ -388,7 +407,7 @@ export class AppComponent implements AfterViewInit, OnInit{
 
     this.barChartDataUsers = [
       { // grey
-        data: this.barChartDataUsers_Aggdata,
+        data: this.barChartDataUsers_Aggdata.reverse(),
         label: 'Monthly Users Joined',
         tension: 0,
         backgroundColor: 'rgb(102, 0, 102, 0.5)',
@@ -399,7 +418,7 @@ export class AppComponent implements AfterViewInit, OnInit{
         pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
       },
       { // grey
-        data: this.barChartDataUsers_data,
+        data: this.barChartDataUsers_data.reverse(),
         label: 'Cumulative Users Joined',
         tension: 0,
         backgroundColor: 'rgb(0, 100, 255, 0.5)',
@@ -413,7 +432,7 @@ export class AppComponent implements AfterViewInit, OnInit{
 
     this.barChartDataSize = [
       { // grey
-        data: this.barChartDataSize_Aggdata,
+        data: this.barChartDataSize_Aggdata.reverse(),
         label: 'Monthly Storage Used (GB)',
         tension: 0,
         backgroundColor: 'rgb(102, 0, 102, 0.5)',
@@ -424,7 +443,7 @@ export class AppComponent implements AfterViewInit, OnInit{
         pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
       },
       { // grey
-        data: this.barChartDataSize_data,
+        data: this.barChartDataSize_data.reverse(),
         label: 'Cumulative Storage Used (GB)',
         tension: 0,
         backgroundColor: 'rgb(0, 100, 255, 0.5)',
