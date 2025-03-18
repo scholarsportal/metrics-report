@@ -20,23 +20,77 @@ export class DownloadComponent {
     const workbook = new ExcelJS.Workbook();
 
     const months = this.data['months'];
+    console.log(this.data);
+
+    var downloads_graph_data_rev: Array<number> = this.data['downloads_graph_data'].reverse();
+    var datasets_graph_data_rev: Array<number> = this.data['datasets_graph_data'].reverse();
+    var files_graph_data_rev: Array<number> = this.data['files_graph_data'].reverse();
+    var users_graph_data_rev: Array<number> = this.data['users_graph_data'].reverse();
+    var size_graph_data_rev: Array<number> = this.data['size_graph_data'].reverse();
 
     // downloads
+    
+    const worksheet_readme = workbook.addWorksheet('Read Me');
+    worksheet_readme.addRow(['FAQ']);
+    worksheet_readme.addRow([]);
+    worksheet_readme.addRow(['Tab', 'Field Name', 'Definition']);
+
+    worksheet_readme.addRow(['Downloads', "", ""]);
+    worksheet_readme.addRow(["",'Date',""]);
+    worksheet_readme.addRow(["", 'Count', 'Total amount of downloads in the given month']);
+    worksheet_readme.addRow(["", 'Cumul Count', 'Total cumulative downloads in the given month']);
+
+    worksheet_readme.addRow(['Datasets', "", ""]);
+    worksheet_readme.addRow(["",'Date',""]);
+    worksheet_readme.addRow(["", 'Count', 'Total amount of realesed datasets in the given month']);
+    worksheet_readme.addRow(["", 'Cumul Count', 'Total cumulative realesed datasets in the given month']);
+
+    worksheet_readme.addRow(['Files', "", ""]);
+    worksheet_readme.addRow(["",'Date',""]);
+    worksheet_readme.addRow(["", 'Count', 'Total amount of files in realesed datasets in the given month']);
+    worksheet_readme.addRow(["", 'Cumul Count', 'Total cumulative files in realesed datasets in the given month']);
+
+    worksheet_readme.addRow(['Users', "", ""]);
+    worksheet_readme.addRow(["",'Date',""]);
+    worksheet_readme.addRow(["", 'Count', 'Total count of users who opened an account in the given month']);
+    worksheet_readme.addRow(["", 'Cumul Count', 'Total cumulative count of users in the given month']);
+
+    worksheet_readme.addRow(['Storage', "", ""]);
+    worksheet_readme.addRow(["",'Date',""]);
+    worksheet_readme.addRow(["", 'Count', 'Total approximate GB of storage allocated in the given month']);
+    worksheet_readme.addRow(["", 'Percent', 'Total cumulative approximate GB of storage allocated in the given month']);
+
+    worksheet_readme.addRow(['Subject Breakdown', "", ""]);
+    worksheet_readme.addRow(["",'Subject',"Subect of Dataset"]);
+    worksheet_readme.addRow(["", 'Count', 'Total count of datasets with assigned subject']);
+    worksheet_readme.addRow(["", 'Percent', 'Percent of datasets with assigned subject over all other subjects']);
+
+    worksheet_readme.addRow(['File Breakdown', "", ""]);
+    worksheet_readme.addRow(["",'Type',"type of file"]);
+    worksheet_readme.addRow(["",'Content Type',"specfic format of file"]);
+    worksheet_readme.addRow(["", 'Count', 'Total count of datasets with assigned subject']);
+    worksheet_readme.addRow(["", 'Percent', 'Percent of datasets with file type over all other file types']);
+
+    
     const worksheet_downloads = workbook.addWorksheet('Downloads');  
-    const headers_downloads = Object.keys(['date', 'count']);
-    worksheet_downloads.addRow(['date', 'count']);
+    const headers_downloads = Object.keys(['date', 'count', 'cumul count']);
+    worksheet_downloads.addRow(['date', 'count', 'cumul count']);
 
     const worksheet_datasets = workbook.addWorksheet('Datasets');  
-    const headers_datasets = Object.keys(['date', 'count']);
-    worksheet_datasets.addRow(['date', 'count']);
+    const headers_datasets = Object.keys(['date', 'count', 'cumul count']);
+    worksheet_datasets.addRow(['date', 'count', 'cumul count']);
+
+    const worksheet_files = workbook.addWorksheet('Files');  
+    const headers_files = Object.keys(['date', 'count', 'cumul count']);
+    worksheet_files.addRow(['date', 'count', 'cumul count']);
 
     const worksheet_users = workbook.addWorksheet('Users');  
-    const headers_users = Object.keys(['date', 'count']);
-    worksheet_users.addRow(['date', 'count']);
+    const headers_users = Object.keys(['date', 'count', 'cumul count']);
+    worksheet_users.addRow(['date', 'count', 'cumul count']);
 
     const worksheet_storage = workbook.addWorksheet('Storage');  
-    const headers_storage = Object.keys(['date', 'count']);
-    worksheet_storage.addRow(['date', 'count']);
+    const headers_storage = Object.keys(['date', 'count', 'cumul count']);
+    worksheet_storage.addRow(['date', 'count', 'cumul count']);
 
     const worksheet_subject = workbook.addWorksheet('Subject Breakdown');  
     const headers_subject = Object.keys(['subject', 'count', 'percent']);
@@ -47,10 +101,11 @@ export class DownloadComponent {
     worksheet_file.addRow(['type', 'content type', 'count', 'percent']);
 
     for (let i = 0; i < months.length - 1; i+=1){
-      worksheet_downloads.addRow([months[i],this.data['downloads_graph_agg_data'][i]]); 
-      worksheet_datasets.addRow([months[i],this.data['datasets_graph_agg_data'][i]]); 
-      worksheet_users.addRow([months[i],this.data['users_graph_agg_data'][i]]); 
-      worksheet_storage.addRow([months[i],this.data['size_graph_agg_data'][i]]); 
+      worksheet_downloads.addRow([months[i],this.data['downloads_graph_agg_data'][i], downloads_graph_data_rev[i]]); 
+      worksheet_datasets.addRow([months[i],this.data['datasets_graph_agg_data'][i], datasets_graph_data_rev[i]]); 
+      worksheet_files.addRow([months[i],this.data['files_graph_agg_data'][i], files_graph_data_rev[i]]); 
+      worksheet_users.addRow([months[i],this.data['users_graph_agg_data'][i], users_graph_data_rev[i]]); 
+      worksheet_storage.addRow([months[i],this.data['size_graph_agg_data'][i], size_graph_data_rev[i]]); 
     }
 
     for (let i = 0; i < this.data['subject_full_data'].length - 1; i+=1){

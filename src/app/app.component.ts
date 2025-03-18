@@ -187,8 +187,11 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   }
 
+  @ViewChild('input') input: ElementRef<HTMLInputElement>;
+  myControl = new FormControl('');
   options: string[] = ["(All)"];
-  filteredOptions: Observable<string[]>;
+  filteredOptions: string[];
+  selectedOption: string = "(All)";
 
   table_data = [];
   alias_data = [];
@@ -475,6 +478,13 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   ngOnInit(): void {
   }
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.options.filter(option => option.toLowerCase().includes(filterValue));
+  }
+
   selectedCollection(event: MatSelectChange) {
     this.selectedCollection_Current_Name = event.value;
     if (event.value == "(All)"){
@@ -496,11 +506,31 @@ export class AppComponent implements AfterViewInit, OnInit{
   }
 
   CollectionDataButtonActivate(){
-    this.selectedCollection_Activate = this.selectedCollection_Current;
-    this.selectedCollection_Activate_Name = this.selectedCollection_Current_Name;
-    this.submitDate();
-    this.date_String = this.dateStringFormat();  
-    console.log(this.selectedCollection_Activate);
+    console.log(this.selectedOption)
+    console.log(this.alias_data)
+    var acceptable_collection = false;
+    if (this.selectedOption == "(All)" ){
+      this.selectedCollection_Current = "(All)"
+      this.selectedCollection_Current_Name = "(All)"
+      acceptable_collection = true;
+    }
+    else{
+    for (let i = 0; i < this.alias_data.length; i++){
+      if (this.alias_data[i]['name'] === this.selectedOption){
+        console.log(this.alias_data[i]['alias'])
+        this.selectedCollection_Current = this.alias_data[i]['alias'];
+        this.selectedCollection_Current_Name = this.selectedOption;
+        acceptable_collection = true;
+      }
+    }
+    }
+    if (acceptable_collection){
+      this.selectedCollection_Activate = this.selectedCollection_Current; 
+      this.selectedCollection_Activate_Name = this.selectedCollection_Current_Name;
+      this.submitDate();
+      this.date_String = this.dateStringFormat();  
+      console.log(this.selectedCollection_Activate);
+    }
   }
 
   @ViewChild(MatSort) sort: MatSort;
@@ -508,7 +538,14 @@ export class AppComponent implements AfterViewInit, OnInit{
   displayedColumns: string[] = ['name', 'views', 'downloads', 'citations'];
   title = 'metrics-app';
 
-  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, private languageService: LanguageService) {}
+  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, private languageService: LanguageService) {
+    this.filteredOptions = this.options.slice();
+  }
+
+  filter(): void {
+    const filterValue = this.input.nativeElement.value.toLowerCase();
+    this.filteredOptions = this.options.filter(o => o.toLowerCase().includes(filterValue));
+  }
 
   switchLanguage(language: string) {
     this.languageService.switchLanguage(language);
