@@ -83,7 +83,7 @@
 <div *ngIf="bad_range==true"> <h4 style="color:red; text-align: center;"> Invalid Date Range </h4> </div>
 
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-  <app-download #download [data]="raw_table_data"></app-download>
+  <app-download #download [data]="raw_table_data" [name]="selectedOption"></app-download>
   <mat-tab label="Overview"> 
     <ng-template matTabContent>
 
@@ -121,6 +121,18 @@
           </mat-card-header>
           <mat-card-content>
             <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_collections_num}}</b> </h1>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+          <mat-card-header>
+            <mat-card-title-group>
+              <mat-card-title> <div *ngIf="selectedCollection_Activate=='(All)'"> Sub Collections </div> 
+                <div *ngIf="selectedCollection_Activate!='(All)'"> Sub Dataverses </div> </mat-card-title>
+            </mat-card-title-group>
+          </mat-card-header>
+          <mat-card-content>
+            <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_dataverses_num}}</b> </h1>
           </mat-card-content>
         </mat-card>
 
@@ -188,6 +200,7 @@
 
           
           <div id="hot" style="margin-left: 10px; margin-top: 10px; ">
+          <!---
           <app-generic-table
           [data]="table_data"
           [colHeaders]="true"
@@ -200,6 +213,7 @@
           [filters]="false"
           licenseKey="non-commercial-and-evaluation"> 
           </app-generic-table>
+          <!-->
           </div>
 
       </div> 
@@ -221,7 +235,7 @@
             
       </div>
 
-      <div style="padding-top: 50px; height: 1000px">
+      <div style="padding-top: 1550px; height: 1000px">
       
       <div id="subject_convert" style="margin-top: 50px; margin: auto; width: 65%;">
         Subject Breakdown
@@ -283,10 +297,5 @@
     
     </ng-template>
     </mat-tab>
-
-  <mat-tab label="Make Data Count"> 
-    <ng-template matTabContent>  
-    </ng-template> 
-  </mat-tab>
 
 </mat-tab-group>

@@ -241,7 +241,9 @@ export class AppComponent implements AfterViewInit, OnInit{
   selectedCollection_Current_Name: string = "(All)";
   selectedCollection_Activate_Name:String = "(All)";
 
+
   total_collections_num: String = "-";
+  total_dataverses_num: String = "-";
   total_datasets_num: String = "-";
   total_files_num: String = "-"; 
   total_downloads_num: String = "-";
@@ -308,6 +310,7 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.pieChartDataFile_data = newItem["DataverseTabData"]['file_content_data'];
 
     this.total_collections_num = newItem["DataverseTabData"]['name_dropdown_data'].length.toString(); 
+    this.total_dataverses_num = (newItem["DataverseTabData"]['dataverse_count'] - newItem["DataverseTabData"]['name_dropdown_data'].length).toString();
     if (this.date_start_activate!=""){
       console.log("ds is activated here")
       this.total_datasets_num = this.barChartDataDatasetsAgg_data.reduce((a, b) => a + b, 0).toLocaleString();
@@ -318,7 +321,7 @@ export class AppComponent implements AfterViewInit, OnInit{
     }
     else{
       this.total_datasets_num = this.barChartDataDatasets_data[0].toLocaleString();
-      this.total_files_num = this.barChartDataFiles_data.reduce((a, b) => a + b, 0).toLocaleString();
+      this.total_files_num = this.barChartDataFiles_data[0].toLocaleString();
       this.total_downloads_num = this.barChartDataDownloads_data[0].toLocaleString();
       this.total_users_num = this.barChartDataUsers_data[0].toLocaleString();
       this.total_size_num = this.barChartDataSize_data[0].toFixed(2).toLocaleString() + "GB"; 
@@ -477,6 +480,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   }
 
   ngOnInit(): void {
+    
   }
 
   private _filter(value: string): string[] {
