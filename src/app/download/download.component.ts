@@ -15,42 +15,130 @@ import html2canvas from 'html2canvas';
 @Injectable()
 export class DownloadComponent {
   @Input() data: any; 
+  @Input() name: string;
 
   exportToExcel(data: any[], fileName: string){
     const workbook = new ExcelJS.Workbook();
 
     const months = this.data['months'];
+    console.log(this.data);
+
+    var downloads_graph_data_rev: Array<number> = this.data['downloads_graph_data'].reverse();
+    var datasets_graph_data_rev: Array<number> = this.data['datasets_graph_data'].reverse();
+    var files_graph_data_rev: Array<number> = this.data['files_graph_data'].reverse();
+    var users_graph_data_rev: Array<number> = this.data['users_graph_data'].reverse();
+    var size_graph_data_rev: Array<number> = this.data['size_graph_data'].reverse();
 
     // downloads
+    
+    const worksheet_readme = workbook.addWorksheet('Read Me');
+    worksheet_readme.addRow(['FAQ']);
+    worksheet_readme.addRow([]);
+    worksheet_readme.addRow(['Tab', 'Field Name', 'Definition']);
+
+    worksheet_readme.addRow(['Downloads', "", ""]);
+    worksheet_readme.addRow(["",'Date',""]);
+    worksheet_readme.addRow(["", 'Count', 'Total amount of downloads in the given month']);
+    worksheet_readme.addRow(["", 'Cumul Count', 'Total cumulative downloads in the given month']);
+
+    worksheet_readme.addRow(['Datasets', "", ""]);
+    worksheet_readme.addRow(["",'Date',""]);
+    worksheet_readme.addRow(["", 'Count', 'Total amount of realesed datasets in the given month']);
+    worksheet_readme.addRow(["", 'Cumul Count', 'Total cumulative realesed datasets in the given month']);
+
+    worksheet_readme.addRow(['Files', "", ""]);
+    worksheet_readme.addRow(["",'Date',""]);
+    worksheet_readme.addRow(["", 'Count', 'Total amount of files in realesed datasets in the given month']);
+    worksheet_readme.addRow(["", 'Cumul Count', 'Total cumulative files in realesed datasets in the given month']);
+
+    worksheet_readme.addRow(['Users', "", ""]);
+    worksheet_readme.addRow(["",'Date',""]);
+    worksheet_readme.addRow(["", 'Count', 'Total count of users who opened an account in the given month']);
+    worksheet_readme.addRow(["", 'Cumul Count', 'Total cumulative count of users in the given month']);
+
+    worksheet_readme.addRow(['Storage', "", ""]);
+    worksheet_readme.addRow(["",'Date',""]);
+    worksheet_readme.addRow(["", 'Count', 'Total approximate GB of storage allocated in the given month']);
+    worksheet_readme.addRow(["", 'Percent', 'Total cumulative approximate GB of storage allocated in the given month']);
+
+    worksheet_readme.addRow(['Subject Breakdown', "", ""]);
+    worksheet_readme.addRow(["",'Subject',"Subect of Dataset"]);
+    worksheet_readme.addRow(["", 'Count', 'Total count of datasets with assigned subject']);
+    worksheet_readme.addRow(["", 'Percent', 'Percent of datasets with assigned subject over all other subjects']);
+
+    worksheet_readme.addRow(['File Breakdown', "", ""]);
+    worksheet_readme.addRow(["",'Type',"type of file"]);
+    worksheet_readme.addRow(["",'Content Type',"specfic format of file"]);
+    worksheet_readme.addRow(["", 'Count', 'Total count of datasets with assigned subject']);
+    worksheet_readme.addRow(["", 'Percent', 'Percent of datasets with file type over all other file types']);
+
+    worksheet_readme.getColumn(1).width = 20;
+    worksheet_readme.getColumn(2).width = 15;
+    worksheet_readme.getColumn(3).width = 60;
+    
     const worksheet_downloads = workbook.addWorksheet('Downloads');  
-    const headers_downloads = Object.keys(['date', 'count']);
-    worksheet_downloads.addRow(['date', 'count']);
+    const headers_downloads = Object.keys(['date', 'count', 'cumul count']);
+    worksheet_downloads.addRow(['date', 'count', 'cumul count']);
+
+    worksheet_downloads.getColumn(1).width = 15;
+    worksheet_downloads.getColumn(2).width = 15;
+    worksheet_downloads.getColumn(3).width = 15;
 
     const worksheet_datasets = workbook.addWorksheet('Datasets');  
-    const headers_datasets = Object.keys(['date', 'count']);
-    worksheet_datasets.addRow(['date', 'count']);
+    const headers_datasets = Object.keys(['date', 'count', 'cumul count']);
+    worksheet_datasets.addRow(['date', 'count', 'cumul count']);
+
+    worksheet_datasets.getColumn(1).width = 15;
+    worksheet_datasets.getColumn(2).width = 15;
+    worksheet_datasets.getColumn(3).width = 15;
+
+    const worksheet_files = workbook.addWorksheet('Files');  
+    const headers_files = Object.keys(['date', 'count', 'cumul count']);
+    worksheet_files.addRow(['date', 'count', 'cumul count']);
+
+    worksheet_files.getColumn(1).width = 15;
+    worksheet_files.getColumn(2).width = 15;
+    worksheet_files.getColumn(3).width = 15;
 
     const worksheet_users = workbook.addWorksheet('Users');  
-    const headers_users = Object.keys(['date', 'count']);
-    worksheet_users.addRow(['date', 'count']);
+    const headers_users = Object.keys(['date', 'count', 'cumul count']);
+    worksheet_users.addRow(['date', 'count', 'cumul count']);
+
+    worksheet_users.getColumn(1).width = 15;
+    worksheet_users.getColumn(2).width = 15;
+    worksheet_users.getColumn(3).width = 15;
 
     const worksheet_storage = workbook.addWorksheet('Storage');  
-    const headers_storage = Object.keys(['date', 'count']);
-    worksheet_storage.addRow(['date', 'count']);
+    const headers_storage = Object.keys(['date', 'count', 'cumul count']);
+    worksheet_storage.addRow(['date', 'count', 'cumul count']);
+
+    worksheet_storage.getColumn(1).width = 15;
+    worksheet_storage.getColumn(2).width = 15;
+    worksheet_storage.getColumn(3).width = 15;
 
     const worksheet_subject = workbook.addWorksheet('Subject Breakdown');  
     const headers_subject = Object.keys(['subject', 'count', 'percent']);
     worksheet_subject.addRow(['subject', 'count', 'percent']);
 
+    worksheet_subject.getColumn(1).width = 30;
+    worksheet_subject.getColumn(2).width = 15;
+    worksheet_subject.getColumn(3).width = 15;
+
     const worksheet_file = workbook.addWorksheet('File Breakdown');  
     const headers_file = Object.keys(['file type', 'specific type', 'count', 'percent']);
     worksheet_file.addRow(['type', 'content type', 'count', 'percent']);
 
+    worksheet_file.getColumn(1).width = 20;
+    worksheet_file.getColumn(2).width = 30;
+    worksheet_file.getColumn(3).width = 15;
+    worksheet_file.getColumn(3).width = 15;
+
     for (let i = 0; i < months.length - 1; i+=1){
-      worksheet_downloads.addRow([months[i],this.data['downloads_graph_agg_data'][i]]); 
-      worksheet_datasets.addRow([months[i],this.data['datasets_graph_agg_data'][i]]); 
-      worksheet_users.addRow([months[i],this.data['users_graph_agg_data'][i]]); 
-      worksheet_storage.addRow([months[i],this.data['size_graph_agg_data'][i]]); 
+      worksheet_downloads.addRow([months[i],this.data['downloads_graph_agg_data'][i], downloads_graph_data_rev[i]]); 
+      worksheet_datasets.addRow([months[i],this.data['datasets_graph_agg_data'][i], datasets_graph_data_rev[i]]); 
+      worksheet_files.addRow([months[i],this.data['files_graph_agg_data'][i], files_graph_data_rev[i]]); 
+      worksheet_users.addRow([months[i],this.data['users_graph_agg_data'][i], users_graph_data_rev[i]]); 
+      worksheet_storage.addRow([months[i],this.data['size_graph_agg_data'][i], size_graph_data_rev[i]]); 
     }
 
     for (let i = 0; i < this.data['subject_full_data'].length - 1; i+=1){
@@ -98,24 +186,24 @@ export class DownloadComponent {
 
       const contentDataURL = canvas.toDataURL('image/png');
 
-      let position = 12;
+      let position = 15;
       pdf.addImage(contentDataURL, 'PNG', 10, position, imgWidth, imgHeight);
     });
 
     html2canvas(c).then(canvas => {
-      const imgWidth = 100;
+      const imgWidth = 95;
       const pageHeight = 100;
       const imgHeight = canvas.height * imgWidth / canvas.width;
       const heightLeft = imgHeight;
 
       const contentDataURL = canvas.toDataURL('image/png');
 
-      let position = 20;
+      let position = 25;
       pdf.addImage(contentDataURL, 'PNG', 5, position, imgWidth, imgHeight);
     });
 
     html2canvas(d).then(canvas => {
-      const imgWidth = 100;
+      const imgWidth = 95;
       const pageHeight = 100;
       const imgHeight = canvas.height * imgWidth / canvas.width;
       const heightLeft = imgHeight;
@@ -134,7 +222,7 @@ export class DownloadComponent {
 
       const contentDataURL = canvas.toDataURL('image/png');
 
-      let position = 155;
+      let position = 205;
       pdf.addImage(contentDataURL, 'PNG', 5, position, imgWidth, imgHeight);
     });
 
@@ -146,14 +234,18 @@ export class DownloadComponent {
 
       const contentDataURL = canvas.toDataURL('image/png');
 
-      let position = 220;
+      let position = 245;
       pdf.addImage(contentDataURL, 'PNG', 5, position, imgWidth, imgHeight);
       pdf.save('dynamicData.pdf'); // Generated PDF
     });
   }
 
   generateExcel() {
-    this.exportToExcel(this.data, 'test');
+    var temp_name = "Borealis Report";
+    if (this.name != "(All)"){
+      temp_name = this.name + " - " + temp_name; 
+    }
+    this.exportToExcel(this.data, temp_name);
   }
 
 }

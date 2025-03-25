@@ -24,11 +24,13 @@ export class PostsComponent {
   public months: Array<any> = [];
   public monthsDate: Array<any> = [];
   
+
   public dataverseCollectionsURL: string = '';
   public monthsDownloadsDateURLS: string = '';
   public monthsDatasetsDateURLS: string = '';
   public monthsFilesDateURLS: string = '';
   public monthsUsersDateURLS: string = '';
+  public dataverseCountURL: string = '';
   public parentAlias: String = "";
 
   public data_rsp: any;
@@ -39,9 +41,12 @@ export class PostsComponent {
   public subject_rsp: Array<any> = [];
   public filecontent_rsp: Array<any> = [];
   public filecontent_rsp_date_range: Array<any> = [];
+  public dataverse_rsp: any;
 
   public table_dataset_rsp: any= {};
   public table_file_rsp: any= {};
+
+  public dataverseCount: number;
 
   public datasetURL: string = '';
   public datasetsContents: Array<any> = [];
@@ -113,7 +118,7 @@ export class PostsComponent {
     else {
       this.parentAlias = "";
     }
-
+    
     this.monthsDownloadsDateURLS = 'https://borealisdata.ca/api/info/metrics/downloads/monthly/' + this.parentAlias
     this.monthsDatasetsDateURLS = 'https://borealisdata.ca/api/info/metrics/datasets/monthly/' + this.parentAlias
     this.monthsFilesDateURLS = 'https://borealisdata.ca/api/info/metrics/files/monthly/' + this.parentAlias
@@ -122,6 +127,8 @@ export class PostsComponent {
     this.subjectURL = 'https://borealisdata.ca/api/info/metrics/datasets/bySubject/toMonth/' + this.months[0] + this.parentAlias
     this.fileContentURL = 'https://borealisdata.ca/api/info/metrics/files/byType/monthly/' + this.parentAlias
 
+    this.dataverseCountURL = 'https://borealisdata.ca/api/info/metrics/dataverses/toMonth/' + this.months[0] + this.parentAlias
+
     this.observables.push(this.httpClient.get<[]>(this.dataverseCollectionsURL));
     this.observables.push(this.httpClient.get<[]>(this.monthsDownloadsDateURLS))
     this.observables.push(this.httpClient.get<[]>(this.monthsDatasetsDateURLS))
@@ -129,6 +136,7 @@ export class PostsComponent {
     this.observables.push(this.httpClient.get<[]>(this.monthsUsersDateURLS))
     this.observables.push(this.httpClient.get<[]>(this.subjectURL))
     this.observables.push(this.httpClient.get<[]>(this.fileContentURL))
+    this.observables.push(this.httpClient.get<[]>(this.dataverseCountURL))
 
     /*
     const httpHeaders: HttpHeaders = new HttpHeaders({
@@ -152,6 +160,7 @@ export class PostsComponent {
           this.users_rsp = responses[4]['data'];
           this.subject_rsp = responses[5]['data'];
           this.filecontent_rsp = responses[6]['data'];
+          this.dataverse_rsp = responses[7]['data'];
 
           this.dataversesDataTree = this.data_rsp['children']
           if (this.collectionSelected != "(All)"){
@@ -185,7 +194,7 @@ export class PostsComponent {
           
           console.log("look at the months,", this.months)
           
-          for (let i = 1; i <= this.months.length - 2 ; i++){
+          for (let i = 0; i <= this.months.length - 2 ; i++){
             this.monthlyDownloads.push(this.downloads_rsp.find(x=>x.date==this.months[i])['count']);
             this.monthlyAggDownloads.push(this.downloads_rsp.find(x=>x.date==this.months[i])['count'] - this.downloads_rsp.find(x=>x.date==this.months[i+1])['count']);
         
@@ -244,6 +253,8 @@ export class PostsComponent {
           this.monthlySize = this.monthlySize.reverse();
           this.monthlyAggSize = this.monthlyAggSize.reverse();
           console.log("size stuff", this.monthlySize, this.monthlyAggSize)
+
+          this.dataverseCount = this.dataverse_rsp['count'];
 
           //this.monthlyAggFiles.push(this.files_rsp.find(x=>x.date==this.months[i])['count'] - this.files_rsp.find(x=>x.date==this.months[i+1])['count']);
           
@@ -322,7 +333,8 @@ export class PostsComponent {
     var DataverseTabData = {
         table_data: this.dataverseCollections,
         alias_data: this.dataverseAlias,
-        downloads_graph_data: this.monthlyDownloads, 
+        downloads_graph_data: this.monthlyDownloads,
+        dataverse_count: this.dataverseCount,
         datasets_graph_data: this.monthlyDatasets,
         files_graph_data: this.monthlyFiles,
         users_graph_data: this.monthlyUsers,
@@ -432,16 +444,20 @@ export class PostsComponent {
     this.monthsDatasetsDateURLS = '';
     this.monthsFilesDateURLS = '';
     this.monthsUsersDateURLS = '';
+    this.dataverseCountURL = '';
 
     this.monthlyDownloads = []; 
     this.monthlyDatasets = []; 
     this.monthlyFiles = [];
     this.monthlyUsers = []; 
     this.monthlySize = []; 
+    this.dataverse_rsp = [];
     this.observables = [];
 
     this.dataversesDataTree = [];
     this.dataverseCollections = [];
+
+    this.dataverseCount = 0;
 
     this.datasetURL = '';
     this.datasetsContents = [];
@@ -454,6 +470,7 @@ export class PostsComponent {
 
     this.fileContentURL = '';
     this.fileContentHash= {}; 
+    this.fileSizeHash = {};
     this.fileContentDetailHash= {}; 
     this.fileContentLabels= []; 
     this.fileContentData = []; 

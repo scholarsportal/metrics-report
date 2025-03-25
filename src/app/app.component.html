@@ -34,11 +34,21 @@
 
 <mat-form-field appearance="outline" style="margin-left: 10px; width:400px;">
   <mat-label >Collection</mat-label>
-  <mat-select panelWidth="400px" (selectionChange)="selectedCollection($event)" value="(All)">
-    @for (option of options; track option) {
-      <mat-option [value]="option">{{option}}</mat-option>
-    }
-  </mat-select>
+    <input #input panelWidth="400px" 
+    type="text"
+    placeholder=""
+           matInput
+           [(ngModel)]="selectedOption"
+           type="text"
+           placeholder="Pick one"
+           [matAutocomplete]="auto"
+           (input)="filter()"
+           (focus)="filter()">
+    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+      @for (option of filteredOptions; track option) {
+        <mat-option [value]="option">{{option}}</mat-option>
+      }
+    </mat-autocomplete>
 </mat-form-field>
 
 <mat-form-field appearance="outline" style="margin-left: 10px;"> 
@@ -73,7 +83,7 @@
 <div *ngIf="bad_range==true"> <h4 style="color:red; text-align: center;"> Invalid Date Range </h4> </div>
 
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-  <app-download #download [data]="raw_table_data"></app-download>
+  <app-download #download [data]="raw_table_data" [name]="selectedOption"></app-download>
   <mat-tab label="Overview"> 
     <ng-template matTabContent>
 
@@ -94,9 +104,9 @@
       <div style="vertical-align:top; margin-top: 50px; margin-left: -10px;">
         
         <div style="vertical-align:top; margin-left: 20px;">
-          <div *ngIf="selectedCollection_Activate=='(All)'" id="title_download"><h1>Borealis&nbsp;(All)</h1></div>
-          <div *ngIf="selectedCollection_Activate!='(All)'" id="title_download"><h1>{{selectedCollection_Activate_Name}}</h1></div>
-          <div style="margin-top: -20px;" id="title_date"><p><i>{{date_String}}</i></p></div>
+          <div *ngIf="selectedCollection_Activate=='(All)'" id="title_download"> <h1 style="font-size: 32px; font-weight: bold;">Borealis&nbsp;(All)</h1></div>
+          <div *ngIf="selectedCollection_Activate!='(All)'" id="title_download"><h1 style="font-size: 32px; font-weight: bold;">{{selectedCollection_Activate_Name}}</h1></div>
+          <div style="margin-top: -5px; font-size: 18px;" id="title_date"><p><i>{{date_String}}</i></p></div>
         </div>
         
         <div id="main_meteris">
@@ -110,7 +120,19 @@
             </mat-card-title-group>
           </mat-card-header>
           <mat-card-content>
-            <h1 style="text-align: right; color:DimGray;"> <b>{{total_collections_num}}</b> </h1>
+            <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_collections_num}}</b> </h1>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+          <mat-card-header>
+            <mat-card-title-group>
+              <mat-card-title> <div *ngIf="selectedCollection_Activate=='(All)'"> Sub Collections </div> 
+                <div *ngIf="selectedCollection_Activate!='(All)'"> Sub Dataverses </div> </mat-card-title>
+            </mat-card-title-group>
+          </mat-card-header>
+          <mat-card-content>
+            <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_dataverses_num}}</b> </h1>
           </mat-card-content>
         </mat-card>
 
@@ -122,8 +144,7 @@
               </mat-card-title-group>
             </mat-card-header>
             <mat-card-content>
-              <h1 style="text-align: right; color:DimGray;"> <b>{{total_datasets_num}}</b> </h1>
-              <h3 style="text-align: right; color:#2fad7b;"> <b>{{total_collections_change}}↑ This Month</b> </h3> 
+              <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_datasets_num}}</b> </h1>
             </mat-card-content>
           </mat-card>
         </div>
@@ -136,7 +157,7 @@
               </mat-card-title-group>
             </mat-card-header>
             <mat-card-content>
-              <h1 style="text-align: right; color:DimGray;"> <b>{{total_files_num}}</b> </h1>
+              <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_files_num}}</b> </h1>
             </mat-card-content>
           </mat-card>
 
@@ -148,7 +169,7 @@
               </mat-card-title-group>
             </mat-card-header>
             <mat-card-content>
-              <h1 style="text-align: right; color:DimGray;"> <b>{{total_downloads_num}}</b> </h1>
+              <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_downloads_num}}</b> </h1>
             </mat-card-content>
           </mat-card>
 
@@ -160,7 +181,7 @@
               </mat-card-title-group>
             </mat-card-header>
             <mat-card-content>
-              <h1 style="text-align: right; color:DimGray;"> <b>{{total_users_num}}</b> </h1>
+              <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_users_num}}</b> </h1>
             </mat-card-content>
           </mat-card>
 
@@ -172,13 +193,14 @@
               </mat-card-title-group>
             </mat-card-header>
             <mat-card-content>
-              <h1 style="text-align: right; color:DimGray;"> <b>{{total_size_num}}</b> </h1>
+              <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_size_num}}</b> </h1>
             </mat-card-content>
           </mat-card>
           </div>
 
           
           <div id="hot" style="margin-left: 10px; margin-top: 10px; ">
+          <!---
           <app-generic-table
           [data]="table_data"
           [colHeaders]="true"
@@ -191,11 +213,12 @@
           [filters]="false"
           licenseKey="non-commercial-and-evaluation"> 
           </app-generic-table>
+          <!-->
           </div>
 
       </div> 
             
-      <div style="display: inline-block; height:200px; padding: 30px; padding-top: 100px">
+      <div style="display: inline-block; height:200px; padding: 30px; padding-top: 100px; font-size: 18px;">
             <div id="contentToConvert">
             Number of Downloads
             <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
@@ -212,11 +235,11 @@
             
       </div>
 
-      <div style="padding-top: 50px; height: 1000px">
+      <div style="padding-top: 1550px; height: 1000px">
       
       <div id="subject_convert" style="margin-top: 50px; margin: auto; width: 65%;">
         Subject Breakdown
-            <div style="">
+            <div style="margin-top: 5px;">
             <mat-card class="example-card" appearance="outlined" style="min-width: 550px; max-width: 550px; min-height: 333px; max-height: 333px;
             justify-content: center; float: left;">
               <mat-card-content>
@@ -245,7 +268,7 @@
       
       <div id="file_convert" style="margin-top: 50px; margin: auto; width: 65%;">
         File Content Breakdown
-          <div style="">
+          <div style="margin-top: 5px;">
           <mat-card class="example-card" appearance="outlined" style="min-width: 550px; max-width: 550px; min-height: 333px; max-height: 333px;; margin-bottom: 8px; 
           justify-content: center; float: left;">
             <mat-card-content>
@@ -274,10 +297,5 @@
     
     </ng-template>
     </mat-tab>
-
-  <mat-tab label="Make Data Count"> 
-    <ng-template matTabContent>  
-    </ng-template> 
-  </mat-tab>
 
 </mat-tab-group>
