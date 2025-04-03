@@ -3,7 +3,7 @@ import { RouterOutlet, RouterModule } from '@angular/router';
 import {JsonPipe, AsyncPipe, CommonModule} from '@angular/common';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
-import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, FormBuilder} from '@angular/forms';
 import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
@@ -35,6 +35,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {DownloadComponent} from './download/download.component'; 
 import {MatMenuModule} from '@angular/material/menu';
 import html2canvas from 'html2canvas';
+import {MatTooltipModule} from '@angular/material/tooltip';
 import { TranslocoModule } from '@ngneat/transloco';
 import { LanguageService } from './language.service';
 import * as _moment from 'moment';
@@ -55,6 +56,11 @@ export const MY_FORMATS = {
     monthYearA11yLabel: 'MMMM YYYY',
   },
 };
+
+interface SearchGroup {
+  letter: string;
+  names: string[];
+}
 
 @Component({
   selector: 'app-root',
@@ -94,13 +100,16 @@ export const MY_FORMATS = {
     GenericTableComponent,
     MatCheckboxModule, 
     DownloadComponent,
-    TranslocoModule
+    MatTooltipModule,
+    TranslocoModule,
     ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent implements AfterViewInit, OnInit{
+
+  private _formBuilder = inject(FormBuilder);
 
   start_on: boolean = false;
   date_start = new FormControl(moment());
@@ -189,11 +198,32 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   @ViewChild('input') input: ElementRef<HTMLInputElement>;
   myControl = new FormControl('');
-  options: string[] = ["(All)"];
+  options: string[] = [];
   filteredOptions: string[];
   selectedOption: string = "(All)";
 
-  table_data = [];
+  searchForm = this._formBuilder.group({
+    searchGroup: '',
+  });
+
+  searchGroups: SearchGroup[] = [
+    {
+      letter: 'Default',
+      names: ["(All)"],
+    },
+    {
+      letter: 'Sub Dataverses',
+      names: [],
+    },
+    {
+      letter: 'Collections',
+      names: [],
+    }
+  ]
+
+  searchGroupOptions: Observable<SearchGroup[]>;
+
+  table_data: Array<any> = [];;
   alias_data = [];
   raw_table_data = {};
   subject_table = [];
@@ -289,6 +319,16 @@ export class AppComponent implements AfterViewInit, OnInit{
     
     this.options = this.options.concat(newItem["DataverseTabData"]['name_dropdown_data'].sort());
 
+    this.searchGroups[2].names = this.options;
+    if (this.selectedCollection_Current == "(All)"){
+      this.searchGroups[1].names = [];
+    }
+    else {
+      this.searchGroups[1].names = this.table_data.map(a => a.name);
+    }
+
+    console.log(this.searchGroups); 
+  
     this.months = newItem["DataverseTabData"]['months'];
     
     this.barChartDataDownloads_data = newItem["DataverseTabData"]['downloads_graph_data'];
@@ -480,14 +520,27 @@ export class AppComponent implements AfterViewInit, OnInit{
   }
 
   ngOnInit(): void {
-    
+    this.searchGroupOptions = this.searchForm.get('searchGroup')!.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filterGroup(value || '')),
+    );
   }
 
-  private _filter(value: string): string[] {
+  private _filterGroup(value: string): SearchGroup[] {
+    if (value) {
+      return this.searchGroups
+        .map(group => ({letter: group.letter, names: this._filter(group.names, value)}))
+        .filter(group => group.names.length > 0);
+    }
+
+    return this.searchGroups;
+  }
+
+  _filter = (opt: string[], value: string): string[] => {
     const filterValue = value.toLowerCase();
-
-    return this.options.filter(option => option.toLowerCase().includes(filterValue));
-  }
+  
+    return opt.filter(item => item.toLowerCase().includes(filterValue));
+  };
 
   selectedCollection(event: MatSelectChange) {
     this.selectedCollection_Current_Name = event.value;
@@ -510,8 +563,8 @@ export class AppComponent implements AfterViewInit, OnInit{
   }
 
   CollectionDataButtonActivate(){
-    console.log(this.selectedOption)
-    console.log(this.alias_data)
+    console.log(this.searchForm.get('searchGroup')?.value);
+    this.selectedOption = this.searchForm.get('searchGroup')?.value as string; 
     var acceptable_collection = false;
     if (this.selectedOption == "(All)" ){
       this.selectedCollection_Current = "(All)"

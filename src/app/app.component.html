@@ -31,26 +31,35 @@
   margin-right: auto;
   padding-bottom: 0.2cm;
   ">
-
+<div style="float: left;">
+<form [formGroup]="searchForm" style="">
 <mat-form-field appearance="outline" style="margin-left: 10px; width:400px;">
   <mat-label >Collection</mat-label>
     <input #input panelWidth="400px" 
     type="text"
     placeholder=""
            matInput
-           [(ngModel)]="selectedOption"
            type="text"
-           placeholder="Pick one"
-           [matAutocomplete]="auto"
+           placeholder="(All)"
+           formControlName= "searchGroup"
+           required
+           [matAutocomplete]="autoGroup"
            (input)="filter()"
            (focus)="filter()">
-    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-      @for (option of filteredOptions; track option) {
-        <mat-option [value]="option">{{option}}</mat-option>
-      }
-    </mat-autocomplete>
+           <mat-autocomplete #autoGroup="matAutocomplete">
+            @for (group of searchGroupOptions | async; track group) {
+              <mat-optgroup [label]="group.letter">
+                @for (name of group.names; track name) {
+                  <mat-option [value]="name">{{name}}</mat-option>
+                }
+              </mat-optgroup>
+            }
+        </mat-autocomplete>
 </mat-form-field>
+</form>
+</div>
 
+<div style="float: left;">
 <mat-form-field appearance="outline" style="margin-left: 10px;"> 
   <mat-label>Start Date</mat-label>
   <input matInput *ngIf="!start_on" disabled> 
@@ -63,8 +72,7 @@
   </mat-datepicker>
 </mat-form-field>
 
-
-<mat-checkbox [ngModel]="!start_on" (ngModelChange)="start_on = !$event" style="margin-left: 10px;"> All-Time </mat-checkbox>
+<mat-checkbox matTooltip="Generates metrics from creation, visual displays last 24 months" [ngModel]="!start_on" (ngModelChange)="start_on = !$event" style="margin-left: 10px; "> All-Time </mat-checkbox>
 
 <mat-form-field appearance="outline"style="margin-left: 10px;"> 
   <mat-label>End Date</mat-label>
@@ -80,9 +88,14 @@
   <button (click)="CollectionDataButtonActivate()" mat-button extended style="margin-left: 10px;"> SUBMIT </button>
 </div>
 
+</div>
+
+
+
+
 <div *ngIf="bad_range==true"> <h4 style="color:red; text-align: center;"> Invalid Date Range </h4> </div>
 
-<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" style="clear:both;">
   <app-download #download [data]="raw_table_data" [name]="selectedOption"></app-download>
   <mat-tab label="Overview"> 
     <ng-template matTabContent>
@@ -94,7 +107,11 @@
 
       <button class="mat-small" 
         mat-button extended (click)="download.generatePDF()"> 
-         PDF <mat-icon> download </mat-icon> </button>
+         PDF <mat-icon> download </mat-icon> </button> |
+
+      <a  mat-button class="mat-small" 
+        href="https://borealisdata.ca/metricsbackend/api/metrics/report"> 
+         Legacy Export  <mat-icon> download </mat-icon> </a>
       </div>
 
       <div style="margin: auto;
@@ -198,9 +215,28 @@
           </mat-card>
           </div>
 
-          
+          <div>
+          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title matTooltip="Metrics provided by [https://makedatacount.org]"> Make Data Count Metrics* </mat-card-title>
+                <mat-card-subtitle> </mat-card-subtitle>
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              <br>
+              <h3> Views: 12,412</h3>
+              <h3> Downloads: 1,000 </h3>
+              <h3> Citations: 32</h3>
+              <button class="mat-small"
+        mat-button extended> 
+         Borealis MakeDataCount Excel<mat-icon> download </mat-icon> </button>
+            </mat-card-content>
+          </mat-card>
+          </div>
+
+          <!---       
           <div id="hot" style="margin-left: 10px; margin-top: 10px; ">
-          <!---
           <app-generic-table
           [data]="table_data"
           [colHeaders]="true"
@@ -213,8 +249,8 @@
           [filters]="false"
           licenseKey="non-commercial-and-evaluation"> 
           </app-generic-table>
-          <!-->
           </div>
+          -->   
 
       </div> 
             
@@ -235,7 +271,7 @@
             
       </div>
 
-      <div style="padding-top: 1550px; height: 1000px">
+      <div style="padding-top: 1200px; height: 1000px">
       
       <div id="subject_convert" style="margin-top: 50px; margin: auto; width: 65%;">
         Subject Breakdown

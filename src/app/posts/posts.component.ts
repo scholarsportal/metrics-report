@@ -138,13 +138,6 @@ export class PostsComponent {
     this.observables.push(this.httpClient.get<[]>(this.fileContentURL))
     this.observables.push(this.httpClient.get<[]>(this.dataverseCountURL))
 
-    /*
-    const httpHeaders: HttpHeaders = new HttpHeaders({
-      'X-Dataverse-key': 'fd4c70ad-9384-463d-a0f9-c83c1c0c6d7c'
-    });
-    //this.observables.push(this.httpClient.get<[]>("https://borealisdata.ca/api/dataverses/macewan/storagesize", { headers: httpHeaders}))
-    */
-
     console.log(this.observables)
 
     forkJoin(this.observables).subscribe(

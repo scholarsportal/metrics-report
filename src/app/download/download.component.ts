@@ -236,7 +236,11 @@ export class DownloadComponent {
 
       let position = 245;
       pdf.addImage(contentDataURL, 'PNG', 5, position, imgWidth, imgHeight);
-      pdf.save('dynamicData.pdf'); // Generated PDF
+      var temp_name = "Borealis Report";
+      if (this.name != "(All)"){
+        temp_name = this.name + " - " + temp_name; 
+      }
+      pdf.save(temp_name); // Generated PDF
     });
   }
 
