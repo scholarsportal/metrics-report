@@ -95,12 +95,11 @@
 
 <div *ngIf="bad_range==true"> <h4 style="color:red; text-align: center;"> Invalid Date Range </h4> </div>
 
-<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" style="clear:both;">
+<div style="clear:both;">
   <app-download #download [data]="raw_table_data" [name]="selectedOption"></app-download>
-  <mat-tab label="Overview"> 
-    <ng-template matTabContent>
+    <ng-template [ngIf]="true">
 
-      <div style="position:absolute; top:10px; right:150px;">
+      <div style="position:relative; top:10px; float:right; right: 20px">
       <button class="mat-small"  (click)="download.generateExcel()" 
         mat-button extended > 
          EXCEL <mat-icon> download </mat-icon> </button> | 
@@ -115,7 +114,7 @@
       </div>
 
       <div style="margin: auto;
-      width: 75%; 
+      width: 60%; 
       display: flex;">
 
       <div style="vertical-align:top; margin-top: 50px; margin-left: -10px;">
@@ -233,6 +232,9 @@
          Borealis MakeDataCount Excel<mat-icon> download </mat-icon> </button>
             </mat-card-content>
           </mat-card>
+
+          <app-tree></app-tree>
+
           </div>
 
           <!---       
@@ -267,22 +269,61 @@
             Storage Usage
             <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataSize"></app-horizontal-bar-graph>
             </div>
-      </div>
-            
-      </div>
-
-      <div style="padding-top: 1200px; height: 1000px">
-      
-      <div id="subject_convert" style="margin-top: 50px; margin: auto; width: 65%;">
-        Subject Breakdown
-            <div style="margin-top: 5px;">
-            <mat-card class="example-card" appearance="outlined" style="min-width: 550px; max-width: 550px; min-height: 333px; max-height: 333px;
-            justify-content: center; float: left;">
+            Subject Breakdown
+            <div style="margin-top: 5px; border:1px solid grey;">
+            <mat-card class="example-card" appearance="outlined" style="min-width: 540px; max-width: 540px; min-height: 333px; max-height: 300px;
+            justify-content: center; float:left">
               <mat-card-content>
-                <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject" width=510 height=200></app-pie-graph>
+                <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject" width=520 height=200></app-pie-graph>
               </mat-card-content>
             </mat-card>
+
+            <div id="hot" style="">
+              <app-generic-table 
+              [data]="subject_table"
+              [colHeaders]="true"
+              [colWidths]="[200, 80, 120]"
+              [rowHeaders]="false"
+              [height]="333"
+              [columnSorting]="true"
+              [columns]="subject_columns"
+              [filters]="false"
+              licenseKey="non-commercial-and-evaluation"> 
+              </app-generic-table>
             </div>
+           </div>
+           <div style="margin-top: 20px;"></div>
+            File Content Breakdown
+            <div style="margin-top: 5px; border:1px solid grey;">
+              <mat-card class="example-card" appearance="outlined" style="min-width: 540px; max-width: 540px; min-height: 333px; max-height: 300px;
+              justify-content: center; float:left">
+                <mat-card-content>
+                  <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile" width=380 height=200></app-pie-graph>
+                </mat-card-content>
+              </mat-card>
+    
+              <div id="hot" style="">
+                <app-generic-table 
+                [data]="file_content_table"
+                [colHeaders]="true"
+                [colWidths]="[80, 190, 60, 80]"
+                [rowHeaders]="false"
+                [height]="333"
+                [columnSorting]="true"
+                [columns]="file_content_columns"
+                [filters]="false"
+                licenseKey="non-commercial-and-evaluation"> 
+                </app-generic-table>
+              </div>
+            </div>
+                              
+          </div>
+      </div>
+            
+      <div style="padding-top: 1200px; height: 1000px">
+      
+        <!--
+      <div id="subject_convert" style="margin-top: 50px; margin: auto; width: 65%;">
 
             <div id="hot" style="margin-left: -10px">
               <app-generic-table 
@@ -297,41 +338,13 @@
               licenseKey="non-commercial-and-evaluation"> 
               </app-generic-table>
             </div>
+           </div>
+          --> 
           
-      </div>
-
-      <div style="padding-top: 50px"> </div>
-      
-      <div id="file_convert" style="margin-top: 50px; margin: auto; width: 65%;">
-        File Content Breakdown
-          <div style="margin-top: 5px;">
-          <mat-card class="example-card" appearance="outlined" style="min-width: 550px; max-width: 550px; min-height: 333px; max-height: 333px;; margin-bottom: 8px; 
-          justify-content: center; float: left;">
-            <mat-card-content>
-              <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile" width=380 height=200></app-pie-graph>
-            </mat-card-content>
-          </mat-card>
-          </div>
-
-          <div id="hot" style="">
-            <app-generic-table 
-            [data]="file_content_table"
-            [colHeaders]="true"
-            [colWidths]="[80, 190, 60, 80]"
-            [rowHeaders]="false"
-            [height]="333"
-            [columnSorting]="true"
-            [columns]="file_content_columns"
-            [filters]="false"
-            licenseKey="non-commercial-and-evaluation"> 
-            </app-generic-table>
-          </div>
-                          
-    </div>
+      <div style="padding-top: 500px"> </div>
       
       </div>
     
     </ng-template>
-    </mat-tab>
 
-</mat-tab-group>
+<div>

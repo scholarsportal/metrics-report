@@ -27,6 +27,7 @@ import {DataTableDatasetComponent} from './data-table-dataset/data-table-dataset
 import {DataTableFileComponent} from './data-table-file/data-table-file.component'; 
 import {MatDatepickerModule, MatDatepicker} from '@angular/material/datepicker';
 import { PostsComponent } from './posts/posts.component';
+import { TreeComponent } from './tree/tree.component';
 import {MatCardModule} from '@angular/material/card';
 import {MatDialog} from '@angular/material/dialog';
 import { GenericTableComponent } from './generic-table/generic-table.component';
@@ -95,6 +96,7 @@ interface SearchGroup {
     RouterModule,
     RouterOutlet,
     PostsComponent,
+    TreeComponent,
     CommonModule,
     MatCardModule,
     GenericTableComponent,

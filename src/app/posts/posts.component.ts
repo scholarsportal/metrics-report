@@ -271,6 +271,7 @@ export class PostsComponent {
 
             let contentType = (this.filecontent_rsp_date_range[i]['contenttype'].split('/')[0]); 
             let count = this.filecontent_rsp_date_range[i]['count']; 
+            if (this.filecontent_rsp_date_range[i]['date'] == this.months[0]){
             if (this.fileContentHash.hasOwnProperty(contentType)){
               this.fileContentHash[contentType] = this.fileContentHash[contentType] + count;
             }
@@ -286,6 +287,7 @@ export class PostsComponent {
             else {
               this.fileContentDetailHash[contentDetailType] = countDetail
             }
+          }
           }
 
           let date_range_sum = 0
