@@ -374,7 +374,8 @@ export class PostsComponent {
       console.log("this is the upper date?", upperDate)
     }
     
-    let mm = upperDate.getMonth() + 1;
+    //let mm = upperDate.getMonth() + 1;
+    let mm = upperDate.getMonth();
     let yyyy = upperDate.getFullYear()
 
     console.log(mm, yyyy);

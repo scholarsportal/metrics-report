@@ -1,6 +1,6 @@
 import {CollectionViewer, SelectionChange, DataSource} from '@angular/cdk/collections';
 import {FlatTreeControl} from '@angular/cdk/tree';
-import {ChangeDetectionStrategy, Component, Injectable, Input, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Injectable, Input, OnInit, SimpleChanges, inject, signal} from '@angular/core';
 import {BehaviorSubject, merge, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
@@ -18,27 +18,54 @@ class DynamicFlatNode {
   ) {}
 }
 
+var dataMap = new Map<string, string[]>([
+  ['Fruits', ['Apple', 'Orange', 'Banana']],
+  ['Vegetables', ['Tomato', 'Potato', 'Onion']],
+  ['Apple', ['Fuji', 'Macintosh']],
+  ['Onion', ['Yellow', 'White', 'Purple']],
+]);
+
+var swag: string[] = [];
+
+var dataMap2 = new Map<string, string[]>([
+]);
+
 @Component({
   selector: 'app-tree',
   standalone: true,
   imports: [MatTreeModule, MatButtonModule, MatIconModule, MatProgressBarModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './tree.component.html',
-  styleUrl: './tree.component.css'
+  styleUrl: './tree.component.css',
 })
 
 export class TreeComponent {
-   ///@Input() data: any;  
+  @Input() data: any;  
+
+  database: DynamicDatabase;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log(this.data)
+    if (this.data != null){
+    swag = this.data['alias_data'].map((obj: { name: any; }) => obj.name);
+      for (var val of swag){
+        dataMap2.set(val, []);
+      }
+    }
+    console.log(swag);
+    this.database.changeRootLevelNodes(swag)
+    this.dataSource.data = this.database.initialData();
+  }
 
   constructor() {
-    const database = inject(DynamicDatabase);
+    this.database = inject(DynamicDatabase);
 
     ///const alias_data: any = this.data["DataverseTabData"]['alias_data'];
 
     this.treeControl = new FlatTreeControl<DynamicFlatNode>(this.getLevel, this.isExpandable);
-    this.dataSource = new DynamicDataSource(this.treeControl, database);
+    this.dataSource = new DynamicDataSource(this.treeControl, this.database);
 
-    this.dataSource.data = database.initialData();
+    this.dataSource.data = this.database.initialData();
   }
 
   treeControl: FlatTreeControl<DynamicFlatNode>;
@@ -61,27 +88,31 @@ export class DynamicDatabase {
 
   ///dataMap_test = new Map<string, string[]>(TreeComponent.alias_data);
 
-  dataMap = new Map<string, string[]>([
-    ['Fruits', ['Apple', 'Orange', 'Banana']],
-    ['Vegetables', ['Tomato', 'Potato', 'Onion']],
-    ['Apple', ['Fuji', 'Macintosh']],
-    ['Onion', ['Yellow', 'White', 'Purple']],
-  ]);
+  rootLevelNodesSource = new BehaviorSubject<string[]>(['test']);
+  rootLevelNodes$ = this.rootLevelNodesSource.asObservable();
 
-rootLevelNodes: string[] = ['Fruits', 'Vegetables'];
 
   /** Initial data from database */
   initialData(): DynamicFlatNode[] {
-    return this.rootLevelNodes.map(name => new DynamicFlatNode(name, 0, true));
+    const rootLevelNodes = this.rootLevelNodesSource.value;
+    return rootLevelNodes.map(name => new DynamicFlatNode(name, 0, true));
   }
 
   getChildren(node: string): string[] | undefined {
-    return this.dataMap.get(node);
+    return dataMap2.get(node);
   }
 
   isExpandable(node: string): boolean {
-    return this.dataMap.has(node);
+    return dataMap2.has(node);
   }
+
+  changeRootLevelNodes(data: any){
+    const rootLevelNodes = this.rootLevelNodesSource.value;
+    this.rootLevelNodesSource.next(swag)
+    console.log(this.rootLevelNodesSource.value) 
+    return rootLevelNodes.map(name => new DynamicFlatNode(name, 0, true));
+  }
+
 }
 /**
  * File database, it can build a tree structured Json object from string.
