@@ -215,25 +215,19 @@
           </div>
 
           <div>
-          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+
+          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; max-height: 1900px;
+  overflow-y: auto;">
             <mat-card-header>
               <mat-card-title-group>
-                <mat-card-title matTooltip="Metrics provided by [https://makedatacount.org]"> Make Data Count Metrics* </mat-card-title>
+                <mat-card-title> Dataverse Tree </mat-card-title>
                 <mat-card-subtitle> </mat-card-subtitle>
               </mat-card-title-group>
             </mat-card-header>
             <mat-card-content>
-              <br>
-              <h3> Views: 12,412</h3>
-              <h3> Downloads: 1,000 </h3>
-              <h3> Citations: 32</h3>
-              <button class="mat-small"
-        mat-button extended> 
-         Borealis MakeDataCount Excel<mat-icon> download </mat-icon> </button>
+              <app-tree [data]="raw_table_data"></app-tree>
             </mat-card-content>
           </mat-card>
-
-          <app-tree [data]="raw_table_data"></app-tree>
 
           </div>
 

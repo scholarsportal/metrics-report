@@ -1,10 +1,23 @@
-<mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
-    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+<input style="position: relative;; float:right; margin-bottom: 30px;" [(ngModel)]="searchString" placeholder="Filter 🔎"/>
+
+<mat-tree [dataSource]="dataSource" [treeControl]="treeControl" style="margin-top: 40px;">
+    <mat-tree-node *matTreeNodeDef="let node" 
+      matTreeNodePadding>
       <button mat-icon-button disabled></button>
-      {{node.item}}
+      <mat-card style="min-height: 60px; min-width: 200px; margin-bottom: 20px; margin-top: 20px">
+        <div style="margin-top: 8px;">
+        <p style="margin-left: 10px">  <b>VIEWS</b> : 10,000 </p>
+        <p style="margin-left: 10px">  <b>DOWNLOADS</b> : 9000 </p>
+        <p style="margin-left: 10px">  <b>CITATIONS</b> : 33 </p>
+        <button style="min-width: 1%; display: block; margin: auto; margin-bottom: 10px;" class="mat-small" mat-button> FULL REPORT </button>
+        </div>
+      </mat-card>
     </mat-tree-node>
-    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodeToggle
-                  [cdkTreeNodeTypeaheadLabel]="node.item">
+    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" 
+    [style.display]="filterParentNode(node) ? 'none' : ''"
+    matTreeNodePadding matTreeNodeToggle
+      [cdkTreeNodeTypeaheadLabel]="node.item" 
+      style="max-height: 100px; overflow: hidden;">
       <button mat-icon-button
               [attr.aria-label]="'Toggle ' + node.item" matTreeNodeToggle>
         <mat-icon class="mat-icon-rtl-mirror">
