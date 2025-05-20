@@ -93,6 +93,7 @@ interface SearchGroup {
     ReactiveFormsModule,
     MatDatepickerModule,
     MatDatepicker,
+    MatMenuModule,
     RouterModule,
     RouterOutlet,
     PostsComponent,
@@ -151,6 +152,7 @@ export class AppComponent implements AfterViewInit, OnInit{
 
     if (!this.start_on){
       this.date_start_activate = "";
+      console.log(this.date_start_activate)
     }
 
     this.bad_range = false;
@@ -295,6 +297,8 @@ export class AppComponent implements AfterViewInit, OnInit{
   subjectTableOn = false;
   fileContentTableOn = false; 
 
+  receivedCollectionFromTree:Array<String> = [];
+
   generic_columns: any[] = [
     {data: "name", readOnly: "true", title: "Collection / Dataverses"},
   ]
@@ -352,7 +356,12 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.pieChartDataFile_data = newItem["DataverseTabData"]['file_content_data'];
 
     this.total_collections_num = newItem["DataverseTabData"]['name_dropdown_data'].length.toString(); 
-    this.total_dataverses_num = (newItem["DataverseTabData"]['dataverse_count'] - newItem["DataverseTabData"]['name_dropdown_data'].length).toString();
+    if (this.selectedCollection_Activate_Name == "(All)"){
+      this.total_dataverses_num = (newItem["DataverseTabData"]['dataverse_count'] - newItem["DataverseTabData"]['name_dropdown_data'].length).toString();
+    }
+    else {
+      this.total_dataverses_num = newItem["DataverseTabData"]['dataverse_count']
+    }
     if (this.date_start_activate!=""){
       console.log("ds is activated here")
       this.total_datasets_num = this.barChartDataDatasetsAgg_data.reduce((a, b) => a + b, 0).toLocaleString();
@@ -559,14 +568,27 @@ export class AppComponent implements AfterViewInit, OnInit{
     console.log(event.value);
   }
 
+  getCollectionFromTree(list: string[]) {
+    this.receivedCollectionFromTree = list;
+    console.log(list)
+    this.selectedCollection_Current = list[1]
+      this.selectedCollection_Current_Name = list[0]
+    this.selectedCollection_Activate = this.selectedCollection_Current; 
+    this.selectedCollection_Activate_Name = this.selectedCollection_Current_Name;
+    this.submitDate();
+    this.date_String = this.dateStringFormat();  
+    console.log(this.selectedCollection_Activate);
+}
+
   selectedDate(eventData: any, dp?:any) {
     console.log(eventData);
     console.log(dp)
   }
 
   CollectionDataButtonActivate(){
-    console.log(this.searchForm.get('searchGroup')?.value);
-    this.selectedOption = this.searchForm.get('searchGroup')?.value as string; 
+    //console.log(this.searchForm.get('searchGroup')?.value);
+    //this.selectedOption = this.searchForm.get('searchGroup')?.value as string; 
+    this.selectedOption = this.selectedCollection_Current_Name;
     var acceptable_collection = false;
     if (this.selectedOption == "(All)" ){
       this.selectedCollection_Current = "(All)"

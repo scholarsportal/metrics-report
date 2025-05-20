@@ -31,3 +31,7 @@ body .handsontable .even{
 .example-month-picker .mat-calendar-arrow {
   display: none;
 }
+
+.mat-mdc-menu-item span{
+  font-size: 12px !important;
+}

@@ -15,6 +15,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 })
 export class PostsComponent {
   @Input() collectionSelected: string = "";
+  @Input() collectionSelectedName: string = ""; 
   @Input() start_on: boolean = false;
   @Input() startDate: string = "";
   @Input() endDate: string = "";
@@ -102,6 +103,7 @@ export class PostsComponent {
 
     if (!this.firstAPIGet){
       this.cleanTempData();
+      console.log('Clean Up Time')
     }
 
     console.log("date", this.dateRangeOn, this.startDate, this.endDate)
@@ -156,6 +158,7 @@ export class PostsComponent {
           this.dataverse_rsp = responses[7]['data'];
 
           this.dataversesDataTree = this.data_rsp['children']
+          /***
           if (this.collectionSelected != "(All)"){
               console.log("HAHAHAHA", this.dataversesDataTree, this.collectionSelected)
               let aliasRow = this.findAliasRow(this.dataversesDataTree , this.collectionSelected)
@@ -167,6 +170,7 @@ export class PostsComponent {
                 this.dataversesDataTree = [];
               }
           }
+          ***/
 
           for (let i = 0; i < this.dataversesDataTree.length; i++){
             this.dataverseCollections.push(
@@ -186,6 +190,10 @@ export class PostsComponent {
           }
           
           console.log("look at the months,", this.months)
+
+          if (this.downloads_rsp.length < this.months.length){
+            this.months = this.downloads_rsp.map( item => { return item.date }).reverse();
+          }
           
           for (let i = 0; i <= this.months.length - 2 ; i++){
             this.monthlyDownloads.push(this.downloads_rsp.find(x=>x.date==this.months[i])['count']);
@@ -452,6 +460,8 @@ export class PostsComponent {
 
     this.dataversesDataTree = [];
     this.dataverseCollections = [];
+
+    this.dataverseAlias = [];
 
     this.dataverseCount = 0;
 

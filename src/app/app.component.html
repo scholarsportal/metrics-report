@@ -1,4 +1,4 @@
-<app-posts (messageEvent)="getData($event)" [collectionSelected]="selectedCollection_Activate" [startDate]="date_start_activate" [endDate]="date_end_activate" [start_on]="start_on"></app-posts>
+<app-posts (messageEvent)="getData($event)" [collectionSelected]="selectedCollection_Activate" [collectionSelectedName]="selectedCollection_Current_Name" [startDate]="date_start_activate" [endDate]="date_end_activate" [start_on]="start_on"></app-posts>
 
 <div>
 <h2 style="padding:20px;"> 
@@ -31,6 +31,8 @@
   margin-right: auto;
   padding-bottom: 0.2cm;
   ">
+
+<!--
 <div style="float: left;">
 <form [formGroup]="searchForm" style="">
 <mat-form-field appearance="outline" style="margin-left: 10px; width:400px;">
@@ -58,6 +60,8 @@
 </mat-form-field>
 </form>
 </div>
+-->
+
 
 <div style="float: left;">
 <mat-form-field appearance="outline" style="margin-left: 10px;"> 
@@ -99,18 +103,16 @@
   <app-download #download [data]="raw_table_data" [name]="selectedOption"></app-download>
     <ng-template [ngIf]="true">
 
-      <div style="position:relative; top:10px; float:right; right: 20px">
-      <button class="mat-small"  (click)="download.generateExcel()" 
-        mat-button extended > 
-         EXCEL <mat-icon> download </mat-icon> </button> | 
+      <div style="position:relative; top:10px; float:right; right: 50px">        
+        <button mat-button [matMenuTriggerFor]="menu" style="width: 200px; border-style: dotted;"> <mat-icon> download </mat-icon> Export</button>
+        <mat-menu #menu="matMenu" class="mat-small" fxLayoutAlign="center center">
+          <button mat-menu-item style="font-size: 9px !important;" (click)="download.generateExcel()"> Excel </button>
+          <button mat-menu-item class="mat-small" (click)="download.generatePDF()"> PDF </button>
+          <a mat-menu-item class="mat-small" href="https://borealisdata.ca/metricsbackend/api/metrics/report"> Legacy (All) </a>
+          <button mat-menu-item class="mat-small" > Make Data Count Metrics (All) </button>
+        </mat-menu>
+        
 
-      <button class="mat-small" 
-        mat-button extended (click)="download.generatePDF()"> 
-         PDF <mat-icon> download </mat-icon> </button> |
-
-      <a  mat-button class="mat-small" 
-        href="https://borealisdata.ca/metricsbackend/api/metrics/report"> 
-         Legacy Export  <mat-icon> download </mat-icon> </a>
       </div>
 
       <div style="margin: auto;
@@ -225,7 +227,7 @@
               </mat-card-title-group>
             </mat-card-header>
             <mat-card-content>
-              <app-tree [data]="raw_table_data"></app-tree>
+              <app-tree [data]="raw_table_data" (dataEvent)="getCollectionFromTree($event)"> </app-tree>
             </mat-card-content>
           </mat-card>
 
@@ -249,6 +251,7 @@
           -->   
 
       </div> 
+      
             
       <div style="display: inline-block; height:200px; padding: 30px; padding-top: 100px; font-size: 18px;">
             <div id="contentToConvert">

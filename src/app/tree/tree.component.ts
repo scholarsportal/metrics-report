@@ -1,6 +1,6 @@
 import {CollectionViewer, SelectionChange, DataSource} from '@angular/cdk/collections';
 import {FlatTreeControl} from '@angular/cdk/tree';
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Injectable, Input, OnInit, SimpleChanges, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Output, EventEmitter, Injectable, Input, OnInit, SimpleChanges, inject, signal} from '@angular/core';
 import {BehaviorSubject, merge, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
@@ -46,6 +46,7 @@ var dataMap2 = new Map<string, string[]>([
 
 export class TreeComponent {
   @Input() data: any; 
+  @Output() dataEvent = new EventEmitter<string[]>();
   searchString = "";
 
   database: DynamicDatabase;
@@ -119,6 +120,18 @@ export class TreeComponent {
       return false
     }
     return true
+}
+
+fullReportButton(alias: string){
+  var name = "";  
+  console.log(name, alias)
+  for(var i = 0; i < alias_data.length; i++){
+   if (alias_data[i].alias == alias){
+    name = alias_data[i].name
+   }
+  } 
+  console.log(name, alias)
+  this.dataEvent.emit([name, alias]);
 }
 
 }
@@ -243,7 +256,7 @@ export class DynamicDataSource implements DataSource<DynamicFlatNode> {
         const z_kids = z.data.children.map((item: { name: any; }) => item.name);
         const z_kids_alias = z.data.children.map((item: { alias : any; }) => item.alias );
 
-        dataMap2.set(node.item, ["test"].concat(z_kids))
+        dataMap2.set(node.item, [y].concat(z_kids))
 
         for(var i = 0; i < z_kids.length; i++){
           dataMap2.set(z_kids[i], []);
@@ -255,7 +268,7 @@ export class DynamicDataSource implements DataSource<DynamicFlatNode> {
         }
 
         else {
-          dataMap2.set(node.item, ['Whatever happens happens'])
+          dataMap2.set(node.item, [y])
         }
 
         const children = this._database.getChildren(node.item);

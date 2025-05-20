@@ -7,3 +7,7 @@
   background: red !important;
   color: red !important;
 }
+
+.mat-mdc-menu-item span{
+  font-size: 40px !important;
+}
