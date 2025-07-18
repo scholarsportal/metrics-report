@@ -1,6 +1,7 @@
 import {CollectionViewer, SelectionChange, DataSource} from '@angular/cdk/collections';
 import {FlatTreeControl} from '@angular/cdk/tree';
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Output, EventEmitter, Injectable, Input, OnInit, SimpleChanges, inject, signal} from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {BehaviorSubject, merge, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
@@ -10,6 +11,7 @@ import { HttpClient } from '@angular/common/http';
 import {MatTreeModule} from '@angular/material/tree';
 import {MatCardModule} from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
+import { TranslocoModule } from '@ngneat/transloco';
 
 /** Flat node with expandable and level information */
 class DynamicFlatNode {
@@ -38,7 +40,7 @@ var dataMap2 = new Map<string, string[]>([
 @Component({
   selector: 'app-tree',
   standalone: true,
-  imports: [MatTreeModule, MatButtonModule, MatIconModule, MatProgressBarModule, MatCardModule, FormsModule],
+  imports: [MatTreeModule, MatButtonModule, MatIconModule, MatProgressBarModule, MatCardModule, FormsModule, CommonModule, TranslocoModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './tree.component.html',
   styleUrl: './tree.component.css',
@@ -46,6 +48,7 @@ var dataMap2 = new Map<string, string[]>([
 
 export class TreeComponent {
   @Input() data: any; 
+  @Input() current_active: String
   @Output() dataEvent = new EventEmitter<string[]>();
   searchString = "";
 
@@ -62,9 +65,11 @@ export class TreeComponent {
       }
     }
     console.log(tree_dropdown);
+    tree_dropdown.sort();
     this.database.changeRootLevelNodes(tree_dropdown)
     this.dataSource.data = this.database.initialData();
     console.log('hello')
+    console.log(this.current_active);
   }
 
   constructor() {

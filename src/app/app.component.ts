@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ViewChild, NgModule, ChangeDetectionStrategy, ViewEncapsulation, ElementRef,OnInit, inject,} from '@angular/core';
+import {AfterViewInit, Component, ViewChild, NgModule, ChangeDetectionStrategy, ViewEncapsulation, ElementRef,OnInit, inject, signal} from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import {JsonPipe, AsyncPipe, CommonModule} from '@angular/common';
 import {MatTabsModule} from '@angular/material/tabs';
@@ -37,8 +37,13 @@ import {DownloadComponent} from './download/download.component';
 import {MatMenuModule} from '@angular/material/menu';
 import html2canvas from 'html2canvas';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import { TranslocoModule } from '@ngneat/transloco';
+import { TranslocoModule, TranslocoService } from '@ngneat/transloco';
 import { LanguageService } from './language.service';
+import { MatListModule } from '@angular/material/list';
+import { ChangeDetectorRef } from '@angular/core';
+import { forkJoin } from 'rxjs';
+
+
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
 import {default as _rollupMoment, Moment} from 'moment';
@@ -105,6 +110,7 @@ interface SearchGroup {
     DownloadComponent,
     MatTooltipModule,
     TranslocoModule,
+    MatListModule,
     ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.component.html',
@@ -275,6 +281,8 @@ export class AppComponent implements AfterViewInit, OnInit{
   selectedCollection_Current_Name: string = "(All)";
   selectedCollection_Activate_Name:String = "(All)";
 
+  translatedText$: ""
+
 
   total_collections_num: String = "-";
   total_dataverses_num: String = "-";
@@ -291,6 +299,12 @@ export class AppComponent implements AfterViewInit, OnInit{
   total_users_change: String = "-";
   total_size_change: String = "-"
 
+  downloads_labels = [this.translocoService.selectTranslate('MonthlyFileDownloads'), this.translocoService.selectTranslate('CumulativeFileDownloads')];
+  datasets_labels = [this.translocoService.selectTranslate('MonthlyDatasetsPublished'), this.translocoService.selectTranslate('CumulativeDatasetsPublished')];
+  file_labels = [this.translocoService.selectTranslate('MonthlyFilePublished'), this.translocoService.selectTranslate('CumulativeFilePublished')];
+  user_labels = [this.translocoService.selectTranslate('MonthlyUsersJoined'), this.translocoService.selectTranslate('CumulativeUsersJoined')];
+  storage_usage = [this.translocoService.selectTranslate('MonthlyStorageUsed'), this.translocoService.selectTranslate('CumulativeStorageUsed')];
+
   dataset_table_data = [];
   file_table_data = [];
 
@@ -298,6 +312,8 @@ export class AppComponent implements AfterViewInit, OnInit{
   fileContentTableOn = false; 
 
   receivedCollectionFromTree:Array<String> = [];
+
+  isOpen = false;
 
   generic_columns: any[] = [
     {data: "name", readOnly: "true", title: "Collection / Dataverses"},
@@ -390,7 +406,7 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.barChartDataDownloads = [
       { // grey
         data: this.barChartDataDownloadsAgg_data.reverse(),
-        label: 'Monthly File Downloads',
+        label: this.translatedText$,
         tension: 0,
         backgroundColor: 'rgb(102, 0, 102, 0.5)',
         borderColor: 'rgb(102, 0, 102, 0.5)',
@@ -401,7 +417,7 @@ export class AppComponent implements AfterViewInit, OnInit{
       },
       { // grey
         data: this.barChartDataDownloads_data.reverse(),
-        label: 'Cumulative File Downloads',
+        label: "CumulativeFileDownloads",
         tension: 0,
         backgroundColor: 'rgb(0, 100, 255, 0.5)',
         borderColor: 'rgb(0, 100, 255, 0.5)',
@@ -415,7 +431,7 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.barChartDataDatasets = [
       { // grey
         data: this.barChartDataDatasetsAgg_data.reverse(),
-        label: 'Monthly Datasets Published',
+        label: this.translocoService.translate('MonthlyDatasetsPublished'),
         tension: 0,
         backgroundColor: 'rgb(102, 0, 102, 0.5)',
         borderColor: 'rgb(102, 0, 102, 0.5)',
@@ -426,7 +442,7 @@ export class AppComponent implements AfterViewInit, OnInit{
       },
       { // grey
         data: this.barChartDataDatasets_data.reverse(),
-        label: 'Cumulative Datasets Published',
+        label: this.translocoService.translate('CumulativeDatasetsPublished'),
         tension: 0,
         backgroundColor: 'rgb(0, 100, 255, 0.5)',
         borderColor: 'rgb(0, 100, 255, 0.5)',
@@ -440,7 +456,7 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.barChartDataFiles = [
       { // grey
         data: this.barChartDataFiles_Aggdata.reverse(),
-        label: 'Monthly Files Published',
+        label: this.translocoService.translate('MonthlyFilePublished'),
         tension: 0,
         backgroundColor: 'rgb(102, 0, 102, 0.5)',
         borderColor: 'rgb(102, 0, 102, 0.5)',
@@ -451,7 +467,7 @@ export class AppComponent implements AfterViewInit, OnInit{
       },
       { // grey
         data: this.barChartDataFiles_data.reverse(),
-        label: 'Cumulative Files Published',
+        label: this.translocoService.translate('CumulativeFilePublished'),
         tension: 0,
         backgroundColor: 'rgb(0, 100, 255, 0.5)',
         borderColor: 'rgb(0, 100, 255, 0.5)',
@@ -465,7 +481,7 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.barChartDataUsers = [
       { // grey
         data: this.barChartDataUsers_Aggdata.reverse(),
-        label: 'Monthly Users Joined',
+        label: this.translocoService.translate('MonthlyUsersJoined'),
         tension: 0,
         backgroundColor: 'rgb(102, 0, 102, 0.5)',
         borderColor: 'rgb(102, 0, 102, 0.5)',
@@ -476,7 +492,7 @@ export class AppComponent implements AfterViewInit, OnInit{
       },
       { // grey
         data: this.barChartDataUsers_data.reverse(),
-        label: 'Cumulative Users Joined',
+        label: this.translocoService.translate('CumulativeUsersJoined'),
         tension: 0,
         backgroundColor: 'rgb(0, 100, 255, 0.5)',
         borderColor: 'rgb(0, 100, 255, 0.5)',
@@ -490,7 +506,7 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.barChartDataSize = [
       { // grey
         data: this.barChartDataSize_Aggdata.reverse(),
-        label: 'Monthly Storage Used (GB)',
+        label: this.translocoService.translate('MonthlyStorageUsed'),
         tension: 0,
         backgroundColor: 'rgb(102, 0, 102, 0.5)',
         borderColor: 'rgb(102, 0, 102, 0.5)',
@@ -501,7 +517,7 @@ export class AppComponent implements AfterViewInit, OnInit{
       },
       { // grey
         data: this.barChartDataSize_data.reverse(),
-        label: 'Cumulative Storage Used (GB)',
+        label: this.translocoService.translate('CumulativeStorageUsed'),
         tension: 0,
         backgroundColor: 'rgb(0, 100, 255, 0.5)',
         borderColor: 'rgb(0, 100, 255, 0.5)',
@@ -618,8 +634,9 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   displayedColumns: string[] = ['name', 'views', 'downloads', 'citations'];
   title = 'metrics-app';
+  
 
-  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, private languageService: LanguageService) {
+  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, private languageService: LanguageService, private translocoService: TranslocoService, private cdr: ChangeDetectorRef) {
     this.filteredOptions = this.options.slice();
   }
 
@@ -630,10 +647,14 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   switchLanguage(language: string) {
     this.languageService.switchLanguage(language);
+    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   getLanguage(){
     return this.languageService.getLanguage();
+    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   ngAfterViewInit() {

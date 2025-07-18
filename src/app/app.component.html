@@ -13,11 +13,11 @@
       <button mat-button (click)="switchLanguage('fr')" [disabled]="getLanguage()=='fr'"> Français </button>
     </div>
     <div  style="clear:both;">
-      <button (click)="openAboutDialog()" style="min-width: 1%;" class="mat-small" mat-button> About </button>
+      <button (click)="openAboutDialog()" style="min-width: 1%;" class="mat-small" mat-button> {{ 'About' | transloco }} </button>
       | 
-      <button style="min-width: 1%;" class="mat-small" mat-button> Terms of Conditions </button>
+      <button style="min-width: 1%;" class="mat-small" mat-button> {{ 'TermsofConditions' | transloco }} </button>
       |
-      <button style="min-width: 1%;" class="mat-small" mat-button> FAQ </button>
+      <button style="min-width: 1%;" class="mat-small" mat-button> {{ 'FAQ' | transloco }} </button>
     </div>
   </div>
 </h2>
@@ -65,7 +65,7 @@
 
 <div style="float: left;">
 <mat-form-field appearance="outline" style="margin-left: 10px;"> 
-  <mat-label>Start Date</mat-label>
+  <mat-label>{{ 'StartDate' | transloco }}</mat-label>
   <input matInput *ngIf="!start_on" disabled> 
   <input matInput *ngIf="start_on"[matDatepicker]="dp_s" [formControl]="date_start" [min]="minDate" [max]="todayDate"> 
   <mat-datepicker-toggle *ngIf="start_on" matIconSuffix [for]="dp_s"> </mat-datepicker-toggle>
@@ -76,10 +76,10 @@
   </mat-datepicker>
 </mat-form-field>
 
-<mat-checkbox matTooltip="Generates metrics from creation, visual displays last 24 months" [ngModel]="!start_on" (ngModelChange)="start_on = !$event" style="margin-left: 10px; "> All-Time </mat-checkbox>
+<mat-checkbox matTooltip="Generates metrics from creation, visual displays last 24 months" [ngModel]="!start_on" (ngModelChange)="start_on = !$event" style="margin-left: 10px; "> {{ 'AllTime' | transloco }} </mat-checkbox>
 
 <mat-form-field appearance="outline"style="margin-left: 10px;"> 
-  <mat-label>End Date</mat-label>
+  <mat-label>{{ 'EndDate' | transloco }}</mat-label>
   <input matInput [matDatepicker]="dp_e" [formControl]="date_end" [min]="minDate" [max]="todayDate">
   <mat-datepicker-toggle matIconSuffix [for]="dp_e"></mat-datepicker-toggle>
   <mat-datepicker #dp_e
@@ -89,7 +89,7 @@
   </mat-datepicker>
 </mat-form-field>
 
-  <button (click)="CollectionDataButtonActivate()" mat-button extended style="margin-left: 10px;"> SUBMIT </button>
+  <button (click)="CollectionDataButtonActivate()" mat-button extended style="margin-left: 10px;"> {{ 'Submit' | transloco }} </button>
 </div>
 
 </div>
@@ -103,131 +103,32 @@
   <app-download #download [data]="raw_table_data" [name]="selectedOption"></app-download>
     <ng-template [ngIf]="true">
 
-      <div style="position:relative; top:10px; float:right; right: 50px">        
-        <button mat-button [matMenuTriggerFor]="menu" style="width: 200px; border-style: dotted;"> <mat-icon> download </mat-icon> Export</button>
-        <mat-menu #menu="matMenu" class="mat-small" fxLayoutAlign="center center">
-          <button mat-menu-item style="font-size: 9px !important;" (click)="download.generateExcel()"> Excel </button>
-          <button mat-menu-item class="mat-small" (click)="download.generatePDF()"> PDF </button>
-          <a mat-menu-item class="mat-small" href="https://borealisdata.ca/metricsbackend/api/metrics/report"> Legacy (All) </a>
-          <button mat-menu-item class="mat-small" > Make Data Count Metrics (All) </button>
-        </mat-menu>
-        
-
+      <div style="vertical-align:top; margin-top: 100px;  margin-left: 20px; position:relative">
+        <div style="vertical-align:top; margin-left: 20px;">
+          <div *ngIf="selectedCollection_Activate=='(All)'" id="pdf_name"> <h1 style="font-size: 32px; font-weight: bold;">{{ 'All' | transloco }}</h1></div>
+          <div *ngIf="selectedCollection_Activate!='(All)'" id="pdf_name"><h1 style="font-size: 32px; font-weight: bold;">{{selectedCollection_Activate_Name}}</h1></div>
+          <div style="margin-top: -5px; font-size: 18px;" id="pdf_date"><p><i>{{date_String}}</i></p></div>
+        </div>
       </div>
 
       <div style="margin: auto;
-      width: 60%; 
+      width: 95%; 
       display: flex;">
 
-      <div style="vertical-align:top; margin-top: 50px; margin-left: -10px;">
+      <div style="vertical-align:top; margin-top: 0px; margin-left: -10px;">
         
-        <div style="vertical-align:top; margin-left: 20px;">
-          <div *ngIf="selectedCollection_Activate=='(All)'" id="title_download"> <h1 style="font-size: 32px; font-weight: bold;">Borealis&nbsp;(All)</h1></div>
-          <div *ngIf="selectedCollection_Activate!='(All)'" id="title_download"><h1 style="font-size: 32px; font-weight: bold;">{{selectedCollection_Activate_Name}}</h1></div>
-          <div style="margin-top: -5px; font-size: 18px;" id="title_date"><p><i>{{date_String}}</i></p></div>
-        </div>
-        
-        <div id="main_meteris">
-        
-        <div>
-        <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
-          <mat-card-header>
-            <mat-card-title-group>
-              <mat-card-title> <div *ngIf="selectedCollection_Activate=='(All)'"> Collections </div> 
-                <div *ngIf="selectedCollection_Activate!='(All)'"> Sub Collections </div> </mat-card-title>
-            </mat-card-title-group>
-          </mat-card-header>
-          <mat-card-content>
-            <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_collections_num}}</b> </h1>
-          </mat-card-content>
-        </mat-card>
+        <div id="main_meteris">        
 
-        <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
-          <mat-card-header>
-            <mat-card-title-group>
-              <mat-card-title> <div *ngIf="selectedCollection_Activate=='(All)'"> Sub Collections </div> 
-                <div *ngIf="selectedCollection_Activate!='(All)'"> Sub Dataverses </div> </mat-card-title>
-            </mat-card-title-group>
-          </mat-card-header>
-          <mat-card-content>
-            <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_dataverses_num}}</b> </h1>
-          </mat-card-content>
-        </mat-card>
-
-          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
+          <mat-card class="example-card hide-scrollbar" appearance="outlined" style="min-width: 350px; max-width: 350px; margin-bottom: 50px; margin-left: 5px; margin-top: 10px; max-height: 3350px;
+  overflow-y: auto; font-size: 12px;">
             <mat-card-header>
               <mat-card-title-group>
-                <mat-card-title> Datasets </mat-card-title>
+                <mat-card-title> {{ 'DataverseTree' | transloco }} </mat-card-title>
                 <mat-card-subtitle> </mat-card-subtitle>
               </mat-card-title-group>
             </mat-card-header>
             <mat-card-content>
-              <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_datasets_num}}</b> </h1>
-            </mat-card-content>
-          </mat-card>
-        </div>
-
-          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
-            <mat-card-header>
-              <mat-card-title-group>
-                <mat-card-title> Files </mat-card-title>
-                <mat-card-subtitle> </mat-card-subtitle>
-              </mat-card-title-group>
-            </mat-card-header>
-            <mat-card-content>
-              <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_files_num}}</b> </h1>
-            </mat-card-content>
-          </mat-card>
-
-          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
-            <mat-card-header>
-              <mat-card-title-group>
-                <mat-card-title> Downloads </mat-card-title>
-                <mat-card-subtitle> </mat-card-subtitle>
-              </mat-card-title-group>
-            </mat-card-header>
-            <mat-card-content>
-              <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_downloads_num}}</b> </h1>
-            </mat-card-content>
-          </mat-card>
-
-          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
-            <mat-card-header>
-              <mat-card-title-group>
-                <mat-card-title> Users </mat-card-title>
-                <mat-card-subtitle> </mat-card-subtitle>
-              </mat-card-title-group>
-            </mat-card-header>
-            <mat-card-content>
-              <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_users_num}}</b> </h1>
-            </mat-card-content>
-          </mat-card>
-
-          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
-            <mat-card-header>
-              <mat-card-title-group>
-                <mat-card-title> Storage Usage </mat-card-title>
-                <mat-card-subtitle> </mat-card-subtitle>
-              </mat-card-title-group>
-            </mat-card-header>
-            <mat-card-content>
-              <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_size_num}}</b> </h1>
-            </mat-card-content>
-          </mat-card>
-          </div>
-
-          <div>
-
-          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px; max-height: 1900px;
-  overflow-y: auto;">
-            <mat-card-header>
-              <mat-card-title-group>
-                <mat-card-title> Dataverse Tree </mat-card-title>
-                <mat-card-subtitle> </mat-card-subtitle>
-              </mat-card-title-group>
-            </mat-card-header>
-            <mat-card-content>
-              <app-tree [data]="raw_table_data" (dataEvent)="getCollectionFromTree($event)"> </app-tree>
+              <app-tree [data]="raw_table_data" [current_active]="selectedCollection_Activate_Name" (dataEvent)="getCollectionFromTree($event)"> </app-tree>
             </mat-card-content>
           </mat-card>
 
@@ -253,59 +154,100 @@
       </div> 
       
             
-      <div style="display: inline-block; height:200px; padding: 30px; padding-top: 100px; font-size: 18px;">
-            <div id="contentToConvert">
-            Number of Downloads
+      <div style="display: inline-block; height:200px; padding: 30px; padding-top: 20px; font-size: 18px;">
+            <div id="pdf_bargraphs">
+            {{ 'NumberofDownloads' | transloco }}
             <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
-            Number of Datasets 
+            {{ 'NumberofDatasets' | transloco }} 
             <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataDatasets"></app-horizontal-bar-graph> 
-            Number of Files
+            {{ 'NumberofFiles' | transloco }} 
             <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataFiles"></app-horizontal-bar-graph>
-            Number of Users
+            {{ 'Numberofusers' | transloco }}
             <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataUsers"></app-horizontal-bar-graph>
-            Storage Usage
+            {{ 'StorageUsage' | transloco }}
             <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataSize"></app-horizontal-bar-graph>
             </div>
-            Subject Breakdown
-            <div style="margin-top: 5px; border:1px solid grey;">
-            <mat-card class="example-card" appearance="outlined" style="min-width: 540px; max-width: 540px; min-height: 333px; max-height: 300px;
-            justify-content: center; float:left">
-              <mat-card-content>
+            
+
+            <p id="subjectGraphTitle"> {{ 'SubjectBreakdown' | transloco }} </p>
+            <div style="border:1px solid lightgray;" class="hide-scrollbar">
+            <mat-card class="example-card" appearance="outlined" style="min-width: 750px; max-width: 750px; min-height: 333px; max-height: 300px;
+            justify-content: center;">
+              <button mat-button extended
+              (click)="download.generateSubject()"
+              style="position: absolute;
+                height: 28px;
+                width: 12px;
+                top: 4px;
+                right: 4px;
+                font-size: 12px;
+                border-style: dotted; 
+                border-width: 1px;">
+                  <mat-icon style="
+                  font-size: 16px;
+                  height: 16px;
+                  width: 12px;
+                  display: block;
+                  line-height: 1;
+                  margin-left: 10px;
+              ">download</mat-icon>
+              </button>
+              <mat-card-content id="subjectGraph">
                 <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject" width=520 height=200></app-pie-graph>
               </mat-card-content>
             </mat-card>
 
-            <div id="hot" style="">
-              <app-generic-table 
+            <div id="hot" style="" class="hide-scrollbar">
+              <app-generic-table class="hide-scrollbar"
               [data]="subject_table"
               [colHeaders]="true"
-              [colWidths]="[200, 80, 120]"
+              [colWidths]="[400, 200, 150]"
               [rowHeaders]="false"
-              [height]="333"
+              [height]="250"       
               [columnSorting]="true"
               [columns]="subject_columns"
-              [filters]="false"
+              [filters]="false" 
               licenseKey="non-commercial-and-evaluation"> 
               </app-generic-table>
             </div>
            </div>
-           <div style="margin-top: 20px;"></div>
-            File Content Breakdown
-            <div style="margin-top: 5px; border:1px solid grey;">
-              <mat-card class="example-card" appearance="outlined" style="min-width: 540px; max-width: 540px; min-height: 333px; max-height: 300px;
-              justify-content: center; float:left">
-                <mat-card-content>
+
+           <div style="margin-top: 20px;" class="hide-scrollbar"></div>
+           <p id="fileGraphTitle"> {{ 'FileContentBreakdown' | transloco }} <p>
+            <div style="margin-top: 5px; border:1px solid lightgray;" class="hide-scrollbar">
+              <mat-card class="example-card" appearance="outlined" style="min-width: 750px; max-width: 750px; min-height: 333px; max-height: 300px;
+                justify-content: center;">
+                <button mat-button extended
+                (click)="download.generateFile()"
+                style="position: absolute;
+                height: 28px;
+                width: 12px;
+                top: 4px;
+                right: 4px;
+                font-size: 12px;
+                border-style: dotted; 
+                border-width: 1px;">
+                  <mat-icon style="
+                  font-size: 16px;
+                  height: 16px;
+                  width: 12px;
+                  display: block;
+                  line-height: 1;
+                  margin-left: 10px;
+                ">download</mat-icon>
+                </button>
+                <mat-card-content id="fileGraph">
                   <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile" width=380 height=200></app-pie-graph>
                 </mat-card-content>
               </mat-card>
     
-              <div id="hot" style="">
-                <app-generic-table 
+              <div id="hot" style="" class="hide-scrollbar">
+                <app-generic-table class="hide-scrollbar"
                 [data]="file_content_table"
                 [colHeaders]="true"
-                [colWidths]="[80, 190, 60, 80]"
+                [colWidths]="[100, 400, 150, 100]"
                 [rowHeaders]="false"
-                [height]="333"
+                [height]="250"
                 [columnSorting]="true"
                 [columns]="file_content_columns"
                 [filters]="false"
@@ -315,31 +257,105 @@
             </div>
                               
           </div>
+          
+          <div style="display: inline-block; height:200px; padding-top: 0px; font-size: 18px;">
+
+            <div style="margin-bottom: 8px;">        
+              <button mat-button [matMenuTriggerFor]="menu" style="width: 250px; height: 30px; border-style: dotted; border-width: 1px;"> <mat-icon> download </mat-icon> {{ 'Export' | transloco }} </button>
+              <mat-menu #menu="matMenu" #subMenu="matMenu" class="mat-small" panelClass="compact-menu" fxLayoutAlign="center center" style="width: 250px;">
+                <button mat-menu-item style="width: 250px" (click)="download.generateExcel()"> {{ 'Excel' | transloco }} </button>
+                <button mat-menu-item class="mat-small" (click)="download.generatePDF()" style="width: 250px;"> {{ 'PDF' | transloco }} </button>
+                <a mat-menu-item class="mat-small" href="https://borealisdata.ca/metricsbackend/api/metrics/report" style="width: 250px;"> {{ 'Legacy' | transloco }} </a>
+                <button mat-menu-item class="mat-small" style="width: 250px;"> {{ 'MakeDataCountMetrics' | transloco }} </button>
+              </mat-menu>
+            </div>
+
+            <mat-card class="example-card" appearance="outlined" style="min-width: 250px; max-width: 250px; margin-bottom: 8px; margin-top: 5px; background-color: white !important;
+            box-shadow: none !important;" id="pdf_collections_num">
+              <mat-card-header>
+                <mat-card-title-group>
+                  <mat-card-title> <div *ngIf="selectedCollection_Activate=='(All)'"> {{ 'Collections' | transloco }} </div> 
+                    <div *ngIf="selectedCollection_Activate!='(All)'"> {{ 'Collections' | transloco }} </div> </mat-card-title>
+                </mat-card-title-group>
+              </mat-card-header>
+              <mat-card-content>
+                <h1 style="text-align: right; color:black; font-size: 20px;"> <b>{{total_collections_num}}</b> </h1>
+              </mat-card-content>
+            </mat-card>
+    
+              <mat-card class="example-card" appearance="outlined" style="min-width: 250px; max-width: 250px;  margin-bottom: 8px; margin-top: 10px; background-color: white !important;
+              box-shadow: none !important;" id="pdf_datasets_num">
+                <mat-card-header>
+                  <mat-card-title-group>
+                    <mat-card-title> {{ 'Datasets' | transloco }} </mat-card-title>
+                    <mat-card-subtitle> </mat-card-subtitle>
+                  </mat-card-title-group>
+                </mat-card-header>
+                <mat-card-content>
+                  <h1 style="text-align: right; color:black; font-size: 20px;"> <b>{{total_datasets_num}}</b> </h1>
+                </mat-card-content>
+              </mat-card>
+    
+              <mat-card class="example-card" appearance="outlined" style="min-width: 250px; max-width: 250px;  margin-bottom: 8px; margin-top: 10px; background-color: white !important;
+              box-shadow: none !important;" id="pdf_files_num">
+                <mat-card-header>
+                  <mat-card-title-group>
+                    <mat-card-title> {{ 'Files' | transloco }} </mat-card-title>
+                    <mat-card-subtitle> </mat-card-subtitle>
+                  </mat-card-title-group>
+                </mat-card-header>
+                <mat-card-content>
+                  <h1 style="text-align: right; color:black; font-size: 20px;"> <b>{{total_files_num}}</b> </h1>
+                </mat-card-content>
+              </mat-card>
+    
+              <mat-card class="example-card" appearance="outlined" style="min-width: 250px; max-width: 250px; margin-bottom: 8px; margin-top: 10px; background-color: white !important;
+              box-shadow: none !important;" id="pdf_download_nums">
+                <mat-card-header>
+                  <mat-card-title-group>
+                    <mat-card-title> {{ 'Downloads' | transloco }} </mat-card-title>
+                    <mat-card-subtitle> </mat-card-subtitle>
+                  </mat-card-title-group>
+                </mat-card-header>
+                <mat-card-content>
+                  <h1 style="text-align: right; color:black; font-size: 20px;"> <b>{{total_downloads_num}}</b> </h1>
+                </mat-card-content>
+              </mat-card>
+    
+              <mat-card class="example-card" appearance="outlined" style="min-width: 250px; max-width: 250px;  margin-bottom: 8px; margin-top: 10px; background-color: white !important;
+              box-shadow: none !important;" id="pdf_users_nums">
+                <mat-card-header>
+                  <mat-card-title-group>
+                    <mat-card-title> {{ 'Users' | transloco }} </mat-card-title>
+                    <mat-card-subtitle> </mat-card-subtitle>
+                  </mat-card-title-group>
+                </mat-card-header>
+                <mat-card-content>
+                  <h1 style="text-align: right; color:black; font-size: 20px;"> <b>{{total_users_num}}</b> </h1>
+                </mat-card-content>
+              </mat-card>
+  
+              <mat-card class="example-card" appearance="outlined" style="min-width: 250px; max-width: 250px; margin-bottom: 8px; margin-top: 10px; background-color: white !important;
+              box-shadow: none !important;" id="pdf_storage_nums">
+                <mat-card-header>
+                  <mat-card-title-group>
+                    <mat-card-title> {{ 'StorageUsage' | transloco }} </mat-card-title>
+                    <mat-card-subtitle> </mat-card-subtitle>
+                  </mat-card-title-group>
+                </mat-card-header>
+                <mat-card-content>
+                  <h1 style="text-align: right; color:black; font-size: 20px;"> <b>{{total_size_num}}</b> </h1>
+                </mat-card-content>
+              </mat-card>
+              </div>
+    
+              <div>
+          </div>
+
       </div>
             
       <div style="padding-top: 1200px; height: 1000px">
-      
-        <!--
-      <div id="subject_convert" style="margin-top: 50px; margin: auto; width: 65%;">
-
-            <div id="hot" style="margin-left: -10px">
-              <app-generic-table 
-              [data]="subject_table"
-              [colHeaders]="true"
-              [colWidths]="[200, 60, 100]"
-              [rowHeaders]="true"
-              [height]="333"
-              [columnSorting]="true"
-              [columns]="subject_columns"
-              [filters]="false"
-              licenseKey="non-commercial-and-evaluation"> 
-              </app-generic-table>
-            </div>
-           </div>
-          --> 
-          
-      <div style="padding-top: 500px"> </div>
-      
+                
       </div>
     
     </ng-template>

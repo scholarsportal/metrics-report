@@ -155,94 +155,67 @@ export class DownloadComponent {
     });
   }
 
-  generatePDF(){
+  async generatePDF(){
     console.log('hefkdaskfdsokfsakfs');
     const pdf = new jsPDF('p', 'mm', 'a4'); // A4 size page of PDF
-    var a = document.getElementById('title_download')!;
-    var b = document.getElementById('title_date')!;
-    var c = document.getElementById('main_meteris')!;
-    var d = document.getElementById('contentToConvert')!;
-    var e = document.getElementById('subject_convert')!; 
-    var f = document.getElementById('file_convert')!;
+    var a = document.getElementById('pdf_name')!;
+    var b = document.getElementById('pdf_date')!;
+    var c = document.getElementById('pdf_collections_num')!;
+    var d = document.getElementById('pdf_datasets_num')!;
+    var e = document.getElementById('pdf_files_num')!; 
+    var f = document.getElementById('pdf_download_nums')!;
+    var g = document.getElementById('pdf_users_nums')!;
+    var h = document.getElementById('pdf_storage_nums')!;
+    var i = document.getElementById('pdf_bargraphs')!;
+    var j = document.getElementById('subjectGraph')!;
+    var k = document.getElementById('fileGraph')!;
+    var l = document.getElementById('subjectGraphTitle')!;
+    var m = document.getElementById('fileGraphTitle')!;
+
+    {
+      const elements = [
+        { el: a, x: 10, y: 5, width: 300 },
+        { el: b, x: 10, y: 12, width: 300 },
+        { el: c, x: 10, y: 20, width: 30 },
+        { el: d, x: 41, y: 20, width: 30 },
+        { el: e, x: 72, y: 20, width: 30 },
+        { el: f, x: 103, y: 20, width: 30 },
+        { el: g, x: 134, y: 20, width: 30 },
+        { el: h, x: 165, y: 20, width: 30 },
+        { el: i, x: 10, y: 35, width: 90},
+        { el: h, x: 165, y: 20, width: 30 },
+        { el: i, x: 10, y: 35, width: 90},
+        { el: h, x: 165, y: 20, width: 30 },
+        { el: i, x: 10, y: 35, width: 90},
+        { el: j, x: 105, y: 45, width: 140 },
+        { el: k, x: 105, y: 95, width: 140},
+
+        { el: l, x: 105, y: 40, width: 90},
+        { el: m, x: 105, y: 90, width: 90},
 
 
-    html2canvas(a).then(canvas => {
-      const imgWidth = 100;
-      const pageHeight = 100;
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-      const heightLeft = imgHeight;
-
-      const contentDataURL = canvas.toDataURL('image/png');
-
-      let position = 5;
-      pdf.addImage(contentDataURL, 'PNG', 10, position, imgWidth, imgHeight);
-    });
-
-    html2canvas(b).then(canvas => {
-      const imgWidth = 100;
-      const pageHeight = 100;
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-      const heightLeft = imgHeight;
-
-      const contentDataURL = canvas.toDataURL('image/png');
-
-      let position = 15;
-      pdf.addImage(contentDataURL, 'PNG', 10, position, imgWidth, imgHeight);
-    });
-
-    html2canvas(c).then(canvas => {
-      const imgWidth = 95;
-      const pageHeight = 100;
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-      const heightLeft = imgHeight;
-
-      const contentDataURL = canvas.toDataURL('image/png');
-
-      let position = 25;
-      pdf.addImage(contentDataURL, 'PNG', 5, position, imgWidth, imgHeight);
-    });
-
-    html2canvas(d).then(canvas => {
-      const imgWidth = 95;
-      const pageHeight = 100;
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-      const heightLeft = imgHeight;
-
-      const contentDataURL = canvas.toDataURL('image/png');
-
-      let position = 5;
-      pdf.addImage(contentDataURL, 'PNG', 110, position, imgWidth, imgHeight);
-    });
-
-    html2canvas(e).then(canvas => {
-      const imgWidth = 100;
-      const pageHeight = 100;
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-      const heightLeft = imgHeight;
-
-      const contentDataURL = canvas.toDataURL('image/png');
-
-      let position = 205;
-      pdf.addImage(contentDataURL, 'PNG', 5, position, imgWidth, imgHeight);
-    });
-
-    html2canvas(f).then(canvas => {
-      const imgWidth = 100;
-      const pageHeight = 100;
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-      const heightLeft = imgHeight;
-
-      const contentDataURL = canvas.toDataURL('image/png');
-
-      let position = 245;
-      pdf.addImage(contentDataURL, 'PNG', 5, position, imgWidth, imgHeight);
-      var temp_name = "Borealis Report";
-      if (this.name != "(All)"){
-        temp_name = this.name + " - " + temp_name; 
+      ];
+    
+      const pdf = new jsPDF(); // or however you're initializing it
+    
+      for (const item of elements) {
+        const canvas = await html2canvas(item.el);
+        const imgWidth = item.width;
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        const imgData = canvas.toDataURL('image/png');
+    
+        pdf.addImage(imgData, 'PNG', item.x, item.y, imgWidth, imgHeight);
       }
-      pdf.save(temp_name); // Generated PDF
-    });
-  }
+    
+      // Final save after all canvases are processed
+      let temp_name = "Borealis Report";
+      if (this.name && this.name !== "(All)") {
+        temp_name = this.name + " - " + temp_name;
+      }
+    
+      pdf.save(temp_name);
+    }
+}
 
   generateExcel() {
     var temp_name = "Borealis Report";
@@ -252,5 +225,52 @@ export class DownloadComponent {
     this.exportToExcel(this.data, temp_name);
   }
 
+  generateSubject() {
+    var a = document.getElementById('subjectGraph')!;
+    html2canvas(a).then(canvas => {
+    const imageData = canvas.toDataURL('image/png');
+
+    const scaleFactor = 0.5;
+    const scaledCanvas = document.createElement('canvas');
+    scaledCanvas.width = canvas.width * scaleFactor;
+    scaledCanvas.height = canvas.height * scaleFactor;
+
+    const ctx = scaledCanvas.getContext('2d');
+    if (ctx) {
+      ctx.scale(scaleFactor, scaleFactor);
+      ctx.drawImage(canvas, 0, 0);
+    }
+
+      // Create a temporary download link
+      const link = document.createElement('a');
+      link.download = 'component-small.png';
+      link.href = scaledCanvas.toDataURL('image/png');
+      link.click();
+    });
+  }
+
+  generateFile(){
+    var a = document.getElementById('fileGraph')!;
+    html2canvas(a).then(canvas => {
+    const imageData = canvas.toDataURL('image/png');
+
+    const scaleFactor = 0.5;
+    const scaledCanvas = document.createElement('canvas');
+    scaledCanvas.width = canvas.width * scaleFactor;
+    scaledCanvas.height = canvas.height * scaleFactor;
+
+    const ctx = scaledCanvas.getContext('2d');
+    if (ctx) {
+      ctx.scale(scaleFactor, scaleFactor);
+      ctx.drawImage(canvas, 0, 0);
+    }
+
+      // Create a temporary download link
+      const link = document.createElement('a');
+      link.download = 'component-small.png';
+      link.href = scaledCanvas.toDataURL('image/png');
+      link.click();
+    });
+  }
 }
 
