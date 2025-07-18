@@ -406,7 +406,7 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.barChartDataDownloads = [
       { // grey
         data: this.barChartDataDownloadsAgg_data.reverse(),
-        label: this.translatedText$,
+        label: this.translocoService.translate('MonthlyFileDownloads'),
         tension: 0,
         backgroundColor: 'rgb(102, 0, 102, 0.5)',
         borderColor: 'rgb(102, 0, 102, 0.5)',
@@ -417,7 +417,7 @@ export class AppComponent implements AfterViewInit, OnInit{
       },
       { // grey
         data: this.barChartDataDownloads_data.reverse(),
-        label: "CumulativeFileDownloads",
+        label: this.translocoService.translate('CumulativeDatasetsPublished'),
         tension: 0,
         backgroundColor: 'rgb(0, 100, 255, 0.5)',
         borderColor: 'rgb(0, 100, 255, 0.5)',
