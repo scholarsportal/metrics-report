@@ -21,3 +21,33 @@
 .hide-scrollbar::-webkit-scrollbar {
   display: none;                   /* Chrome, Safari, Opera */
 }
+
+.title-container {
+  vertical-align: top;
+  margin-top: 100px;
+  margin-left: 25px; /* existing */
+  padding-left: 10px; /* add some padding */
+  position: relative;
+  max-width: 1150px;
+}
+
+.responsive-title {
+  font-weight: bold;
+  font-size: clamp(16px, 4vw, 32px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  padding-left: 5px; /* optional */
+}
+
+#pdf_name h1 {
+  line-height: 1.2;  /* a bit taller than default */
+  padding-bottom: 4px; /* add some space below */
+}
+
+#pdf_date {
+  margin-top: -10px;
+  font-size: 18px;
+  margin-left: 5px; /* existing */
+}

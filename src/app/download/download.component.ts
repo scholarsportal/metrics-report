@@ -1,4 +1,4 @@
-import { Component, Injectable, Input } from '@angular/core';
+import { Component, Injectable, Input, SimpleChanges } from '@angular/core';
 import * as ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
@@ -16,6 +16,12 @@ import html2canvas from 'html2canvas';
 export class DownloadComponent {
   @Input() data: any; 
   @Input() name: string;
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['name']) {
+      this.name = changes['name'].currentValue;
+    }
+  }
 
   exportToExcel(data: any[], fileName: string){
     const workbook = new ExcelJS.Workbook();
@@ -155,67 +161,273 @@ export class DownloadComponent {
     });
   }
 
-  async generatePDF(){
-    console.log('hefkdaskfdsokfsakfs');
-    const pdf = new jsPDF('p', 'mm', 'a4'); // A4 size page of PDF
-    var a = document.getElementById('pdf_name')!;
-    var b = document.getElementById('pdf_date')!;
-    var c = document.getElementById('pdf_collections_num')!;
-    var d = document.getElementById('pdf_datasets_num')!;
-    var e = document.getElementById('pdf_files_num')!; 
-    var f = document.getElementById('pdf_download_nums')!;
-    var g = document.getElementById('pdf_users_nums')!;
-    var h = document.getElementById('pdf_storage_nums')!;
-    var i = document.getElementById('pdf_bargraphs')!;
-    var j = document.getElementById('subjectGraph')!;
-    var k = document.getElementById('fileGraph')!;
-    var l = document.getElementById('subjectGraphTitle')!;
-    var m = document.getElementById('fileGraphTitle')!;
-
-    {
-      const elements = [
-        { el: a, x: 10, y: 5, width: 300 },
-        { el: b, x: 10, y: 12, width: 300 },
-        { el: c, x: 10, y: 20, width: 30 },
-        { el: d, x: 41, y: 20, width: 30 },
-        { el: e, x: 72, y: 20, width: 30 },
-        { el: f, x: 103, y: 20, width: 30 },
-        { el: g, x: 134, y: 20, width: 30 },
-        { el: h, x: 165, y: 20, width: 30 },
-        { el: i, x: 10, y: 35, width: 90},
-        { el: h, x: 165, y: 20, width: 30 },
-        { el: i, x: 10, y: 35, width: 90},
-        { el: h, x: 165, y: 20, width: 30 },
-        { el: i, x: 10, y: 35, width: 90},
-        { el: j, x: 105, y: 45, width: 140 },
-        { el: k, x: 105, y: 95, width: 140},
-
-        { el: l, x: 105, y: 40, width: 90},
-        { el: m, x: 105, y: 90, width: 90},
-
-
-      ];
-    
-      const pdf = new jsPDF(); // or however you're initializing it
-    
-      for (const item of elements) {
-        const canvas = await html2canvas(item.el);
-        const imgWidth = item.width;
-        const imgHeight = canvas.height * imgWidth / canvas.width;
-        const imgData = canvas.toDataURL('image/png');
-    
-        pdf.addImage(imgData, 'PNG', item.x, item.y, imgWidth, imgHeight);
+  async generatePDF() {
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const marginX = 10;
+    const marginY = 10;
+    const lineSpacing = 5;
+  
+    const barGraphWidth = 90;
+    const pieGraphWidth = 90;
+  
+    let currentY = marginY;
+  
+    const drawCanvasToPDF = (
+      canvas: HTMLCanvasElement,
+      x: number,
+      y: number,
+      maxWidth: number
+    ): number => {
+      const aspectRatio = canvas.width / canvas.height;
+      const targetWidth = maxWidth;
+      const targetHeight = maxWidth / aspectRatio;
+  
+      if (y + targetHeight > pageHeight - marginY) {
+        pdf.addPage();
+        y = marginY;
+        currentY = marginY;
       }
-    
-      // Final save after all canvases are processed
-      let temp_name = "Borealis Report";
-      if (this.name && this.name !== "(All)") {
-        temp_name = this.name + " - " + temp_name;
+  
+      const bufferCanvas = document.createElement('canvas');
+      bufferCanvas.width = canvas.width;
+      bufferCanvas.height = canvas.height;
+  
+      const ctx = bufferCanvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, bufferCanvas.width, bufferCanvas.height);
+        ctx.drawImage(canvas, 0, 0);
       }
-    
-      pdf.save(temp_name);
+  
+      const imgData = bufferCanvas.toDataURL('image/png');
+      pdf.addImage(imgData, 'PNG', x, y, targetWidth, targetHeight);
+      return targetHeight + lineSpacing;
+    };
+  
+    // ===== Top Left Static Export Title =====
+    let exportTitle = "Borealis Report";
+    if (this.name && this.name !== "(All)") {
+      exportTitle = `${this.name} - ${exportTitle}`;
     }
-}
+  
+    const currentDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+    });
+  
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9);
+    pdf.text(exportTitle, marginX, marginY);
+    const dateWidth = pdf.getTextWidth(currentDate);
+    pdf.text(currentDate, pageWidth - marginX - dateWidth, marginY);
+  
+    // ===== Dynamic Wrapped Title =====
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(14);
+    let temp_title_name = document.getElementById('responsive-title')?.textContent ?? '';
+    if (temp_title_name === "(All)" || temp_title_name === '') {
+      temp_title_name = "Borealis (All)";
+    }
+  
+    const maxTitleWidth = pageWidth - 2 * marginX;
+    const wrappedTitle = pdf.splitTextToSize(temp_title_name, maxTitleWidth);
+    const lineHeight = 7;
+    const titleY = marginY + 10;
+    pdf.text(wrappedTitle, marginX, titleY);
+  
+    const titleHeight = wrappedTitle.length * lineHeight;
+  
+    // ===== Date Text (Below Title) =====
+    pdf.setFont('helvetica', 'italic');
+    pdf.setFontSize(11);
+    const datetext = document.getElementById('pdf_date')?.textContent ?? '';
+    const dateY = titleY + titleHeight + 1.5;
+    pdf.text(datetext, marginX, dateY);
+  
+    // ===== Update currentY for rest of content =====
+    currentY = dateY + 6;
+  
+    // ===== Summary Cards =====
+    const cardCount = 6;
+    const gap = 4;
+    const cardWidth = (pageWidth - marginX * 2 - gap * (cardCount - 1)) / cardCount;
+    const cardHeight = 15;
+    const cardY = currentY;
+  
+    const cardTitles = ['Collections', 'Datasets', 'Files', 'Downloads', 'Users', 'Storage'];
+    const cardCounts = [
+      document.getElementById('total_collections_num')?.textContent ?? '',
+      document.getElementById('total_datasets_num')?.textContent ?? '',
+      document.getElementById('total_files_num')?.textContent ?? '',
+      document.getElementById('total_downloads_num')?.textContent ?? '',
+      document.getElementById('total_users_num')?.textContent ?? '',
+      document.getElementById('total_size_num')?.textContent ?? ''
+    ];
+  
+    for (let i = 0; i < cardCount; i++) {
+      const cardX = marginX + i * (cardWidth + gap);
+      this.drawCard(pdf, cardTitles[i], cardCounts[i], cardX, cardY, cardWidth, cardHeight);
+    }
+  
+    currentY += cardHeight + 10;
+  
+    // ===== Get All Graphs =====
+    const barDiv = document.querySelector('#pdf_bargraphs');
+    const allBarCanvases = barDiv?.querySelectorAll('canvas') ?? [];
+  
+    const subjectCanvas = document.querySelector('#subjectGraph canvas') as HTMLCanvasElement;
+    const fileCanvas = document.querySelector('#fileGraph canvas') as HTMLCanvasElement;
+  
+    const graphX = pageWidth - marginX - barGraphWidth;
+    let rowY = currentY;
+  
+    const rows = [
+      {
+        leftIndex: 0,
+        leftTitle: "Number of Downloads",
+        rightCanvas: allBarCanvases[4], // Storage Usage
+        rightTitle: "Storage Usage"
+      },
+      {
+        leftIndex: 1,
+        leftTitle: "Number of Datasets",
+        rightCanvas: subjectCanvas,
+        rightTitle: "Subject Breakdown"
+      },
+      {
+        leftIndex: 2,
+        leftTitle: "Number of Files",
+        rightCanvas: fileCanvas,
+        rightTitle: "File Type Breakdown"
+      },
+      {
+        leftIndex: 3,
+        leftTitle: "Number of Users",
+        rightCanvas: null,
+        rightTitle: ""
+      }
+    ];
+  
+    for (const row of rows) {
+      if (rowY + 10 > pageHeight - marginY) {
+        pdf.addPage();
+        rowY = marginY;
+      }
+  
+      let rowHeight = 0;
+  
+      // Left chart
+      const leftCanvas = allBarCanvases[row.leftIndex] as HTMLCanvasElement;
+      if (leftCanvas) {
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(8);
+        pdf.text(row.leftTitle, marginX, rowY);
+        const usedHeight = drawCanvasToPDF(leftCanvas, marginX, rowY + 4, barGraphWidth);
+        rowHeight = usedHeight;
+      }
+  
+      // Right chart
+      if (row.rightCanvas) {
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(8);
+        pdf.text(row.rightTitle, graphX, rowY);
+        const usedHeight = drawCanvasToPDF(row.rightCanvas, graphX, rowY + 4, barGraphWidth);
+        rowHeight = Math.max(rowHeight, usedHeight);
+      }
+  
+      rowY += rowHeight + 6; // vertical space between rows
+    }
+  
+    // ===== Save PDF =====
+    let temp_name = "Borealis Report";
+    if (this.name && this.name !== "(All)") {
+      temp_name = `${this.name} - ${temp_name}`;
+    }
+  
+    pdf.save(temp_name);
+  }      
+  
+  private exportChartAsJPEG(elementId: string, fileName: string, scaleFactor = 0.5) {
+    const container = document.getElementById(elementId)!;
+    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+    if (!canvas) {
+      console.error(`No canvas found inside element with id ${elementId}`);
+      return;
+    }
+  
+    const newCanvas = document.createElement('canvas');
+    newCanvas.width = canvas.width;
+    newCanvas.height = canvas.height;
+  
+    const ctx = newCanvas.getContext('2d');
+    if (ctx) {
+      ctx.fillStyle = 'white';               // white background
+      ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+      ctx.drawImage(canvas, 0, 0);
+    }
+  
+    const scaledCanvas = document.createElement('canvas');
+    scaledCanvas.width = newCanvas.width * scaleFactor;
+    scaledCanvas.height = newCanvas.height * scaleFactor;
+  
+    const scaledCtx = scaledCanvas.getContext('2d');
+    if (scaledCtx) {
+      scaledCtx.scale(scaleFactor, scaleFactor);
+      scaledCtx.drawImage(newCanvas, 0, 0);
+    }
+  
+    const dataUrl = scaledCanvas.toDataURL('image/jpeg', 1.0);
+  
+    const link = document.createElement('a');
+    link.download = fileName;
+    link.href = dataUrl;
+    link.click();
+  }
+
+  drawCard(
+    pdf: jsPDF,
+    title: string,
+    count: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    radius = 2
+  ) {
+    const paddingX = 2; // smaller left/right padding
+    const paddingTop = 5;
+    const paddingBottom = 3;
+  
+    // Draw rounded card
+    pdf.setDrawColor(180,180,180); // border color
+    pdf.setFillColor(255, 255, 255); // background
+    pdf.roundedRect(x, y, width, height, radius, radius, 'FD');
+  
+    // Title (very top-left, minimal padding)
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(8); // smaller title
+    pdf.text(title, x + paddingX, y + paddingTop); // ⬅️ Top-left
+  
+    // Count (bottom-right)
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(10);
+    const textWidth = pdf.getTextWidth(count);
+    const countX = x + width - paddingX - textWidth;
+    const countY = y + height - paddingBottom;
+  
+    pdf.text(count, countX, countY); // ⬇️ Bottom-right
+  }
+
+  generateSubject() {
+    this.exportChartAsJPEG('subjectGraph', 'subject-graph.jpeg', 1);
+  }
+  
+  generateFile() {
+    this.exportChartAsJPEG('fileGraph', 'file-graph.jpeg', 1);
+  }
 
   generateExcel() {
     var temp_name = "Borealis Report";
@@ -223,54 +435,6 @@ export class DownloadComponent {
       temp_name = this.name + " - " + temp_name; 
     }
     this.exportToExcel(this.data, temp_name);
-  }
-
-  generateSubject() {
-    var a = document.getElementById('subjectGraph')!;
-    html2canvas(a).then(canvas => {
-    const imageData = canvas.toDataURL('image/png');
-
-    const scaleFactor = 0.5;
-    const scaledCanvas = document.createElement('canvas');
-    scaledCanvas.width = canvas.width * scaleFactor;
-    scaledCanvas.height = canvas.height * scaleFactor;
-
-    const ctx = scaledCanvas.getContext('2d');
-    if (ctx) {
-      ctx.scale(scaleFactor, scaleFactor);
-      ctx.drawImage(canvas, 0, 0);
-    }
-
-      // Create a temporary download link
-      const link = document.createElement('a');
-      link.download = 'component-small.png';
-      link.href = scaledCanvas.toDataURL('image/png');
-      link.click();
-    });
-  }
-
-  generateFile(){
-    var a = document.getElementById('fileGraph')!;
-    html2canvas(a).then(canvas => {
-    const imageData = canvas.toDataURL('image/png');
-
-    const scaleFactor = 0.5;
-    const scaledCanvas = document.createElement('canvas');
-    scaledCanvas.width = canvas.width * scaleFactor;
-    scaledCanvas.height = canvas.height * scaleFactor;
-
-    const ctx = scaledCanvas.getContext('2d');
-    if (ctx) {
-      ctx.scale(scaleFactor, scaleFactor);
-      ctx.drawImage(canvas, 0, 0);
-    }
-
-      // Create a temporary download link
-      const link = document.createElement('a');
-      link.download = 'component-small.png';
-      link.href = scaledCanvas.toDataURL('image/png');
-      link.click();
-    });
   }
 }
 

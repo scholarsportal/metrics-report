@@ -6,7 +6,7 @@ import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, FormBuilder} from '@angular/forms';
 import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
 import {Observable} from 'rxjs';
-import {map, startWith} from 'rxjs/operators';
+import {map, startWith, take} from 'rxjs/operators';
 import {MatInputModule} from '@angular/material/input';
 import {MatSelectChange, MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -38,10 +38,12 @@ import {MatMenuModule} from '@angular/material/menu';
 import html2canvas from 'html2canvas';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import { TranslocoModule, TranslocoService } from '@ngneat/transloco';
+import { ChartData } from 'chart.js';
 import { LanguageService } from './language.service';
 import { MatListModule } from '@angular/material/list';
 import { ChangeDetectorRef } from '@angular/core';
 import { forkJoin } from 'rxjs';
+
 
 
 import * as _moment from 'moment';
@@ -130,7 +132,6 @@ export class AppComponent implements AfterViewInit, OnInit{
   todayDate:Date = new Date();
   minDate: Date = new Date("2016-02-01");
   bad_range: boolean = false;
-
 
   setStartMonthAndYear(normalizedMonthAndYear: Moment, datepicker: MatDatepicker<Moment>) {
     this.date_start = new FormControl(moment());    const ctrlValue = this.date_start.value ?? moment();
@@ -246,19 +247,38 @@ export class AppComponent implements AfterViewInit, OnInit{
   name_dropdown_data: Array<any> = [];
 
   barChartDataDownloads_data: Array<number> = [];
-  barChartDataDownloads:Array<any> = [];
+  barChartDataDownloads: ChartData<'bar'> = {
+    labels: [],
+    datasets: []
+  };
 
   barChartDataDatasets_data: Array<number> = [];
-  barChartDataDatasets:Array<any> = [];
+  barChartDataDatasets: ChartData<'bar'> = {
+    labels: [],
+    datasets: []
+  };
   
   barChartDataFiles_data: Array<number> = [];
-  barChartDataFiles:Array<any> = [];
+  barChartDataFiles: ChartData<'bar'> = {
+    labels: [],
+    datasets: []
+  };
 
   barChartDataUsers_data: Array<number> = [];
-  barChartDataUsers:Array<any> = [];
+  barChartDataUsers: ChartData<'bar'> = {
+    labels: [],
+    datasets: []
+  };
 
   barChartDataSize_data: Array<number> = [];
-  barChartDataSize:Array<any> = [];
+  barChartDataSize: ChartData<'bar'> = {
+    labels: [],
+    datasets: []
+  };
+
+  subject_columns:Array<any> = [];
+
+  file_content_columns:Array<any> = [];
 
   months = [];
 
@@ -279,7 +299,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   selectedCollection_Current: string = "(All)";
   selectedCollection_Activate: string = "(All)";
   selectedCollection_Current_Name: string = "(All)";
-  selectedCollection_Activate_Name:String = "(All)";
+  selectedCollection_Activate_Name: string = "(All)";
 
   translatedText$: ""
 
@@ -312,23 +332,12 @@ export class AppComponent implements AfterViewInit, OnInit{
   fileContentTableOn = false; 
 
   receivedCollectionFromTree:Array<String> = [];
+  
 
   isOpen = false;
 
   generic_columns: any[] = [
     {data: "name", readOnly: "true", title: "Collection / Dataverses"},
-  ]
-  subject_columns: any[] = [
-    {data: "subject", readOnly: "true", title: "Subject"},
-    {data: "count", readOnly: "true", title: "Count"},
-    {data: "percent", readOnly: "true", title: "Distribution"},
-  ]
-
-  file_content_columns: any[] = [
-    {data: "type", readOnly: "true", title: "File Type"},
-    {data: "contenttype", readOnly: "true", title: "Specific File Type"},
-    {data: "count", readOnly: "true", title: "Count"},
-    {data: "percent", readOnly: "true", title: "Distribution"},
   ]
 
   getData(newItem: any) {
@@ -353,17 +362,17 @@ export class AppComponent implements AfterViewInit, OnInit{
   
     this.months = newItem["DataverseTabData"]['months'];
     
-    this.barChartDataDownloads_data = newItem["DataverseTabData"]['downloads_graph_data'];
-    this.barChartDataDatasets_data = newItem["DataverseTabData"]['datasets_graph_data'];
-    this.barChartDataFiles_data = newItem["DataverseTabData"]['files_graph_data'];
-    this.barChartDataUsers_data = newItem["DataverseTabData"]['users_graph_data'];
-    this.barChartDataSize_data = newItem["DataverseTabData"]['size_graph_data'];
+    this.barChartDataDownloads_data = newItem["DataverseTabData"]['downloads_graph_data'].reverse();
+    this.barChartDataDatasets_data = newItem["DataverseTabData"]['datasets_graph_data'].reverse();
+    this.barChartDataFiles_data = newItem["DataverseTabData"]['files_graph_data'].reverse();
+    this.barChartDataUsers_data = newItem["DataverseTabData"]['users_graph_data'].reverse();
+    this.barChartDataSize_data = newItem["DataverseTabData"]['size_graph_data'].reverse();
 
-    this.barChartDataDownloadsAgg_data = newItem["DataverseTabData"]['downloads_graph_agg_data']
-    this.barChartDataDatasetsAgg_data = newItem["DataverseTabData"]['datasets_graph_agg_data']
-    this.barChartDataFiles_Aggdata = newItem["DataverseTabData"]['files_graph_agg_data']
-    this.barChartDataUsers_Aggdata = newItem["DataverseTabData"]['users_graph_agg_data']
-    this.barChartDataSize_Aggdata = newItem["DataverseTabData"]['size_graph_agg_data']
+    this.barChartDataDownloadsAgg_data = newItem["DataverseTabData"]['downloads_graph_agg_data'].reverse()
+    this.barChartDataDatasetsAgg_data = newItem["DataverseTabData"]['datasets_graph_agg_data'].reverse()
+    this.barChartDataFiles_Aggdata = newItem["DataverseTabData"]['files_graph_agg_data'].reverse()
+    this.barChartDataUsers_Aggdata = newItem["DataverseTabData"]['users_graph_agg_data'].reverse()
+    this.barChartDataSize_Aggdata = newItem["DataverseTabData"]['size_graph_agg_data'].reverse()
 
     this.pieChartLabelsSubject = newItem["DataverseTabData"]['subject_label_data'];
     this.pieChartDataSubject_data = newItem["DataverseTabData"]['subject_data'];
@@ -401,132 +410,177 @@ export class AppComponent implements AfterViewInit, OnInit{
     //total_users_change: String = "-";
     //total_size_change: String = "-"
 
+    type Translations = {
+      [key: string]: string;
+    };
+
+    type TranslationsMap = { [key: string]: string };
+
+    this.translocoService.selectTranslateObject([
+      'MonthlyFileDownloads',
+      'MonthlyDatasetsPublished',
+      'MonthlyFilePublished',
+      'MonthlyUsersJoined',
+      'MonthlyStorageUsed',
+      'CumulativeFileDownloads',
+      'CumulativeDatasetsPublished',
+      'CumulativeFilePublished',
+      'CumulativeUsersJoined',
+      'CumulativeStorageUsed',
+      "Subject",
+      "Count",
+      "Distribution",
+      "FileType",
+      "SpecificFileType"
+    ]).subscribe(([
+      MonthlyFileDownloads,
+      MonthlyDatasetsPublished,
+      MonthlyFilePublished,
+      MonthlyUsersJoined,
+      MonthlyStorageUsed,
+      CumulativeFileDownloads,
+      CumulativeDatasetsPublished,
+      CumulativeFilePublished,
+      CumulativeUsersJoined,
+      CumulativeStorageUsed,
+      Subject,
+      Count,
+      Distribution,
+      FileType,
+      SpecificFileType
+    ]) => {
+
+      const labels = this.months.reverse();
+      
+      // Your labels array (e.g. months reversed)
+      const barChartLabels = this.months.reverse();
+
+      // Your bar chart data with labels + datasets
+      this.barChartDataDownloads = {
+        labels: barChartLabels,
+        datasets: [
+          {
+            data: this.barChartDataDownloadsAgg_data,
+            label: 'Monthly File Downloads',
+            backgroundColor: 'rgba(102, 0, 102, 0.5)',
+            borderColor: 'rgba(102, 0, 102, 0.5)',
+            hoverBackgroundColor: 'rgba(102, 0, 102, 0.7)',
+            hoverBorderColor: 'rgba(102, 0, 102, 0.7)'
+          },
+          {
+            data: this.barChartDataDownloads_data,
+            label: 'Cumulative File Downloads',
+            backgroundColor: 'rgba(0, 100, 255, 0.5)',
+            borderColor: 'rgba(0, 100, 255, 0.5)',
+            hoverBackgroundColor: 'rgba(0, 100, 255, 0.7)',
+            hoverBorderColor: 'rgba(0, 100, 255, 0.7)'
+          }
+        ]
+      };
+
+      this.barChartDataDatasets = {
+        labels: barChartLabels,
+        datasets: [
+          {
+            data: this.barChartDataDatasetsAgg_data,
+            label: 'Monthly Datasets Published',
+            backgroundColor: 'rgba(102, 0, 102, 0.5)',
+            borderColor: 'rgba(102, 0, 102, 0.5)',
+            hoverBackgroundColor: 'rgba(102, 0, 102, 0.7)',
+            hoverBorderColor: 'rgba(102, 0, 102, 0.7)'
+          },
+          {
+            data: this.barChartDataDatasets_data,
+            label: 'Cumulative Datasets Published',
+            backgroundColor: 'rgba(0, 100, 255, 0.5)',
+            borderColor: 'rgba(0, 100, 255, 0.5)',
+            hoverBackgroundColor: 'rgba(0, 100, 255, 0.7)',
+            hoverBorderColor: 'rgba(0, 100, 255, 0.7)'
+          }
+        ]
+      };
+
+      this.barChartDataFiles = {
+        labels: barChartLabels,
+        datasets: [
+          {
+            data: this.barChartDataFiles_Aggdata,
+            label: 'Monthly File Published',
+            backgroundColor: 'rgba(102, 0, 102, 0.5)',
+            borderColor: 'rgba(102, 0, 102, 0.5)',
+            hoverBackgroundColor: 'rgba(102, 0, 102, 0.7)',
+            hoverBorderColor: 'rgba(102, 0, 102, 0.7)'
+          },
+          {
+            data: this.barChartDataFiles_data,
+            label: 'Cumulative File Published',
+            backgroundColor: 'rgba(0, 100, 255, 0.5)',
+            borderColor: 'rgba(0, 100, 255, 0.5)',
+            hoverBackgroundColor: 'rgba(0, 100, 255, 0.7)',
+            hoverBorderColor: 'rgba(0, 100, 255, 0.7)'
+          }
+        ]
+      };
+
+      this.barChartDataUsers = {
+        labels: barChartLabels,
+        datasets: [
+          {
+            data: this.barChartDataUsers_Aggdata,
+            label: 'Monthly Users Joined',
+            backgroundColor: 'rgba(102, 0, 102, 0.5)',
+            borderColor: 'rgba(102, 0, 102, 0.5)',
+            hoverBackgroundColor: 'rgba(102, 0, 102, 0.7)',
+            hoverBorderColor: 'rgba(102, 0, 102, 0.7)'
+          },
+          {
+            data: this.barChartDataUsers_data,
+            label: 'Cumulative Users Joined',
+            backgroundColor: 'rgba(0, 100, 255, 0.5)',
+            borderColor: 'rgba(0, 100, 255, 0.5)',
+            hoverBackgroundColor: 'rgba(0, 100, 255, 0.7)',
+            hoverBorderColor: 'rgba(0, 100, 255, 0.7)'
+          }
+        ]
+      };
+
+      this.barChartDataSize = {
+        labels: barChartLabels,
+        datasets: [
+          {
+            data: this.barChartDataSize_Aggdata,
+            label: 'Monthly Storage Used',
+            backgroundColor: 'rgba(102, 0, 102, 0.5)',
+            borderColor: 'rgba(102, 0, 102, 0.5)',
+            hoverBackgroundColor: 'rgba(102, 0, 102, 0.7)',
+            hoverBorderColor: 'rgba(102, 0, 102, 0.7)'
+          },
+          {
+            data: this.barChartDataSize_data,
+            label: 'Cumulative Storage Used',
+            backgroundColor: 'rgba(0, 100, 255, 0.5)',
+            borderColor: 'rgba(0, 100, 255, 0.5)',
+            hoverBackgroundColor: 'rgba(0, 100, 255, 0.7)',
+            hoverBorderColor: 'rgba(0, 100, 255, 0.7)'
+          }
+        ]
+      };
 
 
-    this.barChartDataDownloads = [
-      { // grey
-        data: this.barChartDataDownloadsAgg_data.reverse(),
-        label: this.translocoService.translate('MonthlyFileDownloads'),
-        tension: 0,
-        backgroundColor: 'rgb(102, 0, 102, 0.5)',
-        borderColor: 'rgb(102, 0, 102, 0.5)',
-        pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
-      },
-      { // grey
-        data: this.barChartDataDownloads_data.reverse(),
-        label: this.translocoService.translate('CumulativeDatasetsPublished'),
-        tension: 0,
-        backgroundColor: 'rgb(0, 100, 255, 0.5)',
-        borderColor: 'rgb(0, 100, 255, 0.5)',
-        pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
-      }
-    ];
-
-    this.barChartDataDatasets = [
-      { // grey
-        data: this.barChartDataDatasetsAgg_data.reverse(),
-        label: this.translocoService.translate('MonthlyDatasetsPublished'),
-        tension: 0,
-        backgroundColor: 'rgb(102, 0, 102, 0.5)',
-        borderColor: 'rgb(102, 0, 102, 0.5)',
-        pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
-      },
-      { // grey
-        data: this.barChartDataDatasets_data.reverse(),
-        label: this.translocoService.translate('CumulativeDatasetsPublished'),
-        tension: 0,
-        backgroundColor: 'rgb(0, 100, 255, 0.5)',
-        borderColor: 'rgb(0, 100, 255, 0.5)',
-        pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
-      }
-    ];
-
-    this.barChartDataFiles = [
-      { // grey
-        data: this.barChartDataFiles_Aggdata.reverse(),
-        label: this.translocoService.translate('MonthlyFilePublished'),
-        tension: 0,
-        backgroundColor: 'rgb(102, 0, 102, 0.5)',
-        borderColor: 'rgb(102, 0, 102, 0.5)',
-        pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
-      },
-      { // grey
-        data: this.barChartDataFiles_data.reverse(),
-        label: this.translocoService.translate('CumulativeFilePublished'),
-        tension: 0,
-        backgroundColor: 'rgb(0, 100, 255, 0.5)',
-        borderColor: 'rgb(0, 100, 255, 0.5)',
-        pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
-      }
-    ];
-
-    this.barChartDataUsers = [
-      { // grey
-        data: this.barChartDataUsers_Aggdata.reverse(),
-        label: this.translocoService.translate('MonthlyUsersJoined'),
-        tension: 0,
-        backgroundColor: 'rgb(102, 0, 102, 0.5)',
-        borderColor: 'rgb(102, 0, 102, 0.5)',
-        pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
-      },
-      { // grey
-        data: this.barChartDataUsers_data.reverse(),
-        label: this.translocoService.translate('CumulativeUsersJoined'),
-        tension: 0,
-        backgroundColor: 'rgb(0, 100, 255, 0.5)',
-        borderColor: 'rgb(0, 100, 255, 0.5)',
-        pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
-      }
-    ];
-
-    this.barChartDataSize = [
-      { // grey
-        data: this.barChartDataSize_Aggdata.reverse(),
-        label: this.translocoService.translate('MonthlyStorageUsed'),
-        tension: 0,
-        backgroundColor: 'rgb(102, 0, 102, 0.5)',
-        borderColor: 'rgb(102, 0, 102, 0.5)',
-        pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
-      },
-      { // grey
-        data: this.barChartDataSize_data.reverse(),
-        label: this.translocoService.translate('CumulativeStorageUsed'),
-        tension: 0,
-        backgroundColor: 'rgb(0, 100, 255, 0.5)',
-        borderColor: 'rgb(0, 100, 255, 0.5)',
-        pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
-      }
-    ];
+      this.subject_columns = [
+        {data: "subject", readOnly: "true", title: Subject},
+        {data: "count", readOnly: "true", title: Count},
+        {data: "percent", readOnly: "true", title: Distribution},
+      ]
+    
+      this.file_content_columns= [
+        {data: "type", readOnly: "true", title: FileType},
+        {data: "contenttype", readOnly: "true", title: SpecificFileType},
+        {data: "count", readOnly: "true", title: Count},
+        {data: "percent", readOnly: "true", title: Distribution},
+      ]
+    });
+    
 
     this.pieChartDataSubject = [
         {
@@ -585,15 +639,21 @@ export class AppComponent implements AfterViewInit, OnInit{
   }
 
   getCollectionFromTree(list: string[]) {
+    if (list.includes("(All)")){
+      this.selectedCollection_Activate = "(All)"
+      this.selectedCollection_Activate_Name = "(All)"
+    }
+
+    else {
     this.receivedCollectionFromTree = list;
     console.log(list)
     this.selectedCollection_Current = list[1]
       this.selectedCollection_Current_Name = list[0]
     this.selectedCollection_Activate = this.selectedCollection_Current; 
     this.selectedCollection_Activate_Name = this.selectedCollection_Current_Name;
+    }
     this.submitDate();
     this.date_String = this.dateStringFormat();  
-    console.log(this.selectedCollection_Activate);
 }
 
   selectedDate(eventData: any, dp?:any) {

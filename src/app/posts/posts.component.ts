@@ -5,11 +5,12 @@ import { Component, inject, EventEmitter, Output, Input} from '@angular/core';
 import { IntervalHistogram } from 'perf_hooks';
 import { forkJoin } from 'rxjs';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 @Component({
   selector: 'app-posts',
   standalone: true,
-  imports: [HttpClientModule, MatProgressSpinnerModule, CommonModule],
+  imports: [HttpClientModule, MatProgressSpinnerModule, CommonModule, MatProgressBarModule],
   templateUrl: './posts.component.html',
   styleUrl: './posts.component.css'
 })
@@ -382,7 +383,9 @@ export class PostsComponent {
       console.log("this is the upper date?", upperDate)
     }
     
-    let mm = upperDate.getMonth() + 1;
+    let currentDay = new Date().getDate();
+    let NewMonthFlag = currentDay > 10 ? 1 : 0; // let 6 days pass. 
+    let mm = upperDate.getMonth() + NewMonthFlag;
     //let mm = upperDate.getMonth();
     let yyyy = upperDate.getFullYear()
 

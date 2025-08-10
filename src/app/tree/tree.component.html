@@ -1,44 +1,47 @@
 <div style="position: relative; float:right; padding-bottom: 50px; display:inline;">
-<input style="margin-top: 10px; width: 155px;" [(ngModel)]="searchString" placeholder=" {{ 'Filter' | transloco }} 🔎"/> <br> <br>
-<button style="min-width: 1%; border-style: dotted; width: 160px; height: 20px; border-width: 1px;" class="mat-small" (click)="fullReportButton('(All)')" mat-button> {{ 'All' | transloco }} </button>
+  <input style="margin-top: 10px; width: 155px;" [(ngModel)]="searchString" placeholder=" {{ 'Filter' | transloco }} 🔎"/> <br><br>
+  <button style="min-width: 1%; border-style: dotted; width: 160px; height: 20px; border-width: 1px;" class="mat-small" (click)="fullReportButton('(All)')" mat-button> 
+    {{ 'All' | transloco }}
+  </button>
 </div>
 
 <div style="padding-top: 20px;">
-<mat-tree [dataSource]="dataSource" [treeControl]="treeControl" style="margin-top: 10px; padding-top: 10px;">
-    <mat-tree-node *matTreeNodeDef="let node" 
-      matTreeNodePadding>
-      <button mat-icon-button disabled></button>
-      <mat-card style="min-height: 60px; min-width: 200px; margin-bottom: 20px; margin-top: 20px">
-        <div style="margin-top: 8px;">
-        <p style="margin-left: 10px">  <b>VIEWS</b> : - </p>
-        <p style="margin-left: 10px">  <b>DOWNLOADS</b> : - </p>
-        <p style="margin-left: 10px">  <b>CITATIONS</b> : - </p>
-        <button style="min-width: 1%; display: block; margin: auto; margin-bottom: 10px;" (click)="fullReportButton(node.item)" class="mat-small" mat-button> FULL REPORT </button>
-        </div>
-      </mat-card>
-    </mat-tree-node>
-    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" 
+  <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+
+    <!-- Parent nodes -->
+    <mat-tree-node *matTreeNodeDef="let node; when: isParentNode" matTreeNodePadding
     [style.display]="filterParentNode(node) ? 'none' : ''"
     matTreeNodePadding matTreeNodeToggle
-      [cdkTreeNodeTypeaheadLabel]="node.item" 
-      style="max-height: 100px; overflow: hidden; text-overflow: ellipsis; width: 100%; font-size : 12px;">
-      <button mat-icon-button
-              [attr.aria-label]="'Toggle ' + node.item" matTreeNodeToggle>
-        <mat-icon class="mat-icon-rtl-mirror">
-          {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+    [cdkTreeNodeTypeaheadLabel]="node.item" 
+    style="max-height: 100px; overflow: hidden; text-overflow: ellipsis; width: 100%; font-size : 12px;">
+      <button mat-icon-button matTreeNodeToggle
+              [attr.aria-label]="'toggle ' + node.item">
+        <mat-icon>
+          {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
         </mat-icon>
       </button>
+
       <span [ngStyle]="{ 'color': node.item === current_active ? 'purple' : 'black', 
     'font-weight': node.item === current_active ? 'bold' : 'normal'}">
         {{node.item}}
       </span>
 
-      @if (node.isLoading()) {
-        <mat-progress-bar
-            mode="indeterminate"
-            class="example-tree-progress-bar"></mat-progress-bar>
-      }
+      <mat-progress-bar *ngIf="node.isLoading()" mode="indeterminate"></mat-progress-bar>
     </mat-tree-node>
+  
+    <!-- Leaf nodes -->
+    <mat-tree-node *matTreeNodeDef="let node; when: noChild" matTreeNodePadding>
+      {{ node.item }}
+    </mat-tree-node>
+  
+    <!-- Card nodes -->
+    <mat-tree-node *matTreeNodeDef="let node; when: isCardNode" matTreeNodePadding>
+      <mat-card style="min-height: 60px; min-width: 200px; margin-bottom: 20px; margin-top: 20px">
+        <div style="margin-top: 8px;">
+        <button style="min-width: 1%; display: block; margin: auto; margin-bottom: 10px;" (click)="fullReportButton(node.item.replace('__CARD__', ''))" class="mat-small" mat-button>FULL REPORT</button>
+        </div>
+      </mat-card>
+    </mat-tree-node>
+  
   </mat-tree>
 </div>
-  
