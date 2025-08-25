@@ -1,0 +1,122 @@
+<div style="display: inline-block; height:200px; padding-top: 10px; font-size: 18px;">
+
+    <div class="button-grid" style="display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px; /* space between buttons */
+    max-width: 400px;">
+      <button mat-button class="mat-small" [ngStyle]="{ 'color': selectedCollection_Activate_Name!='(All)' ? 'purple' : 'black' }" style="border-width: 1px; font-size: 12px; border-style: solid; width: 122px; height: 25px;  display: flex;  justify-content: flex-start;
+      align-items: center;      
+      gap: 8px;                    
+      text-align: left;" (click)="downloadExcel()"> <mat-icon> download </mat-icon> {{ 'Excel' | transloco }} </button>
+      <button mat-button class="mat-small" [ngStyle]="{ 'color': selectedCollection_Activate_Name!='(All)' ? 'purple' : 'black', 'font-weight': selectedCollection_Activate_Name!='(All)' ? 'bold' : '=normal' }" style="border-width: 1px; font-size: 12px; border-style: solid; width: 122px; height: 25px; display: flex;  justify-content: flex-start;
+      align-items: center;      
+      gap: 8px;                    
+      text-align: left;" (click)="downloadPDF()"> <mat-icon> download </mat-icon> {{ 'PDF' | transloco }} </button>
+      <a mat-button class="mat-small" style="border-width: 1px; font-size: 12px; border-style: solid; width: 122px; height: 25px; display: flex;  justify-content: flex-start;
+      align-items: center;      
+      gap: 8px;                    
+      text-align: left;" 
+      matTooltip= "Export of previous metrics App" href="https://borealisdata.ca/metricsbackend/api/metrics/report"> <mat-icon> download </mat-icon> {{ 'Legacy' | transloco }} </a>
+      <span style="display: inline-block;" matTooltip="Export of Make Data Count data">
+      <button mat-button [disabled]="true" class="mat-small" style="border-width: 1px; font-size: 12px; border-style: solid; width: 122px; height: 25px; display: flex;  justify-content: flex-start;
+      align-items: center;      
+      gap: 8px;                    
+      text-align: left;"> 
+      <mat-icon> download </mat-icon> DataCite </button> </span>
+    </div>
+
+    <!-- 
+    <div style="margin-bottom: 8px;">        
+      <button mat-button [matMenuTriggerFor]="menu" style="width: 250px; height: 30px; border-style: dotted; border-width: 1px;"> <mat-icon> download </mat-icon> {{ 'Export' | transloco }} </button>
+      <mat-menu #menu="matMenu" #subMenu="matMenu" class="mat-small" panelClass="compact-menu" fxLayoutAlign="center center" style="width: 250px;">
+        <button mat-menu-item style="width: 250px" (click)="download.generateExcel()"> {{ 'Excel' | transloco }} </button>
+        <button mat-menu-item class="mat-small" (click)="download.generatePDF()" style="width: 250px;"> {{ 'PDF' | transloco }} </button>
+        <a mat-menu-item class="mat-small" href="https://borealisdata.ca/metricsbackend/api/metrics/report" style="width: 250px;"> {{ 'Legacy' | transloco }} </a>
+        <button mat-menu-item class="mat-small" style="width: 250px;"> {{ 'MakeDataCountMetrics' | transloco }} </button>
+      </mat-menu>
+    </div>
+    -->
+
+    <mat-card class="example-card" appearance="outlined" style="min-width: 250px; max-width: 250px; margin-bottom: 8px; margin-top: 10px; background-color: white !important;
+    box-shadow: none !important;" id="pdf_collections_num">
+      <mat-card-header>
+        <mat-card-title-group>
+          <mat-card-title> <div *ngIf="selectedCollection_Activate_Name=='(All)'"> {{ 'Collections' | transloco }} </div> 
+            <div *ngIf="selectedCollection_Activate_Name!='(All)'"> {{ 'Collections' | transloco }} </div> </mat-card-title>
+        </mat-card-title-group>
+      </mat-card-header>
+      <mat-card-content>
+        <h1 id="total_collections_num" style="text-align: right; color:black; font-size: 20px;"> <b>{{total_collections_num}}</b> </h1>
+      </mat-card-content>
+    </mat-card>
+
+      <mat-card class="example-card" appearance="outlined" style="min-width: 250px; max-width: 250px;  margin-bottom: 8px; margin-top: 10px; background-color: white !important;
+      box-shadow: none !important;" id="pdf_datasets_num">
+        <mat-card-header>
+          <mat-card-title-group>
+            <mat-card-title> {{ 'Datasets' | transloco }} </mat-card-title>
+            <mat-card-subtitle> </mat-card-subtitle>
+          </mat-card-title-group>
+        </mat-card-header>
+        <mat-card-content>
+          <h1 id="total_datasets_num" style="text-align: right; color:black; font-size: 20px;"> <b>{{total_datasets_num}}</b> </h1>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="example-card" appearance="outlined" style="min-width: 250px; max-width: 250px;  margin-bottom: 8px; margin-top: 10px; background-color: white !important;
+      box-shadow: none !important;" id="pdf_files_num">
+        <mat-card-header>
+          <mat-card-title-group>
+            <mat-card-title> {{ 'Files' | transloco }} </mat-card-title>
+            <mat-card-subtitle> </mat-card-subtitle>
+          </mat-card-title-group>
+        </mat-card-header>
+        <mat-card-content>
+          <h1 id="total_files_num"  style="text-align: right; color:black; font-size: 20px;"> <b>{{total_files_num}}</b> </h1>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="example-card" appearance="outlined" style="min-width: 250px; max-width: 250px; margin-bottom: 8px; margin-top: 10px; background-color: white !important;
+      box-shadow: none !important;" id="pdf_downloads_nums">
+        <mat-card-header>
+          <mat-card-title-group>
+            <mat-card-title> {{ 'Downloads' | transloco }} </mat-card-title>
+            <mat-card-subtitle> </mat-card-subtitle>
+          </mat-card-title-group>
+        </mat-card-header>
+        <mat-card-content>
+          <h1 id="total_downloads_num"  style="text-align: right; color:black; font-size: 20px;"> <b>{{total_downloads_num}}</b> </h1>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="example-card" appearance="outlined" style="min-width: 250px; max-width: 250px;  margin-bottom: 8px; margin-top: 10px; background-color: white !important;
+      box-shadow: none !important;" id="pdf_users_nums">
+        <mat-card-header>
+          <mat-card-title-group>
+            <mat-card-title>
+                {{ (selectedCollection_Activate_Name === '(All)' ? 'Users' : 'Authors') | transloco }}
+              </mat-card-title>
+            <mat-card-subtitle> </mat-card-subtitle>
+          </mat-card-title-group>
+        </mat-card-header>
+        <mat-card-content>
+          <h1 id="total_users_num"  style="text-align: right; color:black; font-size: 20px;"> <b>{{total_users_num}}</b> </h1>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="example-card" appearance="outlined" style="min-width: 250px; max-width: 250px; margin-bottom: 8px; margin-top: 10px; background-color: white !important;
+      box-shadow: none !important;" id="pdf_storage_nums">
+        <mat-card-header>
+          <mat-card-title-group>
+            <mat-card-title> {{ 'StorageUsage' | transloco }} </mat-card-title>
+            <mat-card-subtitle> </mat-card-subtitle>
+          </mat-card-title-group>
+        </mat-card-header>
+        <mat-card-content>
+          <h1 id="total_size_num"  style="text-align: right; color:black; font-size: 20px;"> <b>{{total_size_num}}</b> </h1>
+        </mat-card-content>
+      </mat-card>
+      </div>
+
+      <div>
+  </div>

@@ -31,7 +31,6 @@ import { TreeComponent } from './tree/tree.component';
 import {MatCardModule} from '@angular/material/card';
 import {MatDialog} from '@angular/material/dialog';
 import { GenericTableComponent } from './generic-table/generic-table.component';
-import {TranslateModule, TranslateService, TranslateStore} from '@ngx-translate/core';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {DownloadComponent} from './download/download.component'; 
 import {MatMenuModule} from '@angular/material/menu';
@@ -42,6 +41,8 @@ import { ChartData } from 'chart.js';
 import { LanguageService } from './language.service';
 import { MatListModule } from '@angular/material/list';
 import { ChangeDetectorRef } from '@angular/core';
+import { GraphDashboardComponent } from './graph-dashboard/graph-dashboard.component';
+import { ValueExportDashboardComponent } from './value-export-dashboard/value-export-dashboard.component';
 import { forkJoin } from 'rxjs';
 
 
@@ -76,9 +77,9 @@ interface SearchGroup {
   providers: [provideMomentDateAdapter(MY_FORMATS)],
   imports: [
     MatTabsModule,
-    MatFormFieldModule, 
+    MatFormFieldModule,
     MatSelectModule,
-    MatInputModule, 
+    MatInputModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
     FormsModule,
@@ -108,12 +109,14 @@ interface SearchGroup {
     CommonModule,
     MatCardModule,
     GenericTableComponent,
-    MatCheckboxModule, 
+    MatCheckboxModule,
     DownloadComponent,
     MatTooltipModule,
     TranslocoModule,
     MatListModule,
-    ],
+    GraphDashboardComponent,
+    ValueExportDashboardComponent
+],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
@@ -303,7 +306,6 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   translatedText$: ""
 
-
   total_collections_num: String = "-";
   total_dataverses_num: String = "-";
   total_datasets_num: String = "-";
@@ -333,12 +335,7 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   receivedCollectionFromTree:Array<String> = [];
   
-
   isOpen = false;
-
-  generic_columns: any[] = [
-    {data: "name", readOnly: "true", title: "Collection / Dataverses"},
-  ]
 
   getData(newItem: any) {
     this.raw_table_data = newItem["DataverseTabData"];
@@ -396,11 +393,11 @@ export class AppComponent implements AfterViewInit, OnInit{
       this.total_size_num = this.barChartDataSize_Aggdata.reduce((a, b) => a + b, 0).toFixed(2).toLocaleString(); + "GB";
     }
     else{
-      this.total_datasets_num = this.barChartDataDatasets_data[0].toLocaleString();
-      this.total_files_num = this.barChartDataFiles_data[0].toLocaleString();
-      this.total_downloads_num = this.barChartDataDownloads_data[0].toLocaleString();
-      this.total_users_num = this.barChartDataUsers_data[0].toLocaleString();
-      this.total_size_num = this.barChartDataSize_data[0].toFixed(2).toLocaleString() + "GB"; 
+      this.total_datasets_num = this.barChartDataDatasets_data[this.barChartDataDatasetsAgg_data.length - 1].toLocaleString();
+      this.total_files_num = this.barChartDataFiles_data[this.barChartDataDatasets_data.length - 1].toLocaleString();
+      this.total_downloads_num = this.barChartDataDownloads_data[this.barChartDataDownloads_data.length - 1].toLocaleString();
+      this.total_users_num = this.barChartDataUsers_data[this.barChartDataUsers_data.length - 1].toLocaleString();
+      this.total_size_num = this.barChartDataSize_data[this.barChartDataSize_data.length - 1].toFixed(2).toLocaleString() + "GB"; 
     }
 
     this.total_collections_change = (((this.barChartDataDatasets_data[0] - this.barChartDataDatasets_data[1]) / this.barChartDataDatasets_data[1]) * 100).toFixed(2).toString() + "%"
@@ -449,8 +446,6 @@ export class AppComponent implements AfterViewInit, OnInit{
       FileType,
       SpecificFileType
     ]) => {
-
-      const labels = this.months.reverse();
       
       // Your labels array (e.g. months reversed)
       const barChartLabels = this.months.reverse();
@@ -743,6 +738,14 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.dialog.open(AboutDialog);
   }
 
+  openTOCDialog() {
+    this.dialog.open(TOCDialog);
+  }
+
+  openFAQDialog() {
+    this.dialog.open(FAQDialog);
+  }  
+
   subjectToggle() {
     if (this.subjectTableOn){this.subjectTableOn = false}
     else {this.subjectTableOn = true} 
@@ -760,3 +763,17 @@ export class AppComponent implements AfterViewInit, OnInit{
 })
 
 export class AboutDialog {}
+
+@Component({
+  selector: 'toc-dialog-popup',
+  templateUrl: 'toc-dialog-popup.html',
+})
+
+export class TOCDialog {}
+
+@Component({
+  selector: 'faq-dialog-popup',
+  templateUrl: 'faq-dialog-popup.html',
+})
+
+export class FAQDialog {}

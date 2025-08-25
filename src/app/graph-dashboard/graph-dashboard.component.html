@@ -1,0 +1,102 @@
+<div style="display: inline-block; height:200px; padding: 30px; padding-top: 20px; font-size: 18px;">
+    <div id="pdf_bargraphs">
+    <div class="graph-title"> {{ 'NumberofDownloads' | transloco }} </div> 
+    <app-horizontal-bar-graph class="graph-section" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
+    <div class="graph-title" style="padding-top: 20px"> {{ 'NumberofDatasets' | transloco }} </div>
+    <app-horizontal-bar-graph class="graph-section" [barChartData]= "barChartDataDatasets"></app-horizontal-bar-graph> 
+    <div class="graph-title" style="padding-top: 20px"> {{ 'NumberofFiles' | transloco }} </div>
+    <app-horizontal-bar-graph class="graph-section" [barChartData]= "barChartDataFiles"></app-horizontal-bar-graph>
+    <div class="graph-title" style="padding-top: 20px"> {{ (selectedCollection_Activate_Name === '(All)' ? 'Numberofusers' : 'Numberofauthors') | transloco }} </div>
+    <app-horizontal-bar-graph class="graph-section" [barChartData]= "barChartDataUsers"></app-horizontal-bar-graph>
+    <div class="graph-title" style="padding-top: 20px"> {{ 'StorageUsage' | transloco }} </div>
+    <app-horizontal-bar-graph class="graph-section" [barChartData]= "barChartDataSize"></app-horizontal-bar-graph>
+    </div>
+
+    <p style="padding-top: 20px" id="subjectGraphTitle"> {{ 'SubjectBreakdown' | transloco }} </p>
+    <div style="border:1px solid lightgray;" class="hide-scrollbar">
+    <mat-card class="example-card" appearance="outlined" style="min-width: 750px; max-width: 750px; min-height: 333px; max-height: 300px;
+    justify-content: center;">
+      <button mat-button extended
+      (click)="downloadSubject()"
+      style="position: absolute;
+        height: 28px;
+        width: 12px;
+        top: 4px;
+        right: 4px;
+        font-size: 12px;
+        border-style: dotted; 
+        border-width: 1px;">
+          <mat-icon style="
+          font-size: 16px;
+          height: 16px;
+          width: 12px;
+          display: block;
+          line-height: 1;
+          margin-left: 10px;
+      ">download</mat-icon>
+      </button>
+      <mat-card-content id="subjectGraph">
+        <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject" width=520 height=200></app-pie-graph>
+      </mat-card-content>
+    </mat-card>
+
+    <div id="hot" style="" class="hide-scrollbar">
+      <app-generic-table class="hide-scrollbar"
+      [data]="subject_table"
+      [colHeaders]="true"
+      [colWidths]="[400, 200, 150]"
+      [rowHeaders]="false"
+      [height]="250"       
+      [columnSorting]="true"
+      [columns]="subject_columns"
+      [filters]="false" 
+      licenseKey="non-commercial-and-evaluation"> 
+      </app-generic-table>
+    </div>
+   </div>
+
+   <div style="margin-top: 20px;" class="hide-scrollbar"></div>
+   <p id="fileGraphTitle"> {{ 'FileContentBreakdown' | transloco }} <p>
+    <div style="margin-top: 5px; border:1px solid lightgray;" class="hide-scrollbar">
+      <mat-card class="example-card" appearance="outlined" style="min-width: 750px; max-width: 750px; min-height: 333px; max-height: 300px;
+        justify-content: center;">
+        <button mat-button extended
+        (click)="downloadFile"
+        style="position: absolute;
+        height: 28px;
+        width: 12px;
+        top: 4px;
+        right: 4px;
+        font-size: 12px;
+        border-style: dotted; 
+        border-width: 1px;">
+          <mat-icon style="
+          font-size: 16px;
+          height: 16px;
+          width: 12px;
+          display: block;
+          line-height: 1;
+          margin-left: 10px;
+        ">download</mat-icon>
+        </button>
+        <mat-card-content id="fileGraph">
+          <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile" width=380 height=200></app-pie-graph>
+        </mat-card-content>
+      </mat-card>
+
+      <div id="hot" style="" class="hide-scrollbar">
+        <app-generic-table class="hide-scrollbar"
+        [data]="file_content_table"
+        [colHeaders]="true"
+        [colWidths]="[100, 400, 150, 100]"
+        [rowHeaders]="false"
+        [height]="250"
+        [columnSorting]="true"
+        [columns]="file_content_columns"
+        [filters]="false"
+        licenseKey="non-commercial-and-evaluation"> 
+        </app-generic-table>
+      </div>
+    </div>
+                      
+  </div>

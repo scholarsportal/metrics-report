@@ -1,8 +1,9 @@
-import { Component, Injectable, Input, SimpleChanges } from '@angular/core';
+import { Component, Injectable, Input, OnInit, SimpleChanges } from '@angular/core';
 import * as ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { InteractionService } from '../shared/interaction.service';
 
 @Component({
   selector: 'app-download',
@@ -13,14 +14,31 @@ import html2canvas from 'html2canvas';
 })
 
 @Injectable()
-export class DownloadComponent {
+export class DownloadComponent implements OnInit {
   @Input() data: any; 
   @Input() name: string;
+
+  constructor(private interactionService: InteractionService) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['name']) {
       this.name = changes['name'].currentValue;
     }
+  }
+
+  ngOnInit(): void {
+    this.interactionService.downloadSubjectTriggered$.subscribe(() => {
+      this.generateSubject();
+    });
+    this.interactionService.downloadFileTriggered$.subscribe(() => {
+      this.generateFile();
+    });
+    this.interactionService.downloadExcelTriggered$.subscribe(() => {
+      this.generateExcel();
+    });
+    this.interactionService.downloadPDFTriggered$.subscribe(() => {
+      this.generatePDF();
+    });
   }
 
   exportToExcel(data: any[], fileName: string){
