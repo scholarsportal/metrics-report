@@ -36,16 +36,6 @@ body .handsontable .even{
   font-size: 12px !important;
 }
 
-.hide-scrollbar {
-  overflow: auto;
-  scrollbar-width: none;           /* Firefox */
-  -ms-overflow-style: none;        /* IE 10+ */
-}
-
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;                   /* Chrome, Safari, Opera */
-}
-
 .compact-form-field {
   width: 125px !important;
   max-width: 125px !important;

@@ -43,13 +43,14 @@ import { MatListModule } from '@angular/material/list';
 import { ChangeDetectorRef } from '@angular/core';
 import { GraphDashboardComponent } from './graph-dashboard/graph-dashboard.component';
 import { ValueExportDashboardComponent } from './value-export-dashboard/value-export-dashboard.component';
+import { MatDialogRef } from '@angular/material/dialog';
+import { LoadingService } from './loading.service';
 import { forkJoin } from 'rxjs';
-
-
 
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
 import {default as _rollupMoment, Moment} from 'moment';
+import { MatProgressBar } from "@angular/material/progress-bar";
 
 registerAllModules();
 
@@ -115,7 +116,8 @@ interface SearchGroup {
     TranslocoModule,
     MatListModule,
     GraphDashboardComponent,
-    ValueExportDashboardComponent
+    ValueExportDashboardComponent,
+    MatProgressBar
 ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.component.html',
@@ -336,6 +338,8 @@ export class AppComponent implements AfterViewInit, OnInit{
   receivedCollectionFromTree:Array<String> = [];
   
   isOpen = false;
+
+  isLoading = false;
 
   getData(newItem: any) {
     this.raw_table_data = newItem["DataverseTabData"];
@@ -691,8 +695,11 @@ export class AppComponent implements AfterViewInit, OnInit{
   title = 'metrics-app';
   
 
-  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, private languageService: LanguageService, private translocoService: TranslocoService, private cdr: ChangeDetectorRef) {
+  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, private languageService: LanguageService, private translocoService: TranslocoService, private cdr: ChangeDetectorRef, private loadingService: LoadingService) {
     this.filteredOptions = this.options.slice();
+    this.loadingService.isLoading$.subscribe((loading) => {
+      this.isLoading = loading;
+    });
   }
 
   filter(): void {
@@ -762,18 +769,36 @@ export class AppComponent implements AfterViewInit, OnInit{
   templateUrl: 'about-dialog-popup.html',
 })
 
-export class AboutDialog {}
+export class AboutDialog {
+  constructor(private dialogRef: MatDialogRef<AboutDialog>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+}
 
 @Component({
   selector: 'toc-dialog-popup',
   templateUrl: 'toc-dialog-popup.html',
 })
 
-export class TOCDialog {}
+export class TOCDialog {
+  constructor(private dialogRef: MatDialogRef<TOCDialog>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+}
 
 @Component({
   selector: 'faq-dialog-popup',
   templateUrl: 'faq-dialog-popup.html',
 })
 
-export class FAQDialog {}
+export class FAQDialog {
+  constructor(private dialogRef: MatDialogRef<FAQDialog>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+}

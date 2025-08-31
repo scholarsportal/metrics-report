@@ -113,17 +113,34 @@ export class TreeComponent implements OnInit {
 
   isCardNode = (_: number, node: DynamicFlatNode) => node.item.startsWith('__CARD__');
 
-  filterLeafNode(node: DynamicFlatNode): boolean {
-    if (!this.searchString) return false;
-    return node.item.toLowerCase().indexOf(this.searchString.toLowerCase()) === -1;
+  nodeMatchesFilter(node: DynamicFlatNode): boolean {
+    if (!this.searchString) return true;
+    return node.item.toLowerCase().includes(this.searchString.toLowerCase());
+  }
+  
+  nodeOrDescendantsMatch(node: DynamicFlatNode): boolean {
+    if (this.nodeMatchesFilter(node)) return true;
+  
+    const descendants = this.treeControl.getDescendants(node);
+    return descendants.some(descendant => this.nodeMatchesFilter(descendant));
   }
 
-  filterParentNode(node: DynamicFlatNode): boolean {
-    if (!this.searchString || node.item.toLowerCase().indexOf(this.searchString.toLowerCase()) !== -1) {
-      return false;
+  shouldShowNode(node: DynamicFlatNode): boolean {
+    if (!this.searchString) return true;
+  
+    // Direct match
+    if (this.nodeMatchesFilter(node)) return true;
+  
+    // If any of its ancestors match, show
+    let parent = this.getParentNode(node);
+    while (parent) {
+      if (this.nodeMatchesFilter(parent)) {
+        return true;
+      }
+      parent = this.getParentNode(parent);
     }
-    const descendants = this.treeControl.getDescendants(node);
-    return !descendants.some(descendantNode => descendantNode.item.toLowerCase().includes(this.searchString.toLowerCase()));
+  
+    return false;
   }
 
   getExpandedNodes(): Set<string> {
@@ -143,6 +160,37 @@ export class TreeComponent implements OnInit {
         this.treeControl.expand(node);
       }
     });
+  }
+
+  cardNodeMatchesFilter(node: DynamicFlatNode): boolean {
+    if (!this.searchString) return true;
+  
+    // The card node item looks like "__CARD__ParentName", so extract ParentName
+    const parentName = node.item.replace('__CARD__', '');
+  
+    // Check if parent or any of its descendants match the filter
+    if (parentName.toLowerCase().includes(this.searchString.toLowerCase())) {
+      return true;
+    }
+  
+    // Also check descendants of parent node
+    const parentNode = this.treeControl.dataNodes.find(n => n.item === parentName);
+    if (!parentNode) return false;
+  
+    const descendants = this.treeControl.getDescendants(parentNode);
+    return descendants.some(descendant => descendant.item.toLowerCase().includes(this.searchString.toLowerCase()));
+  }
+
+  getParentNode(node: DynamicFlatNode): DynamicFlatNode | null {
+    const currentIndex = this.treeControl.dataNodes.indexOf(node);
+  
+    for (let i = currentIndex - 1; i >= 0; i--) {
+      const current = this.treeControl.dataNodes[i];
+      if (current.level < node.level) {
+        return current;
+      }
+    }
+    return null;
   }
 
   fullReportButton(name: string) {
@@ -165,6 +213,8 @@ export class TreeComponent implements OnInit {
       console.log('Emitting:', [name, alias]);
       this.dataEvent.emit([name, alias]);
   }
+
+
 }
 
 @Injectable({providedIn: 'root'})

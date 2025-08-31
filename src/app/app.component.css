@@ -38,7 +38,7 @@
   font-size: clamp(16px, 4vw, 32px);
   white-space: normal;    /* allow wrapping */
   overflow-wrap: break-word; /* wrap long words */
-  max-width: 90vw;
+  max-width: 73vw;
   padding-left: 5px;      /* optional */
 }
 
@@ -64,4 +64,14 @@
   padding-top: 4px;
   padding-bottom: 4px;
   height: 32px;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3); /* semi-transparent background */
+  z-index: 9999; /* Ensure it's on top of everything */
 }

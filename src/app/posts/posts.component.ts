@@ -4,6 +4,7 @@ import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { LoadingService } from '../loading.service';
 import { ApiService } from '../api.service';
 
 @Component({
@@ -22,7 +23,7 @@ export class PostsComponent {
   @Input() endDate: string = "";
 
   // --- Constructor ---
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private loadingService: LoadingService) {}
 
   // --- Data from API responses ---
   public data_rsp: any;
@@ -115,11 +116,13 @@ export class PostsComponent {
     console.log("date", this.dateRangeOn, this.startDate, this.endDate);
   
     this.apiService.getAllMetrics(this.cleanedParentAlias, this.months[0]).subscribe(
-      (rep: any[]) => {
-        this.isLoading = true;
-  
+      ({ data: rep, errorOccurredFlag }) => {
+        this.loadingService.hide();
+    
         console.log('raw responses,', rep);
-  
+    
+        // your existing logic using rep (which is an array of results) continues unchanged
+        
         [
           this.data_rsp,
           this.downloads_rsp,
@@ -270,9 +273,9 @@ export class PostsComponent {
         this.sendData();
       },
       (error) => {
+        // This is a fallback for the unlikely case the entire forkJoin fails (very rare if you catch errors inside)
         console.error('API Error:', error);
-      
-        // Set each response variable to empty array or object as appropriate
+    
         this.data_rsp = {};
         this.downloads_rsp = [];
         this.datasets_rsp = [];
@@ -282,13 +285,13 @@ export class PostsComponent {
         this.filecontent_rsp = [];
         this.dataverse_rsp = {};
         this.authors_rsp = {};
-      
-        this.isLoading = false;
+    
+        this.loadingService.show();
         this.firstAPIGet = false;
       }
     );
   
-    this.isLoading = false;
+    this.loadingService.show();
     this.firstAPIGet = false;
   }
 

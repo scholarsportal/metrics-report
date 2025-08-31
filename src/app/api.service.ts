@@ -65,49 +65,50 @@ export class ApiService {
   }
 
   getUniqueAuthors(parentAlias: string): Observable<{ data: { date: string; count: number }[] }> {
-    const perPage = 1000;
-    const maxPages = 30;
+    const perPage = 500;
+    const maxPages = 10;
   
-    const fetchPage = (start: number): Observable<{ items: DatasetItem[]; start: number; page: number }> => {
+    const fetchPage = (start: number): Observable<DatasetItem[]> => {
+      console.log(`Fetching page starting from: ${start}`);
+      const startTime = Date.now();
       return this.getDatasets(parentAlias, start, perPage).pipe(
-        map(response => ({
-          items: response?.data?.items || [],
-          start,
-          page: start / perPage
-        }))
+        map(response => {
+          const endTime = Date.now();
+          console.log(`Fetched page starting at ${start} in ${endTime - startTime}ms`);
+          return response?.data?.items || [];
+        })
       );
     };
   
-    return fetchPage(0).pipe(
-      expand(({ items, start, page }) => {
-        if (items.length < perPage || page >= maxPages) {
-          return EMPTY;
-        }
-        return fetchPage(start + perPage);
-      }),
-      reduce((acc, { items }) => {
-        items.forEach((item: DatasetItem) => {
+    const pageStarts = Array.from({ length: maxPages }, (_, i) => i * perPage);
+    const pageRequests = pageStarts.map(start => fetchPage(start));
+  
+    return forkJoin(pageRequests).pipe(
+      map((pages: DatasetItem[][]) => pages.flat()),
+      map((allItems: DatasetItem[]) => {
+        console.log(`Total items fetched: ${allItems.length}`);
+  
+        const authorsByMonth: { [month: string]: Set<string> } = {};
+  
+        allItems.forEach(item => {
           const pubDate = item.published_at || item.publicationDate;
           if (!pubDate) return;
   
           const month = pubDate.slice(0, 7);
-          if (!acc[month]) acc[month] = new Set<string>();
+          if (!authorsByMonth[month]) authorsByMonth[month] = new Set();
   
-          const authors = item.authors || [];
-          authors.forEach((author: string) => {
+          (item.authors || []).forEach(author => {
             const trimmed = author.trim().toLowerCase();
-            if (trimmed) acc[month].add(trimmed);
+            if (trimmed) authorsByMonth[month].add(trimmed);
           });
         });
-        return acc;
-      }, {} as { [month: string]: Set<string> }),
+  
+        return authorsByMonth;
+      }),
       map(authorsByMonth => {
         const months = Object.keys(authorsByMonth).sort();
-      
-        if (months.length === 0) {
-          return { data: [{ date: '', count: 0 }] };
-        }
-      
+        if (months.length === 0) return { data: [{ date: '', count: 0 }] };
+  
         const nextMonth = (monthStr: string): string => {
           let [year, month] = monthStr.split('-').map(Number);
           month++;
@@ -117,48 +118,52 @@ export class ApiService {
           }
           return `${year}-${month.toString().padStart(2, '0')}`;
         };
-      
+  
         const firstMonth = months[0];
-        
-        // Get current month in 'YYYY-MM' format
         const now = new Date();
         const currentMonth = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-      
+  
         const cumulativeAuthors = new Set<string>();
         const result: { date: string; count: number }[] = [];
-      
+  
         let current = firstMonth;
         while (current <= currentMonth) {
           if (authorsByMonth[current]) {
-            authorsByMonth[current].forEach(author => cumulativeAuthors.add(author));
-            result.push({ date: current, count: cumulativeAuthors.size });
-          } else {
-            // No data for this month — count is cumulative count or zero if empty
-            result.push({ date: current, count: cumulativeAuthors.size || 0 });
+            authorsByMonth[current].forEach(a => cumulativeAuthors.add(a));
           }
+          result.push({ date: current, count: cumulativeAuthors.size });
           current = nextMonth(current);
         }
-      
+  
         return { data: result };
       })
     );
   }
+    
   
-  getAllMetrics(parentAlias: string = '', toMonth: string = ''): Observable<any[]> {
+  getAllMetrics(parentAlias: string = '', toMonth: string = ''): Observable<{ data: any[]; errorOccurredFlag: boolean }> {
+    let errorOccurredFlag = false;
+    const setError = () => errorOccurredFlag = true;
+    
     const authorOrUser$ = parentAlias
-      ? this.getUniqueAuthors(parentAlias).pipe(catchError(() => of({})))
-      : this.getMonthlyUsers(parentAlias).pipe(catchError(() => of({})));
+      ? this.withErrorHandling(this.getUniqueAuthors(parentAlias), setError)
+      : this.withErrorHandling(this.getMonthlyUsers(parentAlias), setError);
   
     return forkJoin([
-      this.getDataverseCollections().pipe(catchError(() => of({}))),
-      this.getMonthlyDownloads(parentAlias).pipe(catchError(() => of({}))),
-      this.getMonthlyDatasets(parentAlias).pipe(catchError(() => of({}))),
-      this.getMonthlyFiles(parentAlias).pipe(catchError(() => of({}))),
+      this.withErrorHandling(this.getDataverseCollections(), setError),
+      this.withErrorHandling(this.getMonthlyDownloads(parentAlias), setError),
+      this.withErrorHandling(this.getMonthlyDatasets(parentAlias), setError),
+      this.withErrorHandling(this.getMonthlyFiles(parentAlias), setError),
       authorOrUser$,
-      this.getSubjectData(toMonth, parentAlias).pipe(catchError(() => of({}))),
-      this.getFileContentData(parentAlias).pipe(catchError(() => of({}))),
-      this.getDataverseCount(toMonth, parentAlias).pipe(catchError(() => of({}))),
-    ]);
+      this.withErrorHandling(this.getSubjectData(toMonth, parentAlias), setError),
+      this.withErrorHandling(this.getFileContentData(parentAlias), setError),
+      this.withErrorHandling(this.getDataverseCount(toMonth, parentAlias), setError),
+    ]).pipe(
+      map(results => ({
+        data: results,
+        errorOccurredFlag
+      }))
+    );
   }
 
   getDatasets(parentAlias: string = '', start: number = 0, perPage: number = 1000): Observable<any> {
@@ -175,5 +180,14 @@ export class ApiService {
     }
   
     return this.http.get<any>(url, { params });
+  }
+
+  private withErrorHandling<T>(obs$: Observable<T>, onError: () => void): Observable<T> {
+    return obs$.pipe(
+      catchError(err => {
+        onError();
+        return of({} as T);
+      })
+    );
   }
 }

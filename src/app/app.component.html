@@ -21,25 +21,10 @@
   </h2>
 </div>
 
+<mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
+<div class="loading-overlay" *ngIf="isLoading"></div>
+
 <app-posts (messageEvent)="getData($event)" [collectionSelected]="selectedCollection_Activate" [collectionSelectedName]="selectedCollection_Current_Name" [startDate]="date_start_activate" [endDate]="date_end_activate" [start_on]="start_on"></app-posts>
-
-<!-- Title + Date Container -->
-<div style="max-width: none; width: 100vw; margin-left: 0; padding-left: 40px;">
-  <div class="title-container" style="">
-    <div *ngIf="selectedCollection_Activate === '(All)'" id="pdf_name">
-      <h1 id="responsive-title" class="responsive-title">{{ 'All' | transloco }}</h1>
-    </div>
-
-    <div *ngIf="selectedCollection_Activate !== '(All)'" id="pdf_name">
-      <h4 style="color: purple;"><b> • Collection Selected • </b></h4>
-      <h1 id="responsive-title" class="responsive-title">{{ selectedCollection_Activate_Name }}</h1>
-    </div>
-
-    <div id="pdf_date" style="margin-bottom: 4px;">
-      <p><i>{{ date_String }}</i></p>
-    </div>
-  </div>
-</div>
 
 <!-- Content BELOW, inside your fit-content container -->
 <div style="
@@ -55,6 +40,22 @@
   <div style="clear:both;">
     <app-download #download [data]="raw_table_data" [name]="selectedOption"></app-download>
     <ng-template [ngIf]="true">
+
+      <!-- Title + Date Container -->
+  <div class="title-container" style="">
+    <div *ngIf="selectedCollection_Activate === '(All)'" id="pdf_name">
+      <h1 id="responsive-title" class="responsive-title">{{ 'All' | transloco }}</h1>
+    </div>
+
+    <div *ngIf="selectedCollection_Activate !== '(All)'" id="pdf_name">
+      <h4 style="color: purple;"><b> • Collection Selected • </b></h4>
+      <h1 id="responsive-title" class="responsive-title">{{ selectedCollection_Activate_Name }}</h1>
+    </div>
+
+    <div id="pdf_date" style="margin-bottom: 4px;">
+      <p><i>{{ date_String }}</i></p>
+    </div>
+  </div>
 
       <hr style="border: none; height: 1px; background-color: #ccc; margin: 16px 0;">
 

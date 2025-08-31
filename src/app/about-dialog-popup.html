@@ -1,6 +1,17 @@
-<div style="height: 600px; width: 700px; padding: 20px 40px; overflow-y: auto; box-sizing: border-box;">
-    <h1 mat-dialog-title style="font-size: 32px; font-weight: bold;">About</h1>
+<div class="dialog-container" style="position: relative; height: 600px; width: 700px; padding: 20px 40px; overflow-y: auto; box-sizing: border-box;">
+
+    <!-- Close Button -->
+    <button class="close-button"
+            (click)="closeDialog()"
+            style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 24px; cursor: pointer;"
+            aria-label="Close dialog">
+      &#x2715;
+    </button>
   
+    <!-- Dialog Title -->
+    <h1 mat-dialog-title style="font-size: 32px; font-weight: bold; margin-top: 40px;">About</h1>
+  
+    <!-- Dialog Content -->
     <p>
       <strong>Borealis</strong> is a secure, multidisciplinary Canadian research data repository.
       This metrics page, created by the University of Toronto Dataverse Team, allows Borealis users
@@ -52,8 +63,8 @@
     <p>Number of files downloaded that are hosted within the selected dataverse.</p>
   
     <h3><strong>Users</strong></h3>
-    <p>Number of user accounts in Borealis. Only given when Borealis (All) is selected. </p>
-
+    <p>Number of user accounts in Borealis. Only given when Borealis (All) is selected.</p>
+  
     <h3><strong>Authors</strong></h3>
     <p>Number of authors with published contributions in the selected dataverse.</p>
   
@@ -75,5 +86,6 @@
       Available in English or Français. Dataverses are represented in their original language and intention,
       along with the metadata attached to them.
     </p>
+  
   </div>
   
