@@ -24,7 +24,7 @@
 <mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
 <div class="loading-overlay" *ngIf="isLoading"></div>
 
-<app-posts (messageEvent)="getData($event)" [collectionSelected]="selectedCollection_Activate" [collectionSelectedName]="selectedCollection_Current_Name" [startDate]="date_start_activate" [endDate]="date_end_activate" [start_on]="start_on"></app-posts>
+<app-posts (messageEvent)="getData($event)" [collectionSelected]="selectedCollection_Activate" [collectionSelectedName]="selectedCollection_Current_Name" [startDate]="date_start_activate" [endDate]="date_end_activate" [start_on]="date_select_on"></app-posts>
 
 <!-- Content BELOW, inside your fit-content container -->
 <div style="
@@ -32,10 +32,6 @@
   margin-left: auto;
   margin-right: auto;
 ">
-
-  <div *ngIf="bad_range==true"> 
-    <h4 style="color:red; text-align: center;"> Invalid Date Range </h4> 
-  </div>
 
   <div style="clear:both;">
     <app-download #download [data]="raw_table_data" [name]="selectedOption"></app-download>
@@ -55,6 +51,20 @@
     <div id="pdf_date" style="margin-bottom: 4px;">
       <p><i>{{ date_String }}</i></p>
     </div>
+
+    <div *ngIf="error_flag" style="
+    margin-bottom: 4px; 
+    margin-left: 5px; 
+    color: red; 
+    border: 1px solid red; 
+    border-radius: 8px; 
+    background-color: #ffe5e5; 
+    padding: 10px 10px 0px 10px; 
+    max-width: 270px;
+    line-height: 1;
+    ">
+  <p><i>There is missing data for this Dataverse</i></p>
+</div>
   </div>
 
       <hr style="border: none; height: 1px; background-color: #ccc; margin: 16px 0;">
@@ -81,7 +91,7 @@
                     <input matInput *ngIf="start_on"
                            [matDatepicker]="dp_s"
                            [formControl]="date_start"
-                           [min]="minDate"
+                           [min]="this.creation_date"
                            [max]="todayDate">
 
                     <mat-datepicker-toggle *ngIf="start_on"
@@ -106,8 +116,8 @@
                     <input matInput
                            [matDatepicker]="dp_e"
                            [formControl]="date_end"
-                           [min]="minDate"
-                           [max]="todayDate">
+                           [min]="this.creation_date"
+                           [max]="maxDate">
 
                     <mat-datepicker-toggle matIconSuffix
                                            [for]="dp_e"
@@ -135,6 +145,7 @@
 
                   <div style="margin-left: auto; margin-right: 10px;">
                     <button (click)="CollectionDataButtonActivate()"
+                            [disabled]="isStartTimeAfterEndTime()"
                             mat-button
                             style="border: 1px solid; font-size: 12px; width: 125px; height: 25px;">
                       {{ 'Submit' | transloco }}

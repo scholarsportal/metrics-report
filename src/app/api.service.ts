@@ -64,6 +64,18 @@ export class ApiService {
     return this.http.get<any>(url);
   }
 
+  getDataverseCreationDate(alias: string = ''): Observable<{ data: { date: string } }> {
+    const url = `https://borealisdata.ca/api/dataverses/${alias || ':root'}`;
+    return this.http.get<{ data: { creationDate: string } }>(url).pipe(
+      map(response => {
+        const date = response?.data?.creationDate ?? '';
+        const formattedDate = date ? date.slice(0, 7) : ''; // Format as YYYY-MM
+        return { data: { date: formattedDate } }; 
+      }),
+      catchError(() => of({ data: { date: '' } }))
+    );
+  }
+
   getUniqueAuthors(parentAlias: string): Observable<{ data: { date: string; count: number }[] }> {
     const perPage = 500;
     const maxPages = 10;
@@ -144,20 +156,21 @@ export class ApiService {
   getAllMetrics(parentAlias: string = '', toMonth: string = ''): Observable<{ data: any[]; errorOccurredFlag: boolean }> {
     let errorOccurredFlag = false;
     const setError = () => errorOccurredFlag = true;
-    
+  
     const authorOrUser$ = parentAlias
       ? this.withErrorHandling(this.getUniqueAuthors(parentAlias), setError)
       : this.withErrorHandling(this.getMonthlyUsers(parentAlias), setError);
   
     return forkJoin([
-      this.withErrorHandling(this.getDataverseCollections(), setError),
-      this.withErrorHandling(this.getMonthlyDownloads(parentAlias), setError),
-      this.withErrorHandling(this.getMonthlyDatasets(parentAlias), setError),
-      this.withErrorHandling(this.getMonthlyFiles(parentAlias), setError),
-      authorOrUser$,
-      this.withErrorHandling(this.getSubjectData(toMonth, parentAlias), setError),
-      this.withErrorHandling(this.getFileContentData(parentAlias), setError),
-      this.withErrorHandling(this.getDataverseCount(toMonth, parentAlias), setError),
+      this.withErrorHandling(this.getDataverseCollections(), setError), // 0
+      this.withErrorHandling(this.getMonthlyDownloads(parentAlias), setError), // 1
+      this.withErrorHandling(this.getMonthlyDatasets(parentAlias), setError), // 2
+      this.withErrorHandling(this.getMonthlyFiles(parentAlias), setError), // 3
+      authorOrUser$, // 4
+      this.withErrorHandling(this.getSubjectData(toMonth, parentAlias), setError), // 5
+      this.withErrorHandling(this.getFileContentData(parentAlias), setError), // 6
+      this.withErrorHandling(this.getDataverseCount(toMonth, parentAlias), setError), // 7
+      this.withErrorHandling(this.getDataverseCreationDate(parentAlias), setError) // 8
     ]).pipe(
       map(results => ({
         data: results,

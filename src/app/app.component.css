@@ -12,16 +12,6 @@
   font-size: 40px !important;
 }
 
-.hide-scrollbar {
-  overflow: auto;
-  scrollbar-width: none;           /* Firefox */
-  -ms-overflow-style: none;        /* IE 10+ */
-}
-
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;                   /* Chrome, Safari, Opera */
-}
-
 .title-container {
   vertical-align: top;
   margin-top: 60px;      /* move it up a bit (less than 100px) */

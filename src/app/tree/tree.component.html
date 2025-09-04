@@ -58,18 +58,17 @@
       matTreeNodePadding
       [style.display]="!shouldShowNode(node) ? 'none' : ''"
     >
-      <mat-card style="min-height: 60px; min-width: 200px; margin: 20px 0;">
-        <div style="margin-top: 8px;">
-          <button
-            style="min-width: 1%; display: block; margin: auto; margin-bottom: 10px;"
-            (click)="fullReportButton(node.item.replace('__CARD__', ''))"
-            class="mat-small"
-            mat-button
-          >
-            FULL REPORT
+
+          <button mat-button class="mat-small"
+          style="
+          border-width: 1px; font-size: 12px; border-style: solid; width: 150px; 
+          height: 35px; margin-left: 50px; display: flex;  justify-content: flex-start;
+          align-items: center; 
+          margin-bottom: 10px;     
+          gap: 8px;                    
+          text-align: left;" (click)="fullReportButton(node.item.replace('__CARD__', ''))"> <mat-icon> dashboard </mat-icon> FULL REPORT 
           </button>
-        </div>
-      </mat-card>
+          
     </mat-tree-node>
 
   </mat-tree>

@@ -36,6 +36,7 @@ export class PostsComponent {
   public filecontent_rsp_date_range: any[] = [];
   public dataverse_rsp: any;
   public authors_rsp: any;
+  public creation_date_rs: any; 
 
   // --- Processed Data Collections ---
   public data: any[] = [];
@@ -99,10 +100,16 @@ export class PostsComponent {
   // --- Others ---
   public observables: any[] = [];
 
+  /// -- Creation Date --- 
+  public creationDate: string;
+
   // --- Flags ---
   public isLoading: boolean = false;
   public firstAPIGet: boolean = true;
   public dateRangeOn: boolean = false;
+
+  // --- Errors ---
+  errorFlag: boolean = false;
 
     
   ngOnChanges() {
@@ -120,6 +127,7 @@ export class PostsComponent {
         this.loadingService.hide();
     
         console.log('raw responses,', rep);
+        this.errorFlag = errorOccurredFlag;
     
         // your existing logic using rep (which is an array of results) continues unchanged
         
@@ -132,16 +140,22 @@ export class PostsComponent {
           this.subject_rsp,
           this.filecontent_rsp,
           this.dataverse_rsp,
-          this.authors_rsp
+          this.creation_date_rs
         ] = rep.map((r, idx) => {
           if (r && typeof r.data === 'object' && Object.keys(r.data).length === 0) {
-            if ([0, 7, 8].includes(idx)) { // Expected object
+            if ([0, 7, 8].includes(idx)) {
               return {};
             }
-            return []; // Expected array
+            return [];
           }
           return r.data;
         });
+
+        console.log(this.creation_date_rs)
+
+        if (this.creation_date_rs?.date) {
+          this.creationDate = this.creation_date_rs.date;
+        }
   
         this.dataversesDataTree = Array.isArray(this.data_rsp?.children) ? this.data_rsp.children : [];
   
@@ -318,8 +332,10 @@ export class PostsComponent {
         file_content_label_data: this.fileContentLabels,
         file_content_data: this.fileContentData,
         file_content_full_data: this.fileContentFullData,
-        name_dropdown_data: this.dataverseCollectionsDropDown,     
-        months: this.months
+        name_dropdown_data: this.dataverseCollectionsDropDown, 
+        creation_date: this.creationDate,
+        months: this.months,
+        error_flag: this.errorFlag
     }
     console.log(DataverseTabData)
     this.messageEvent.emit({"DataverseTabData": DataverseTabData});
@@ -329,23 +345,32 @@ export class PostsComponent {
     this.months = [];
     let dateDiff = 24;
   
+    // If startDate and endDate are provided, calculate the month difference
     if (this.start_on && this.startDate && this.endDate) {
-      dateDiff = this.monthDifference(this.startDate, this.endDate);
+      dateDiff = this.monthAmount(this.startDate, this.endDate);
     }
   
-    // Determine starting point for month loop
+    // Determine the starting point for the month loop
     let upperDate = this.endDate ? new Date(Date.parse(this.endDate + "-02")) : new Date();
-    if (new Date().getDate() < 7) {
+    console.log("months", upperDate, this.startDate, this.endDate)
+  
+    // If today is in the first week of the month, move the starting date back by a month
+    if (new Date().getDate() < 7 && !this.start_on) {
       upperDate.setMonth(upperDate.getMonth() - 1);
     }
+    console.log("months", upperDate)
   
     let foundStartMonth = false;
+
+    console.log("months diff", dateDiff, this.startDate, this.endDate)
   
-    for (let i = 0; i <= dateDiff + 1; i++) {
-      const mm = upperDate.getMonth() + 1;
-      const yyyy = upperDate.getFullYear();
-      const dateStr = `${yyyy}-${String(mm).padStart(2, '0')}`;
-  
+    // Loop through the months from the endDate to startDate (if provided)
+    for (let i = 0; i <= dateDiff; i++) {
+      const mm = upperDate.getMonth() + 1; // Get the month (1-12)
+      const yyyy = upperDate.getFullYear(); // Get the year
+      const dateStr = `${yyyy}-${String(mm).padStart(2, '0')}`; // Format the date as YYYY-MM
+      
+      console.log("months one by one", dateStr, i)
       this.months.push(dateStr);
   
       // If start_on is active and we've hit the startDate, flag it
@@ -353,31 +378,29 @@ export class PostsComponent {
         foundStartMonth = true;
       }
   
-      // After finding the startDate, add one more (the month before), then break
-      if (foundStartMonth && i >= dateDiff) {
-        upperDate.setMonth(upperDate.getMonth() - 1);
-        const prev_mm = upperDate.getMonth() + 1;
-        const prev_yyyy = upperDate.getFullYear();
-        const prevDateStr = `${prev_yyyy}-${String(prev_mm).padStart(2, '0')}`;
-        this.months.push(prevDateStr);
-        break;
-      }
-  
-      // Move to previous month
+      // Move to the previous month
       upperDate.setMonth(upperDate.getMonth() - 1);
     }
   
-    // Sort in reverse chronological order
+    // Sort the months in reverse chronological order
     this.months.sort((a, b) => (a < b ? 1 : -1));
   }
   
-  // Helper method moved outside populateMonths for clarity
-  monthDifference(s1: string, s2: string): number {
-    const lowerDate = new Date(Date.parse(s1));
-    const upperDate = new Date(Date.parse(s2));
   
-    return (upperDate.getFullYear() - lowerDate.getFullYear()) * 12 + (upperDate.getMonth() - lowerDate.getMonth());
-  }
+  // Helper method moved outside populateMonths for clarity
+  monthAmount(s1: string, s2: string): number {
+    const lowerDate = new Date(Date.parse(s1 + "-01"));  // Add a dummy day to avoid time issues
+    const upperDate = new Date(Date.parse(s2 + "-01"));  // Add a dummy day to avoid time issues
+
+    let monthsDifference = (upperDate.getFullYear() - lowerDate.getFullYear()) * 12 + (upperDate.getMonth() - lowerDate.getMonth());
+    if (monthsDifference === 0) {
+        return 1;
+    }
+    if (monthsDifference === 1) {
+        return 2;
+    }
+    return Math.abs(monthsDifference) + 1;
+}
 
   cleanTempData() {
     // Collections and dropdown data
@@ -431,6 +454,9 @@ export class PostsComponent {
   
     // Other
     this.months = [];
+    this.creation_date_rs = "";
+    this.creationDate = ""; 
+    this.errorFlag = false;
   }
 
   get cleanedParentAlias(): string {

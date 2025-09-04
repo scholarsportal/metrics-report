@@ -45,6 +45,7 @@ import { GraphDashboardComponent } from './graph-dashboard/graph-dashboard.compo
 import { ValueExportDashboardComponent } from './value-export-dashboard/value-export-dashboard.component';
 import { MatDialogRef } from '@angular/material/dialog';
 import { LoadingService } from './loading.service';
+import { debounceTime } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 
 import * as _moment from 'moment';
@@ -128,14 +129,15 @@ export class AppComponent implements AfterViewInit, OnInit{
   private _formBuilder = inject(FormBuilder);
 
   start_on: boolean = false;
-  date_start = new FormControl(moment());
-  date_end = new FormControl(moment());
+  minDate = new Date(new Date().setMonth(new Date().getDate() < 7 ? new Date().getMonth() - 1 : new Date().getMonth()));
+  maxDate = new Date(new Date().setMonth(new Date().getDate() < 7 ? new Date().getMonth() - 1 : new Date().getMonth()));
+  date_start = new FormControl(moment().date() < 7 ? moment().subtract(1, 'month') : moment());
+  date_end = new FormControl(moment().date() < 7 ? moment().subtract(1, 'month') : moment());
   date_String: String = this.dateStringFormat();  
   date_start_activate: string = "";
   date_end_activate: string = "";
   date_select_on = false; 
-  todayDate:Date = new Date();
-  minDate: Date = new Date("2016-02-01");
+  todayDate = new Date(new Date().setMonth(new Date().getDate() < 7 ? new Date().getMonth() - 1 : new Date().getMonth()));
   bad_range: boolean = false;
 
   setStartMonthAndYear(normalizedMonthAndYear: Moment, datepicker: MatDatepicker<Moment>) {
@@ -171,6 +173,7 @@ export class AppComponent implements AfterViewInit, OnInit{
 
     if (this.start_on && date_s > date_e){
       this.bad_range = true;
+      this.date_select_on = false; 
     }
 
     if (this.start_on && !this.bad_range){
@@ -184,6 +187,15 @@ export class AppComponent implements AfterViewInit, OnInit{
       this.date_select_on = true; 
     }
 
+  }
+
+  isStartTimeAfterEndTime(): boolean {
+    const start = this.date_start.value;
+    const end = this.date_end.value;
+
+    if (!start || !end) return true;
+
+    return moment(end).isBefore(moment(start)) && this.start_on;
   }
 
   dateStringFormat(): String{
@@ -250,6 +262,8 @@ export class AppComponent implements AfterViewInit, OnInit{
   users_graph_data: Array<any> = [];
   size_graph_data: Array<any> = [];
   name_dropdown_data: Array<any> = [];
+  creation_date: Array<any> = [];
+
 
   barChartDataDownloads_data: Array<number> = [];
   barChartDataDownloads: ChartData<'bar'> = {
@@ -341,6 +355,8 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   isLoading = false;
 
+  error_flag = false;
+
   getData(newItem: any) {
     this.raw_table_data = newItem["DataverseTabData"];
     this.table_data = newItem["DataverseTabData"]['table_data'];
@@ -362,6 +378,8 @@ export class AppComponent implements AfterViewInit, OnInit{
     console.log(this.searchGroups); 
   
     this.months = newItem["DataverseTabData"]['months'];
+    this.creation_date = newItem["DataverseTabData"]['creation_date'];
+    this.error_flag = newItem["DataverseTabData"]['error_flag'];
     
     this.barChartDataDownloads_data = newItem["DataverseTabData"]['downloads_graph_data'].reverse();
     this.barChartDataDatasets_data = newItem["DataverseTabData"]['datasets_graph_data'].reverse();
@@ -661,6 +679,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   }
 
   CollectionDataButtonActivate(){
+    console.log(this.date_end < this.date_start)
     //console.log(this.searchForm.get('searchGroup')?.value);
     //this.selectedOption = this.searchForm.get('searchGroup')?.value as string; 
     this.selectedOption = this.selectedCollection_Current_Name;
