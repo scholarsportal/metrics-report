@@ -15,20 +15,23 @@ import { TranslocoModule } from '@ngneat/transloco';
 
 /** Flat node with expandable and level information */
 class DynamicFlatNode {
-  item: string;
+  item: string; // name
+  alias: string; 
   level: number;
   expandable: boolean;
-  isLoading: WritableSignal<boolean>;  // <-- change type here
+  isLoading: WritableSignal<boolean>;
   isCardNode?: boolean;
 
   constructor(
     item: string,
+    alias: string,
     level = 1,
     expandable = false,
-    isLoading: WritableSignal<boolean> = signal(false),  // <-- default writable signal
-    isCardNode: boolean = false  // default false
+    isLoading: WritableSignal<boolean> = signal(false),
+    isCardNode: boolean = false
   ) {
     this.item = item;
+    this.alias = alias;
     this.level = level;
     this.expandable = expandable;
     this.isLoading = isLoading;
@@ -57,7 +60,6 @@ export class TreeComponent implements OnInit {
   searchString = "";
   dataMap2 = new Map<string, string[]>();
 
-
   treeControl!: FlatTreeControl<DynamicFlatNode>;
   dataSource!: DynamicDataSource;
 
@@ -69,6 +71,8 @@ export class TreeComponent implements OnInit {
       node => node.expandable
     );
     this.dataSource = new DynamicDataSource(this.treeControl, this.database, this.http);
+    console.log(this.data);
+    console.log(this.dataMap2);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -78,6 +82,7 @@ export class TreeComponent implements OnInit {
 
     if (this.data != null) {
       alias_data = this.data['alias_data'];
+      console.log(alias_data )
       tree_dropdown = alias_data.map((obj: { name: any }) => obj.name);
       tree_alias = alias_data.map((obj: { alias: any }) => obj.alias);
       tree_dropdown.sort();
@@ -115,7 +120,19 @@ export class TreeComponent implements OnInit {
 
   nodeMatchesFilter(node: DynamicFlatNode): boolean {
     if (!this.searchString) return true;
-    return node.item.toLowerCase().includes(this.searchString.toLowerCase());
+  
+    const normalizedSearchString = this.normalizeString(this.searchString);
+    const normalizedItem = this.normalizeString(node.item); // name
+    const normalizedAlias = this.normalizeString(node.alias);
+  
+    return normalizedItem.includes(normalizedSearchString) || normalizedAlias.includes(normalizedSearchString);
+  }
+  
+  private normalizeString(value: string): string {
+    return value
+      .toLowerCase()
+      .normalize('NFD')               // Decompose accents
+      .replace(/[\u0300-\u036f]/g, ''); // Remove accents
   }
   
   nodeOrDescendantsMatch(node: DynamicFlatNode): boolean {
@@ -225,9 +242,12 @@ export class DynamicDatabase {
 
   initialData(): DynamicFlatNode[] {
     const rootLevelNodes = this.rootLevelNodesSource.value;
-    return rootLevelNodes.map(name =>
-      new DynamicFlatNode(name, 0, this.isExpandable(name)) // use actual expandability
-    );
+  
+    return rootLevelNodes.map(name => {
+      const match = alias_data.find(d => d.name === name);
+      const alias = match?.alias || '';
+      return new DynamicFlatNode(name, alias, 0, this.isExpandable(name));
+    });
   }
 
   getChildren(node: string): string[] | undefined {
@@ -353,10 +373,14 @@ export class DynamicDataSource implements DataSource<DynamicFlatNode> {
             return;
           }
   
-          const cardNode = new DynamicFlatNode(`__CARD__${node.item}`, node.level + 1, false, signal(false), true);
+          // Create the card node with empty alias string
+          const cardNode = new DynamicFlatNode(`__CARD__${node.item}`, '', node.level + 1, false, signal(false), true);
+  
           const childNodes = (children || []).map(name => {
+            const match = alias_data.find(d => d.name === name);
+            const alias = match?.alias || '';
             const isExpandable = !!this._database.isExpandable(name);
-            return new DynamicFlatNode(name, node.level + 1, isExpandable);
+            return new DynamicFlatNode(name, alias, node.level + 1, isExpandable);
           });
   
           this.data.splice(index + 1, 0, cardNode, ...childNodes);

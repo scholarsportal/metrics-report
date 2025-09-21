@@ -93,6 +93,25 @@ export class GraphDashboardComponent {
   user_labels: string[] = [];
   storage_usage: string[] = [];
 
+  subjectTranslationMap: { [key: string]: string } = {
+    'Social Sciences': 'SocialSciences',
+    'Earth and Environmental Sciences': 'EarthandEnvironmentalSciences',
+    'Other': 'Other',
+    'Medicine, Health and Life Sciences': 'MedicineHealthandLifeSciences',
+    'Arts and Humanities': 'ArtsandHumanities',
+    'Engineering': 'Engineering',
+    'Agricultural Sciences': 'AgriculturalSciences',
+    'Computer and Information Science': 'ComputerandInformationScience',
+    'Physics': 'Physics',
+    'Chemistry': 'Chemistry',
+    'Business and Management': 'BusinessandManagement',
+    'Law': 'Law',
+    'Mathematical Sciences': 'MathematicalSciences',
+    'Astronomy and Astrophysics': 'AstronomyandAstrophysics'
+  };
+
+  subjectTranslations: { [key: string]: string } = {};
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['data']) {
       this.processData(this.data);
@@ -148,7 +167,21 @@ export class GraphDashboardComponent {
         'Count',
         'Distribution',
         'FileType',
-        'SpecificFileType'
+        'SpecificFileType',
+        "SocialSciences",
+        "EarthandEnvironmentalSciences",
+        "Other",
+        "MedicineHealthandLifeSciences",
+        "ArtsandHumanities",
+        "Engineering",
+        "AgriculturalSciences",
+        "ComputerandInformationScience",
+        "Physics",
+        "Chemistry",
+        "BusinessandManagement",
+        "Law",
+        "MathematicalSciences",
+        "AstronomyandAstrophysics"
       ])
       .subscribe(
         ([
@@ -168,13 +201,46 @@ export class GraphDashboardComponent {
           Count,
           Distribution,
           FileType,
-          SpecificFileType
+          SpecificFileType,
+          SocialSciences,
+          EarthandEnvironmentalSciences,
+          Other,
+          MedicineHealthandLifeSciences,
+          ArtsandHumanities,
+          Engineering,
+          AgriculturalSciences,
+          ComputerandInformationScience,
+          Physics,
+          Chemistry,
+          BusinessandManagement,
+          Law,
+          MathematicalSciences,
+          AstronomyandAstrophysics
         ]) => {
+
+          const subjectTranslationMap: { [key: string]: string } = {
+            'Social Sciences': SocialSciences,
+            'Earth and Environmental Sciences': EarthandEnvironmentalSciences,
+            'Other': Other,
+            'Medicine, Health and Life Sciences': MedicineHealthandLifeSciences,
+            'Arts and Humanities': ArtsandHumanities,
+            'Engineering': Engineering,
+            'Agricultural Sciences': AgriculturalSciences,
+            'Computer and Information Science': ComputerandInformationScience,
+            'Physics': Physics,
+            'Chemistry': Chemistry,
+            'Business and Management': BusinessandManagement,
+            'Law': Law,
+            'Mathematical Sciences': MathematicalSciences,
+            'Astronomy and Astrophysics': AstronomyandAstrophysics
+          };
+
           // Assign translated labels here
           this.downloads_labels = [MonthlyFileDownloads, CumulativeFileDownloads];
           this.datasets_labels = [MonthlyDatasetsPublished, CumulativeDatasetsPublished];
           this.file_labels = [MonthlyFilePublished, CumulativeFilePublished];
-          this.user_labels = this.selectedCollection_Activate_Name === "(All)" ? [MonthlyUsersJoined, CumulativeUsersJoined]: [MonthlyAuthorsRegistered, CumulativeAuthorsRegistered];
+          //this.user_labels = this.selectedCollection_Activate_Name === "(All)" ? [MonthlyUsersJoined, CumulativeUsersJoined]: [MonthlyAuthorsRegistered, CumulativeAuthorsRegistered];
+          this.user_labels = [MonthlyUsersJoined, CumulativeUsersJoined];
           this.storage_usage = [MonthlyStorageUsed, CumulativeStorageUsed];
 
           // Bar chart labels

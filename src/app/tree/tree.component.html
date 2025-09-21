@@ -1,21 +1,38 @@
-<div style="position: relative; float: right; padding-bottom: 50px; display: inline;">
-  <input
-    style="margin-top: 10px; width: 155px;"
-    [(ngModel)]="searchString"
-    placeholder="{{ 'Filter' | transloco }} 🔎"
-  />
-  <br /><br />
-  <button
-    style="min-width: 1%; border-style: dotted; width: 160px; height: 20px; border-width: 1px;"
-    class="mat-small"
-    (click)="fullReportButton('(All)')"
-    mat-button
-  >
-    {{ 'All' | transloco }}
-  </button>
+<div
+  style="
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 30px;
+    position: relative;
+  "
+>
+  <!-- Row container for input and button -->
+  <div style="display: flex; justify-content: center; width: 100%; margin-top: 10px;">
+    <input
+      style="width: 190px;"
+      [(ngModel)]="searchString"
+      placeholder="{{ 'Filter' | transloco }} 🔎"
+    />
+
+    <button
+      style="
+        margin-left: 10px;
+        width: 120px;
+        height: 32px;
+        border-width: 1px;
+        border-style: solid;
+      "
+      class="mat-small"
+      (click)="fullReportButton('(All)')"
+      mat-button
+    >
+      {{ 'All' | transloco }}
+    </button>
+  </div>
 </div>
 
-<div style="padding-top: 20px;">
+<div style="padding-top: 10px;">
   <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
 
     <!-- Parent nodes -->

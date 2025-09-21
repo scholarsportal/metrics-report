@@ -156,9 +156,10 @@ export class ApiService {
   getAllMetrics(parentAlias: string = '', toMonth: string = ''): Observable<{ data: any[]; errorOccurredFlag: boolean }> {
     let errorOccurredFlag = false;
     const setError = () => errorOccurredFlag = true;
-  
+    
+    // Just  Users (for now)
     const authorOrUser$ = parentAlias
-      ? this.withErrorHandling(this.getUniqueAuthors(parentAlias), setError)
+      ? this.withErrorHandling(this.getMonthlyUsers(parentAlias), setError)
       : this.withErrorHandling(this.getMonthlyUsers(parentAlias), setError);
   
     return forkJoin([

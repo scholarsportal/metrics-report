@@ -17,12 +17,12 @@
       gap: 8px;                    
       text-align: left;" 
       matTooltip= "Export of previous metrics App" href="https://borealisdata.ca/metricsbackend/api/metrics/report"> <mat-icon> download </mat-icon> {{ 'Legacy' | transloco }} </a>
-      <span style="display: inline-block;" matTooltip="Export of Make Data Count data">
-      <button mat-button [disabled]="true" class="mat-small" style="border-width: 1px; font-size: 12px; border-style: solid; width: 122px; height: 25px; display: flex;  justify-content: flex-start;
+      <span style="display: inline-block;" matTooltip = "Expected for future release" [matTooltipDisabled]="false">
+      <button mat-button [disabled]="true" class="mat-small" style="border-width: 1px; font-size: 9px; border-style: solid; width: 122px; height: 25px; display: flex;  justify-content: flex-start;
       align-items: center;      
       gap: 8px;                    
       text-align: left;"> 
-      <mat-icon> download </mat-icon> DataCite </button> </span>
+      <mat-icon> download </mat-icon> MakeDataCount </button> </span>
     </div>
 
     <!-- 
@@ -94,7 +94,8 @@
         <mat-card-header>
           <mat-card-title-group>
             <mat-card-title>
-                {{ (selectedCollection_Activate_Name === '(All)' ? 'Users' : 'Authors') | transloco }}
+                <!-- {{ (selectedCollection_Activate_Name === '(All)' ? 'Users' : 'Authors') | transloco }} -->
+                {{ 'Users' | transloco }}
               </mat-card-title>
             <mat-card-subtitle> </mat-card-subtitle>
           </mat-card-title-group>
@@ -113,7 +114,7 @@
           </mat-card-title-group>
         </mat-card-header>
         <mat-card-content>
-          <h1 id="total_size_num"  style="text-align: right; color:black; font-size: 20px;"> <b>{{total_size_num}}</b> </h1>
+          <h1 id="total_size_num"  style="text-align: right; color:black; font-size: 20px;"> <b>{{total_size_num}} {{ 'GB' | transloco }} </b> </h1>
         </mat-card-content>
       </mat-card>
       </div>

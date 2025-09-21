@@ -6,11 +6,12 @@ import {MatButtonModule} from '@angular/material/button';
 import { TranslocoModule, TranslocoService } from '@ngneat/transloco';
 import { DownloadComponent } from '../download/download.component';
 import { InteractionService } from '../shared/interaction.service';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-value-export-dashboard',
   standalone: true,
-  imports: [CommonModule, MatCard, MatCardHeader, MatCardTitleGroup, MatCardTitle, MatCardSubtitle, MatCardContent, MatIcon, MatButtonModule, TranslocoModule],
+  imports: [CommonModule, MatCard, MatCardHeader, MatCardTitleGroup, MatCardTitle, MatCardSubtitle, MatCardContent, MatIcon, MatButtonModule, TranslocoModule, MatTooltipModule],
   templateUrl: './value-export-dashboard.component.html',
   styleUrl: './value-export-dashboard.component.css'
 })
@@ -96,7 +97,7 @@ export class ValueExportDashboardComponent {
       this.total_downloads_num = this.barChartDataDownloads_data[this.barChartDataDownloads_data.length - 1].toLocaleString();
       this.total_users_num = this.barChartDataUsers_data[this.barChartDataUsers_data.length - 1].toLocaleString();
       const total = this.barChartDataSize_data[this.barChartDataSize_data.length - 1] ?? 0;
-      this.total_size_num = total.toFixed(2).toLocaleString() + "GB"; 
+      this.total_size_num = total.toFixed(2).toLocaleString(); 
     }
 
     console.log(this.total_datasets_num, this.total_files_num, this.total_downloads_num, this.total_users_num, this.total_size_num)
