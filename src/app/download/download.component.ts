@@ -4,6 +4,7 @@ import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { InteractionService } from '../shared/interaction.service';
+import { TranslocoModule, TranslocoService } from '@ngneat/transloco';
 
 @Component({
   selector: 'app-download',
@@ -18,7 +19,7 @@ export class DownloadComponent implements OnInit {
   @Input() data: any; 
   @Input() name: string;
 
-  constructor(private interactionService: InteractionService) {}
+  constructor(private interactionService: InteractionService, private translocoService: TranslocoService) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['name']) {
@@ -275,7 +276,8 @@ export class DownloadComponent implements OnInit {
     const cardHeight = 15;
     const cardY = currentY;
   
-    const cardTitles = ['Collections', 'Datasets', 'Files', 'Downloads', 'Users', 'Storage'];
+    const cardTitles = [this.translocoService.translate('Collections'), this.translocoService.translate('Datasets'), this.translocoService.translate('Files'), this.translocoService.translate('Downloads'), 
+    this.translocoService.translate('Users'), this.translocoService.translate('Storage')];
     const cardCounts = [
       document.getElementById('total_collections_num')?.textContent ?? '',
       document.getElementById('total_datasets_num')?.textContent ?? '',
@@ -305,25 +307,25 @@ export class DownloadComponent implements OnInit {
     const rows = [
       {
         leftIndex: 0,
-        leftTitle: "Number of Downloads",
+        leftTitle: this.translocoService.translate('NumberofDownloads'),
         rightCanvas: allBarCanvases[4], // Storage Usage
-        rightTitle: "Storage Usage"
+        rightTitle: this.translocoService.translate('StorageUsage')
       },
       {
         leftIndex: 1,
-        leftTitle: "Number of Datasets",
+        leftTitle: this.translocoService.translate('NumberofDatasets'),
         rightCanvas: subjectCanvas,
-        rightTitle: "Subject Breakdown"
+        rightTitle: this.translocoService.translate('SubjectBreakdown')
       },
       {
         leftIndex: 2,
-        leftTitle: "Number of Files",
+        leftTitle: this.translocoService.translate('NumberofFiles'),
         rightCanvas: fileCanvas,
-        rightTitle: "File Type Breakdown"
+        rightTitle: this.translocoService.translate('FileContentBreakdown')
       },
       {
         leftIndex: 3,
-        leftTitle: "Number of Users",
+        leftTitle: this.translocoService.translate('Numberofusers'),
         rightCanvas: null,
         rightTitle: ""
       }

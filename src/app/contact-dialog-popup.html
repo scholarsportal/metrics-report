@@ -1,0 +1,74 @@
+<div style="height: 600px; width: 700px; padding: 20px 40px; overflow-y: auto; box-sizing: border-box; position: relative;">
+
+  <!-- Close Button -->
+  <button (click)="closeDialog()"
+          style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 24px; cursor: pointer;"
+          aria-label="Close dialog">
+    &#x2715;
+  </button>
+
+  <h1 mat-dialog-title style="font-size: 32px; font-weight: bold; margin-top: 40px;"> Contact - Feedback Form</h1>
+
+  <p style="margin-top: 20px;">
+    In order to ensure that the new Borealis Metrics Reporting application is fully functional and beneficial to the Canadian research data community,
+    we are asking Borealis member institutions to take a few moments to provide feedback about their experience using the new Borealis Metrics Report.
+  </p>
+
+  <p>
+    All responses are voluntary and can be anonymous. We ask you to provide your institution so we can adequately understand regional differences.
+    If you have specific questions to which you would like a direct response from the Borealis team, please include your email address so we can be in touch.
+  </p>
+
+  <p><strong>Thank you for taking the time to give us your feedback!</strong></p>
+
+  <form #feedbackForm="ngForm" (ngSubmit)="submitFeedback(feedbackForm)" style="margin-top: 30px;">
+
+    <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 20px;">
+      <mat-label>Email </mat-label>
+      <input matInput type="email" name="email" ngModel required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 20px;">
+      <mat-label>Affiliation (Institution)</mat-label>
+      <input matInput type="text" name="affiliation" ngModel>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 20px;">
+      <mat-label>Role</mat-label>
+      <mat-select name="role" ngModel required>
+        <mat-option value="Student">Student</mat-option>
+        <mat-option value="Researcher">Researcher</mat-option>
+        <mat-option value="Faculty">Faculty</mat-option>
+        <mat-option value="Librarian">Librarian</mat-option>
+        <mat-option value="Staff">Staff</mat-option>
+        <mat-option value="Other">Other</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 20px;">
+      <mat-label>What do you like about the new Borealis Metrics Report?</mat-label>
+      <textarea matInput name="likes" ngModel rows="4"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 20px;">
+      <mat-label>What do you dislike about the new Borealis Metrics Report?</mat-label>
+      <textarea matInput name="dislikes" ngModel rows="4"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 20px;">
+      <mat-label>Feedback about the interface (layout, labels, visuals, tabs, etc.)</mat-label>
+      <textarea matInput name="interfaceFeedback" ngModel rows="4"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 30px;">
+      <mat-label>Feedback about navigating the Metrics Report</mat-label>
+      <textarea matInput name="navigationFeedback" ngModel required rows="4"></textarea>
+    </mat-form-field>
+
+    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+      <button mat-button type="button" (click)="closeDialog()">Cancel</button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="!feedbackForm.valid">Submit</button>
+    </div>
+
+  </form>
+</div>

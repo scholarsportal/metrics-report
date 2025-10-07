@@ -10,6 +10,15 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideHttpClient } from '@angular/common/http';
 import { TranslocoHttpLoader } from './transloco-loader';
 import { provideTransloco } from '@ngneat/transloco';
+import 'moment/locale/fr';
+
+
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
+import localeEn from '@angular/common/locales/en';
+
+registerLocaleData(localeFr);
+registerLocaleData(localeEn);
 
 bootstrapApplication(AppComponent, {
   providers: [provideCharts(withDefaultRegisterables()), provideAnimationsAsync(), provideHttpClient(), provideTransloco({

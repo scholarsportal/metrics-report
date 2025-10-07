@@ -3,20 +3,20 @@ import { RouterOutlet, RouterModule } from '@angular/router';
 import {JsonPipe, AsyncPipe, CommonModule} from '@angular/common';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
-import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, FormBuilder} from '@angular/forms';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, FormBuilder, NgForm} from '@angular/forms';
 import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
 import {Observable} from 'rxjs';
 import {map, startWith, take} from 'rxjs/operators';
 import {MatInputModule} from '@angular/material/input';
-import {MatSelectChange, MatSelectModule} from '@angular/material/select';
-import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSelect, MatSelectChange, MatSelectModule} from '@angular/material/select';
+import {MatFormFieldControl, MatFormFieldModule} from '@angular/material/form-field';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {LineGraphComponent} from './line-graph/line-graph.component';
 import {HorizontalBarGraphComponent } from './horizontal-bar-graph/horizontal-bar-graph.component';
 import { PieGraphComponent } from './pie-graph/pie-graph.component';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {MatButtonModule} from '@angular/material/button';
-import {provideNativeDateAdapter} from '@angular/material/core';
+import {MatOption, provideNativeDateAdapter} from '@angular/material/core';
 import {MatIconModule} from '@angular/material/icon';
 import {MatSort, Sort, MatSortModule} from '@angular/material/sort';
 import {LiveAnnouncer} from '@angular/cdk/a11y';
@@ -118,7 +118,8 @@ interface SearchGroup {
     MatListModule,
     GraphDashboardComponent,
     ValueExportDashboardComponent,
-    MatProgressBar
+    MatProgressBar,
+    FormsModule
 ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.component.html',
@@ -198,31 +199,32 @@ export class AppComponent implements AfterViewInit, OnInit{
     return moment(end).isBefore(moment(start)) && this.start_on;
   }
 
-  dateStringFormat(): String{
-
-    var monthNames = ["January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"];
-
-    var dateString = ""; 
-
-  if (this.start_on){
-    const ctrlValue_s = this.date_start.value ?? moment();
-    const year_s = ctrlValue_s.format('YYYY');
-    const month_s = ctrlValue_s.format('MM');
-    console.log(ctrlValue_s.format('YYYY'), ctrlValue_s.format('MM')) 
-    const str_s = monthNames[parseInt(month_s)-1] + " " + year_s
-    dateString = str_s; 
-  }
-
-  const ctrlValue_e = this.date_end.value ?? moment();
-  const year_e = ctrlValue_e.format('YYYY');
-  const month_e = ctrlValue_e.format('MM');
-  console.log(ctrlValue_e.format('YYYY'), ctrlValue_e.format('MM')) 
-  const str_e = monthNames[parseInt(month_e)-1] + " " + year_e
+  dateStringFormat(): string {
+    // Prevent crash if translations aren't loaded yet
+    if (!this.monthTranslations || Object.keys(this.monthTranslations).length === 0) {
+      return '';
+    }
   
-  return(dateString = dateString + " - " + str_e);
-
+    const ctrlValue_e = this.date_end.value ?? moment();
+    const year_e = ctrlValue_e.format('YYYY');
+    const month_e = parseInt(ctrlValue_e.format('MM'));
+    const endMonthName = this.monthTranslations[month_e.toString()] || '';
+  
+    const end_date = `${endMonthName} ${year_e}`;
+  
+    if (this.start_on) {
+      const ctrlValue_s = this.date_start.value ?? moment();
+      const year_s = ctrlValue_s.format('YYYY');
+      const month_s = parseInt(ctrlValue_s.format('MM'));
+      const startMonthName = this.monthTranslations[month_s.toString()] || '';
+  
+      const start_date = `${startMonthName} ${year_s}`;
+      return `${start_date} - ${end_date}`;
+    }
+  
+    return `- ${end_date}`;
   }
+  
 
   @ViewChild('input') input: ElementRef<HTMLInputElement>;
   myControl = new FormControl('');
@@ -380,18 +382,6 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.months = newItem["DataverseTabData"]['months'];
     this.creation_date = newItem["DataverseTabData"]['creation_date'];
     this.error_flag = newItem["DataverseTabData"]['error_flag'];
-    
-    this.barChartDataDownloads_data = newItem["DataverseTabData"]['downloads_graph_data'].reverse();
-    this.barChartDataDatasets_data = newItem["DataverseTabData"]['datasets_graph_data'].reverse();
-    this.barChartDataFiles_data = newItem["DataverseTabData"]['files_graph_data'].reverse();
-    this.barChartDataUsers_data = newItem["DataverseTabData"]['users_graph_data'].reverse();
-    this.barChartDataSize_data = newItem["DataverseTabData"]['size_graph_data'].reverse();
-
-    this.barChartDataDownloadsAgg_data = newItem["DataverseTabData"]['downloads_graph_agg_data'].reverse()
-    this.barChartDataDatasetsAgg_data = newItem["DataverseTabData"]['datasets_graph_agg_data'].reverse()
-    this.barChartDataFiles_Aggdata = newItem["DataverseTabData"]['files_graph_agg_data'].reverse()
-    this.barChartDataUsers_Aggdata = newItem["DataverseTabData"]['users_graph_agg_data'].reverse()
-    this.barChartDataSize_Aggdata = newItem["DataverseTabData"]['size_graph_agg_data'].reverse()
 
     this.pieChartLabelsSubject = newItem["DataverseTabData"]['subject_label_data'];
     this.pieChartDataSubject_data = newItem["DataverseTabData"]['subject_data'];
@@ -436,32 +426,12 @@ export class AppComponent implements AfterViewInit, OnInit{
     type TranslationsMap = { [key: string]: string };
 
     this.translocoService.selectTranslateObject([
-      'MonthlyFileDownloads',
-      'MonthlyDatasetsPublished',
-      'MonthlyFilePublished',
-      'MonthlyUsersJoined',
-      'MonthlyStorageUsed',
-      'CumulativeFileDownloads',
-      'CumulativeDatasetsPublished',
-      'CumulativeFilePublished',
-      'CumulativeUsersJoined',
-      'CumulativeStorageUsed',
       "Subject",
       "Count",
       "Distribution",
       "FileType",
       "SpecificFileType"
     ]).subscribe(([
-      MonthlyFileDownloads,
-      MonthlyDatasetsPublished,
-      MonthlyFilePublished,
-      MonthlyUsersJoined,
-      MonthlyStorageUsed,
-      CumulativeFileDownloads,
-      CumulativeDatasetsPublished,
-      CumulativeFilePublished,
-      CumulativeUsersJoined,
-      CumulativeStorageUsed,
       Subject,
       Count,
       Distribution,
@@ -470,7 +440,7 @@ export class AppComponent implements AfterViewInit, OnInit{
     ]) => {
       
       // Your labels array (e.g. months reversed)
-      const barChartLabels = this.months.reverse();
+      const barChartLabels = this.months
 
       // Your bar chart data with labels + datasets
       this.barChartDataDownloads = {
@@ -617,7 +587,15 @@ export class AppComponent implements AfterViewInit, OnInit{
     
   }
 
+  monthTranslations: { [key: string]: string } = {};
+
   ngOnInit(): void {
+
+    this.translocoService.selectTranslateObject('months').subscribe(translations => {
+      this.monthTranslations = translations;
+      this.date_String = this.dateStringFormat(); 
+    });
+
     this.searchGroupOptions = this.searchForm.get('searchGroup')!.valueChanges.pipe(
       startWith(''),
       map(value => this._filterGroup(value || '')),
@@ -765,7 +743,16 @@ export class AppComponent implements AfterViewInit, OnInit{
   }
 
   openTOCDialog() {
-    this.dialog.open(TOCDialog);
+    const lang = this.getLanguage();
+  if (lang === 'fr') {
+    this.dialog.open(TOCDialogFr);
+  } else {
+    this.dialog.open(TOCDialogEn);
+  }
+  }
+
+  openContactDialog(){
+    this.dialog.open(ContactDialog);
   }
 
   openFAQDialog() {
@@ -797,15 +784,56 @@ export class AboutDialog {
 }
 
 @Component({
-  selector: 'toc-dialog-popup',
-  templateUrl: 'toc-dialog-popup.html',
+  selector: 'toc-dialog-popup-en',
+  templateUrl: 'toc-dialog-popup-en.html',
 })
-
-export class TOCDialog {
-  constructor(private dialogRef: MatDialogRef<TOCDialog>) {}
+export class TOCDialogEn {
+  constructor(private dialogRef: MatDialogRef<TOCDialogEn>) {}
 
   closeDialog(): void {
     this.dialogRef.close();
+  }
+}
+
+
+@Component({
+  selector: 'toc-dialog-popup-fr',
+  templateUrl: 'toc-dialog-popup-fr.html',
+})
+export class TOCDialogFr {
+  constructor(private dialogRef: MatDialogRef<TOCDialogFr>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+}
+
+@Component({
+  selector: 'contact-dialog-popup',
+  standalone: true,
+  templateUrl: 'contact-dialog-popup.html',
+  imports: [
+    FormsModule,          
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatSelectModule
+  ]
+})
+export class ContactDialog {
+  constructor(private dialogRef: MatDialogRef<ContactDialog>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+
+  submitFeedback(form: NgForm): void {
+    if (form.valid) {
+      const feedbackData = form.value;
+      console.log('Feedback submitted:', feedbackData);
+      // TODO: Send to backend or service
+      this.dialogRef.close(feedbackData);
+    }
   }
 }
 

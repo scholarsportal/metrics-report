@@ -282,8 +282,20 @@ export class PostsComponent {
   
         this.fileContentLabels = Object.keys(this.fileContentHash);
         this.fileContentData = Object.values(this.fileContentHash);
+
+        this.monthlyDownloads.reverse();
+        this.monthlyDatasets.reverse();
+        this.monthlyFiles.reverse();
+        this.monthlyUsers.reverse();
+        this.monthlySize.reverse();
+        this.monthlyAggDownloads.reverse();
+        this.monthlyAggDatasets.reverse();
+        this.monthlyAggFiles.reverse();
+        this.monthlyAggUsers.reverse();
+        this.monthlyAggSize.reverse();
+        this.months.reverse();
   
-        this.months.pop();
+        this.months.shift();
         this.sendData();
       },
       (error) => {
@@ -372,6 +384,7 @@ export class PostsComponent {
       
       console.log("months one by one", dateStr, i)
       this.months.push(dateStr);
+      console.log(this.months)
   
       // If start_on is active and we've hit the startDate, flag it
       if (this.start_on && dateStr === this.startDate) {

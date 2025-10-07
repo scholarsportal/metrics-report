@@ -93,24 +93,9 @@ export class GraphDashboardComponent {
   user_labels: string[] = [];
   storage_usage: string[] = [];
 
-  subjectTranslationMap: { [key: string]: string } = {
-    'Social Sciences': 'SocialSciences',
-    'Earth and Environmental Sciences': 'EarthandEnvironmentalSciences',
-    'Other': 'Other',
-    'Medicine, Health and Life Sciences': 'MedicineHealthandLifeSciences',
-    'Arts and Humanities': 'ArtsandHumanities',
-    'Engineering': 'Engineering',
-    'Agricultural Sciences': 'AgriculturalSciences',
-    'Computer and Information Science': 'ComputerandInformationScience',
-    'Physics': 'Physics',
-    'Chemistry': 'Chemistry',
-    'Business and Management': 'BusinessandManagement',
-    'Law': 'Law',
-    'Mathematical Sciences': 'MathematicalSciences',
-    'Astronomy and Astrophysics': 'AstronomyandAstrophysics'
-  };
-
   subjectTranslations: { [key: string]: string } = {};
+
+  fileTranslations: { [key: string]: string } = {};
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['data']) {
@@ -181,7 +166,17 @@ export class GraphDashboardComponent {
         "BusinessandManagement",
         "Law",
         "MathematicalSciences",
-        "AstronomyandAstrophysics"
+        "AstronomyandAstrophysics",
+        "image",
+        "text",
+        "application",
+        "video",
+        "audio",
+        "model",
+        "type",
+        "chemical",
+        "biosequence",
+        "multipart"
       ])
       .subscribe(
         ([
@@ -215,7 +210,17 @@ export class GraphDashboardComponent {
           BusinessandManagement,
           Law,
           MathematicalSciences,
-          AstronomyandAstrophysics
+          AstronomyandAstrophysics,
+          image,
+          text,
+          application,
+          video,
+          audio,
+          model,
+          type,
+          chemical,
+          biosequence,
+          multipart
         ]) => {
 
           const subjectTranslationMap: { [key: string]: string } = {
@@ -234,6 +239,41 @@ export class GraphDashboardComponent {
             'Mathematical Sciences': MathematicalSciences,
             'Astronomy and Astrophysics': AstronomyandAstrophysics
           };
+
+          const fileTranslationMap: { [key: string]: string } = {
+            "image": image,
+            "text": text,
+            "application": application,
+            "video": video,
+            "audio": audio,
+            "model": model,
+            "type": type,
+            "chemical": chemical,
+            "biosequence": biosequence,
+            "multipart": multipart,
+          };
+
+          this.subject_table = data['subject_full_data'].map((item: any) => {
+            return {
+              ...item,
+              subject: subjectTranslationMap[item.subject] || item.subject
+            };
+          });
+
+          this.pieChartLabelsSubject = data['subject_label_data'].map((label: string) => {
+            return subjectTranslationMap[label] || label;
+          });
+          
+          this.file_content_table = data['file_content_full_data'].map((item: any) => {
+            return {
+              ...item,
+              type: fileTranslationMap[item.type] || item.type
+            };
+          });
+
+          this.pieChartLabelsFile = data['file_content_label_data'].map((label: string) => {
+            return fileTranslationMap[label] || label;
+          });
 
           // Assign translated labels here
           this.downloads_labels = [MonthlyFileDownloads, CumulativeFileDownloads];

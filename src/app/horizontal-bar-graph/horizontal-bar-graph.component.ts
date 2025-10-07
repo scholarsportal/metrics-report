@@ -5,7 +5,9 @@ import {
   ChartConfiguration,
   ChartData,
   ChartType,
+  TooltipItem
 } from 'chart.js';
+import { TranslocoService } from '@ngneat/transloco';
 
 @Component({
   selector: 'app-horizontal-bar-graph',
@@ -19,6 +21,17 @@ export class HorizontalBarGraphComponent implements OnChanges {
 
   barChartData_datasets: ChartData<'bar'>['datasets'] = [];
   barChartData_labels: ChartData<'bar'>['labels'] = [];
+
+  constructor(private translocoService: TranslocoService) {}
+
+  // 👇 Formatter that depends on active language
+  formatNumber(value: number | string): string {
+    const lang = this.translocoService.getActiveLang();
+
+    return Number(value).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US', {
+      useGrouping: true
+    });
+  }
 
   public barChartOptions: ChartConfiguration['options'] = {
     responsive: true,
@@ -45,16 +58,29 @@ export class HorizontalBarGraphComponent implements OnChanges {
             });
           }
         }
+      },
+      tooltip: {
+        callbacks: {
+          label: (context: TooltipItem<'bar'>) => {
+            const label = context.dataset.label || '';
+            const value = context.parsed.y !== null ? this.formatNumber(context.parsed.y) : '';
+            return `${label}: ${value}`;
+          }
+        }
       }
     },
     scales: {
-      // We use this empty structure as a placeholder for dynamic theming.
-      y: {
-        stacked: false,
-      },
       x: {
         stacked: true,
       },
+      y: {
+        stacked: false,
+        ticks: {
+          callback: (value) => {
+            return this.formatNumber(value);
+          }
+        }
+      }
     }
   };
 

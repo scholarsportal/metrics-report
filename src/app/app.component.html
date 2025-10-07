@@ -13,7 +13,9 @@
       <div  style="clear:both;">
         <button (click)="openAboutDialog()" style="min-width: 1%;" class="mat-small" mat-button> {{ 'About' | transloco }} </button>
         | 
-        <button (click)="openTOCDialog()" style="min-width: 1%;" class="mat-small" mat-button> {{ 'TermsofConditions' | transloco }} </button>
+        <button (click)="openTOCDialog()" style="min-width: 1%;" class="mat-small" mat-button> {{ 'TermsofUse' | transloco }} </button>
+        |
+        <button (click)="openContactDialog()" style="min-width: 1%;" class="mat-small" mat-button> {{ 'Contact' | transloco }} </button>
         |
         <button (click)="openFAQDialog()" style="min-width: 1%;" class="mat-small" mat-button> {{ 'FAQ' | transloco }} </button>
       </div>
@@ -76,7 +78,7 @@
             <mat-card class="example-card hide-scrollbar" appearance="outlined" style="min-width: 350px; max-width: 350px; margin-bottom: 10px; margin-left: 5px; margin-top: 10px; max-height: 500px; overflow-y: auto; font-size: 12px;">
               <mat-card-header>
                 <mat-card-title-group>
-                  <mat-card-title> Date Range </mat-card-title>
+                  <mat-card-title> {{ 'DateRange' | transloco }} </mat-card-title>
                   <mat-card-subtitle> </mat-card-subtitle>
                 </mat-card-title-group>
               </mat-card-header>

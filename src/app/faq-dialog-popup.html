@@ -1,66 +1,68 @@
 <div style="height: 600px; width: 700px; padding: 20px 40px; overflow-y: auto; box-sizing: border-box;">
 
-    <!-- Close Button -->
-    <button class="close-button"
-            (click)="closeDialog()"
-            style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 24px; cursor: pointer;"
-            aria-label="Close dialog">
-      &#x2715;
-    </button>
+  <!-- Close Button -->
+  <button class="close-button"
+          (click)="closeDialog()"
+          style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 24px; cursor: pointer;"
+          aria-label="Close dialog">
+    &#x2715;
+  </button>
 
-    <h1 style="font-size: 32px; font-weight: bold; margin-top: 40px;">FAQ</h1>
-  
-    <h3><strong>Where is this data collected from?</strong></h3>
-    <p>
-      Data is collected through the Dataverse Metrics API. For more information, visit:
-      <a href="https://guides.dataverse.org/en/latest/api/metrics.html" target="_blank">
-        guides.dataverse.org/en/latest/api/metrics.html
-      </a>
-    </p>
-  
-    <h3><strong>Who created this tool?</strong></h3>
-    <p>
-      The Dataverse Team at the University of Toronto Libraries.
-    </p>
-  
-    <h3><strong>What is Borealis (All)?</strong></h3>
-    <p>
-      Borealis (All) refers to the entirety of Borealis — meaning the data represents all dataverses combined.
-    </p>
-  
-    <h3><strong>Why isn’t this specific dataverse included?</strong></h3>
-    <p>
-      It may take time for a dataverse to be reflected in the source data. Also, dataverses must be published to be included.
-    </p>
-  
-    <h3><strong>Why isn’t my dataverse displayed in French?</strong></h3>
-    <p>
-      Dataverses are displayed in their original, published language.
-    </p>
-  
-    <h3><strong>What is Legacy?</strong></h3>
-    <p>
-      Legacy is a structured data export that was previously hosted on the older version of the Dataverse Metrics Page.
-    </p>
-  
-    <h3><strong>What is DataCite / MakeDataCount?</strong></h3>
-    <p>
-      MakeDataCount is a third-party, community-led project that tracks metrics such as downloads, views, and citations for files, datasets, and dataverses within Borealis.
-    </p>
-  
-    <h3><strong>It’s the first of the month — why isn’t this month included?</strong></h3>
-    <p>
-      It can take a few business days (typically 3–5) for the current month’s data to appear in the metrics.
-    </p>
+  <h1 style="font-size: 32px; font-weight: bold; margin-top: 40px;">FAQ</h1>
 
-    <h3><strong>Why does the Make Data Count data differ from the standard data? </strong></h3>
-    <p>
-      These metrics may differ from the data provided by Dataverse metrics, so expect slight discrepancies.
-    </p>
-  
-    <h3><strong>Who can I contact for other questions, improvements, discovered bugs and feature requests?</strong></h3>
-    <p>
-      Please reach out to the Dataverse Team at the University of Toronto Libraries.
-    </p>
-  </div>
-  
+  <h3><strong>Where is this data collected from?</strong></h3>
+  <p>
+    Data is collected through the Dataverse Metrics API. For more information, visit:
+    <a href="https://guides.dataverse.org/en/latest/api/metrics.html" target="_blank">
+      guides.dataverse.org/en/latest/api/metrics.html
+    </a>
+  </p>
+
+  <h3><strong>What is “Borealis (All)”? </strong></h3>
+  <p>
+    “Borealis (All)” refers to the entirety of Borealis, meaning the data represents all data and collections in Borealis.
+  </p>
+
+  <h3><strong>Why isn’t X specific dataverse included in the report?</strong></h3>
+  <p>
+    It may take time for a new collection to be reflected in the source data. Additionally, collections must be published, not in draft mode, to be included.
+  </p>
+
+  <h3><strong>Why isn’t my collection displayed in French/English?</strong></h3>
+  <p>
+    Collections are displayed in their original, published language. While the interface will update to match the language selected by the user, collection data will not.
+  </p>
+
+  <h3><strong>What does “Legacy” mean for data download?</strong></h3>
+  <p>
+    The Legacy download option provides a structured data export that was hosted on the previous version of the Borealis Metrics Report. Data in this export may be formatted differently from other available export formats such as Make Data Count.
+  </p>
+
+  <h3><strong>What is Make Data Count?</strong></h3>
+  <p>
+    Make Data Count is a third-party, community-led initiative that promotes the development of open data metrics to meaningfully assess data usage and impact. The intention is to establish standardized metrics for usage data such as views, downloads and citations that can be applied broadly across datasets and repository platforms to encourage collaboration and data sharing practices.
+  </p>
+  <p>
+    Make Data Count is part of a larger initiative through the Research Data Alliance’s Data Usage Metrics Working Group, and is operated in collaboration with DataCite. Make Data Count is unique in its focus on community-driven standards and its dedication to open metrics for widespread collaboration and adoption across the research data landscape.
+  </p>
+  <p>
+    Make Data Count developed the COUNTER Code of Practice for Research Data, the standard used to track views and downloads in the Borealis Metrics Report. The Borealis Metrics Report also uses the DataCite Citation Corpus, co-developed by DataCite and Make Data Count, to provide citation metrics for data in Borealis.
+  </p>
+
+  <h3><strong>It’s the first day of the month — why isn’t data from this month included in the report?</strong></h3>
+  <p>
+    It can take a few business days (typically 3–5) for the current month’s data to appear in the metrics.
+  </p>
+
+  <h3><strong>Why can’t I access metrics specific to my institution for the Odesi collection?</strong></h3>
+  <p>
+    Following the Odesi redevelopment and migration from Nesstar to Borealis in 2023, the majority of data in Odesi is now open. As part of this transition, we no longer collect or provide institution-level metrics.
+  </p>
+
+  <h3><strong>Who can I contact for other questions, improvements, discovered bugs and feature requests?</strong></h3>
+  <p>
+    Please reach out via email to <a href="mailto:info&#64;borealisdata.ca">info&#64;borealisdata.ca</a> using the contact tab
+    and a member of our team will be happy to help
+  </p>
+
+</div>
