@@ -48,110 +48,110 @@ export class DownloadComponent implements OnInit {
     const months = this.data['months'];
     console.log(this.data);
 
-    var downloads_graph_data_rev: Array<number> = this.data['downloads_graph_data'].reverse();
-    var datasets_graph_data_rev: Array<number> = this.data['datasets_graph_data'].reverse();
-    var files_graph_data_rev: Array<number> = this.data['files_graph_data'].reverse();
-    var users_graph_data_rev: Array<number> = this.data['users_graph_data'].reverse();
-    var size_graph_data_rev: Array<number> = this.data['size_graph_data'].reverse();
+    var downloads_graph_data_rev: Array<number> = this.data['downloads_graph_data']
+    var datasets_graph_data_rev: Array<number> = this.data['datasets_graph_data']
+    var files_graph_data_rev: Array<number> = this.data['files_graph_data']
+    var users_graph_data_rev: Array<number> = this.data['users_graph_data']
+    var size_graph_data_rev: Array<number> = this.data['size_graph_data']
 
     // downloads
     
-    const worksheet_readme = workbook.addWorksheet('Read Me');
-    worksheet_readme.addRow(['FAQ']);
+    const worksheet_readme = workbook.addWorksheet(this.translocoService.translate('ReadMe'));
+    worksheet_readme.addRow([this.translocoService.translate('FAQ')]);
     worksheet_readme.addRow([]);
-    worksheet_readme.addRow(['Tab', 'Field Name', 'Definition']);
+    worksheet_readme.addRow([this.translocoService.translate('Tab'), this.translocoService.translate('FieldName'), this.translocoService.translate('Definition')]);
 
-    worksheet_readme.addRow(['Downloads', "", ""]);
-    worksheet_readme.addRow(["",'Date',""]);
-    worksheet_readme.addRow(["", 'Count', 'Total amount of downloads in the given month']);
-    worksheet_readme.addRow(["", 'Cumul Count', 'Total cumulative downloads in the given month']);
+    worksheet_readme.addRow([this.translocoService.translate('Downloads'), "", ""]);
+    worksheet_readme.addRow(["",this.translocoService.translate('Date'),""]);
+    worksheet_readme.addRow(["", this.translocoService.translate('Count'), this.translocoService.translate('DownloadsCountDef')]);
+    worksheet_readme.addRow(["", this.translocoService.translate('CumulCount'), this.translocoService.translate('DownloadsCumulCountDef')]);
 
-    worksheet_readme.addRow(['Datasets', "", ""]);
-    worksheet_readme.addRow(["",'Date',""]);
-    worksheet_readme.addRow(["", 'Count', 'Total amount of realesed datasets in the given month']);
-    worksheet_readme.addRow(["", 'Cumul Count', 'Total cumulative realesed datasets in the given month']);
+    worksheet_readme.addRow([this.translocoService.translate('Datasets'), "", ""]);
+    worksheet_readme.addRow(["",this.translocoService.translate('Date'),""]);
+    worksheet_readme.addRow(["", this.translocoService.translate('Count'), this.translocoService.translate('DatasetsCountDef')]);
+    worksheet_readme.addRow(["", this.translocoService.translate('CumulCount'), this.translocoService.translate('DatasetsCountDef')]);
 
-    worksheet_readme.addRow(['Files', "", ""]);
-    worksheet_readme.addRow(["",'Date',""]);
-    worksheet_readme.addRow(["", 'Count', 'Total amount of files in realesed datasets in the given month']);
-    worksheet_readme.addRow(["", 'Cumul Count', 'Total cumulative files in realesed datasets in the given month']);
+    worksheet_readme.addRow([this.translocoService.translate('Files'), "", ""]);
+    worksheet_readme.addRow(["",this.translocoService.translate('Date'),""]);
+    worksheet_readme.addRow(["", this.translocoService.translate('Count'), this.translocoService.translate('FilesCountDef')]);
+    worksheet_readme.addRow(["", this.translocoService.translate('CumulCount'), this.translocoService.translate('FilesCountDef')]);
 
-    worksheet_readme.addRow(['Users', "", ""]);
-    worksheet_readme.addRow(["",'Date',""]);
-    worksheet_readme.addRow(["", 'Count', 'Total count of users who opened an account in the given month']);
-    worksheet_readme.addRow(["", 'Cumul Count', 'Total cumulative count of users in the given month']);
+    worksheet_readme.addRow([this.translocoService.translate('Users'), "", ""]);
+    worksheet_readme.addRow(["",this.translocoService.translate('Date'),""]);
+    worksheet_readme.addRow(["", this.translocoService.translate('Count'), this.translocoService.translate('UsersCountDef')]);
+    worksheet_readme.addRow(["", this.translocoService.translate('CumulCount'), this.translocoService.translate('UsersCumulCountDef')]);
 
-    worksheet_readme.addRow(['Storage', "", ""]);
-    worksheet_readme.addRow(["",'Date',""]);
-    worksheet_readme.addRow(["", 'Count', 'Total approximate GB of storage allocated in the given month']);
-    worksheet_readme.addRow(["", 'Percent', 'Total cumulative approximate GB of storage allocated in the given month']);
+    worksheet_readme.addRow([this.translocoService.translate('Storage'), "", ""]);
+    worksheet_readme.addRow(["",this.translocoService.translate('Date'),""]);
+    worksheet_readme.addRow(["", this.translocoService.translate('Count'), this.translocoService.translate('StorageCountDef')]);
+    worksheet_readme.addRow(["", this.translocoService.translate('Percent'), this.translocoService.translate('StorageCumulCountDef')]);
 
-    worksheet_readme.addRow(['Subject Breakdown', "", ""]);
-    worksheet_readme.addRow(["",'Subject',"Subect of Dataset"]);
-    worksheet_readme.addRow(["", 'Count', 'Total count of datasets with assigned subject']);
-    worksheet_readme.addRow(["", 'Percent', 'Percent of datasets with assigned subject over all other subjects']);
+    worksheet_readme.addRow([this.translocoService.translate('SubjectBreakdown'), "", ""]);
+    worksheet_readme.addRow(["",this.translocoService.translate('Subject'),this.translocoService.translate('SubjectDef')]);
+    worksheet_readme.addRow(["", this.translocoService.translate('Count'), this.translocoService.translate('SubjectCountDef')]);
+    worksheet_readme.addRow(["", this.translocoService.translate('Percent'), this.translocoService.translate('SubjectPercentDef')]);
 
-    worksheet_readme.addRow(['File Breakdown', "", ""]);
-    worksheet_readme.addRow(["",'Type',"type of file"]);
-    worksheet_readme.addRow(["",'Content Type',"specfic format of file"]);
-    worksheet_readme.addRow(["", 'Count', 'Total count of datasets with assigned subject']);
-    worksheet_readme.addRow(["", 'Percent', 'Percent of datasets with file type over all other file types']);
+    worksheet_readme.addRow([this.translocoService.translate('FileContentBreakdown'), "", ""]);
+    worksheet_readme.addRow(["",this.translocoService.translate('Type'),this.translocoService.translate('FileTypeDef')]);
+    worksheet_readme.addRow(["",this.translocoService.translate('SpecificFileType'),this.translocoService.translate('FileSpecficTypeDef')]);
+    worksheet_readme.addRow(["", this.translocoService.translate('Count'), this.translocoService.translate('FileCountDef')]);
+    worksheet_readme.addRow(["", this.translocoService.translate('Percent'), this.translocoService.translate('FilePercentDef')]);
 
-    worksheet_readme.getColumn(1).width = 20;
-    worksheet_readme.getColumn(2).width = 15;
-    worksheet_readme.getColumn(3).width = 60;
+    worksheet_readme.getColumn(1).width = 30;
+    worksheet_readme.getColumn(2).width = 25;
+    worksheet_readme.getColumn(3).width = 100;
     
-    const worksheet_downloads = workbook.addWorksheet('Downloads');  
-    const headers_downloads = Object.keys(['date', 'count', 'cumul count']);
-    worksheet_downloads.addRow(['date', 'count', 'cumul count']);
+    const worksheet_downloads = workbook.addWorksheet(this.translocoService.translate('Downloads'));  
+    const headers_downloads = Object.keys([this.translocoService.translate('Date'), this.translocoService.translate('Count'), this.translocoService.translate('CumulCount')]);
+    worksheet_downloads.addRow([this.translocoService.translate('Date'), this.translocoService.translate('Count'), this.translocoService.translate('CumulCount')]);
 
     worksheet_downloads.getColumn(1).width = 15;
     worksheet_downloads.getColumn(2).width = 15;
     worksheet_downloads.getColumn(3).width = 15;
 
-    const worksheet_datasets = workbook.addWorksheet('Datasets');  
-    const headers_datasets = Object.keys(['date', 'count', 'cumul count']);
-    worksheet_datasets.addRow(['date', 'count', 'cumul count']);
+    const worksheet_datasets = workbook.addWorksheet(this.translocoService.translate('Datasets'));  
+    const headers_datasets = Object.keys([this.translocoService.translate('Date'), this.translocoService.translate('Count'), this.translocoService.translate('CumulCount')]);
+    worksheet_datasets.addRow([this.translocoService.translate('Date'), this.translocoService.translate('Count'), this.translocoService.translate('CumulCount')]);
 
     worksheet_datasets.getColumn(1).width = 15;
     worksheet_datasets.getColumn(2).width = 15;
     worksheet_datasets.getColumn(3).width = 15;
 
-    const worksheet_files = workbook.addWorksheet('Files');  
-    const headers_files = Object.keys(['date', 'count', 'cumul count']);
-    worksheet_files.addRow(['date', 'count', 'cumul count']);
+    const worksheet_files = workbook.addWorksheet(this.translocoService.translate('Files'));  
+    const headers_files = Object.keys([this.translocoService.translate('Date'), this.translocoService.translate('Count'), this.translocoService.translate('CumulCount')]);
+    worksheet_files.addRow([this.translocoService.translate('Date'), this.translocoService.translate('Count'), this.translocoService.translate('CumulCount')]);
 
     worksheet_files.getColumn(1).width = 15;
     worksheet_files.getColumn(2).width = 15;
     worksheet_files.getColumn(3).width = 15;
 
-    const worksheet_users = workbook.addWorksheet('Users');  
-    const headers_users = Object.keys(['date', 'count', 'cumul count']);
-    worksheet_users.addRow(['date', 'count', 'cumul count']);
+    const worksheet_users = workbook.addWorksheet(this.translocoService.translate('Users'));  
+    const headers_users = Object.keys([this.translocoService.translate('Date'), this.translocoService.translate('Count'), this.translocoService.translate('CumulCount')]);
+    worksheet_users.addRow([this.translocoService.translate('Date'), this.translocoService.translate('Count'), this.translocoService.translate('CumulCount')]);
 
     worksheet_users.getColumn(1).width = 15;
     worksheet_users.getColumn(2).width = 15;
     worksheet_users.getColumn(3).width = 15;
 
-    const worksheet_storage = workbook.addWorksheet('Storage');  
-    const headers_storage = Object.keys(['date', 'count', 'cumul count']);
-    worksheet_storage.addRow(['date', 'count', 'cumul count']);
+    const worksheet_storage = workbook.addWorksheet(this.translocoService.translate('Storage'));  
+    const headers_storage = Object.keys([this.translocoService.translate('Date'), this.translocoService.translate('Count'), this.translocoService.translate('CumulCount')]);
+    worksheet_storage.addRow([this.translocoService.translate('Date'), this.translocoService.translate('Count'), this.translocoService.translate('CumulCount')]);
 
     worksheet_storage.getColumn(1).width = 15;
     worksheet_storage.getColumn(2).width = 15;
     worksheet_storage.getColumn(3).width = 15;
 
-    const worksheet_subject = workbook.addWorksheet('Subject Breakdown');  
-    const headers_subject = Object.keys(['subject', 'count', 'percent']);
-    worksheet_subject.addRow(['subject', 'count', 'percent']);
+    const worksheet_subject = workbook.addWorksheet(this.translocoService.translate('SubjectBreakdown'));  
+    const headers_subject = Object.keys([this.translocoService.translate('Subject'), this.translocoService.translate('Count'), this.translocoService.translate('Percent')]);
+    worksheet_subject.addRow([this.translocoService.translate('Subject'), this.translocoService.translate('Count'), this.translocoService.translate('Percent')]);
 
     worksheet_subject.getColumn(1).width = 30;
     worksheet_subject.getColumn(2).width = 15;
     worksheet_subject.getColumn(3).width = 15;
 
-    const worksheet_file = workbook.addWorksheet('File Breakdown');  
-    const headers_file = Object.keys(['file type', 'specific type', 'count', 'percent']);
-    worksheet_file.addRow(['type', 'content type', 'count', 'percent']);
+    const worksheet_file = workbook.addWorksheet(this.translocoService.translate('FileContentBreakdown'));  
+    const headers_file = Object.keys([this.translocoService.translate('FileType'), this.translocoService.translate('SpecificFileType'), this.translocoService.translate('Count'), this.translocoService.translate('Percent')]);
+    worksheet_file.addRow([this.translocoService.translate('Type'), this.translocoService.translate('SpecificFileType'), this.translocoService.translate('Count'), this.translocoService.translate('Percent')]);
 
     worksheet_file.getColumn(1).width = 20;
     worksheet_file.getColumn(2).width = 30;
@@ -166,12 +166,60 @@ export class DownloadComponent implements OnInit {
       worksheet_storage.addRow([months[i],this.data['size_graph_agg_data'][i], size_graph_data_rev[i]]); 
     }
 
-    for (let i = 0; i < this.data['subject_full_data'].length - 1; i+=1){
-      worksheet_subject.addRow([this.data['subject_full_data'][i]['subject'], this.data['subject_full_data'][i]['count'], this.data['subject_full_data'][i]['percent'] ]); 
+    const subjectTranslationMap: { [key: string]: string } = {
+      'Social Sciences': "SocialSciences",
+      'Earth and Environmental Sciences': "EarthandEnvironmentalSciences",
+      'Other': "Other",
+      'Medicine, Health and Life Sciences': "MedicineHealthandLifeSciences",
+      'Arts and Humanities': "ArtsandHumanities",
+      'Engineering': "Engineering",
+      'Agricultural Sciences': "AgriculturalSciences",
+      'Computer and Information Science': "ComputerandInformationScience",
+      'Physics': "Physics",
+      'Chemistry': "Chemistry",
+      'Business and Management': "BusinessandManagement",
+      'Law': "Law",
+      'Mathematical Sciences': "MathematicalSciences",
+      'Astronomy and Astrophysics': "AstronomyandAstrophysics"
+    };
+
+    const fileTranslationMap: { [key: string]: string } = {
+      "image": "image",
+      "text": "text",
+      "application": "application",
+      "video": "video",
+      "audio": "audio",
+      "model": "model",
+      "type": "type",
+      "chemical": "chemical",
+      "biosequence": "biosequence",
+      "multipart": "multipart",
+    };
+
+    for (let i = 0; i < this.data['subject_full_data'].length - 1; i++) {
+      const subjectRaw = this.data['subject_full_data'][i]['subject'];
+      const subjectKey = subjectTranslationMap[subjectRaw] || subjectRaw; // fallback if missing
+      const translatedSubject = this.translocoService.translate(subjectKey);
+      worksheet_subject.addRow([
+        translatedSubject,
+        this.data['subject_full_data'][i]['count'],
+        this.data['subject_full_data'][i]['percent']
+      ]); 
     }
 
-    for (let i = 0; i < this.data['file_content_full_data'].length - 1; i+=1){
-      worksheet_file.addRow([this.data['file_content_full_data'][i]['type'], this.data['file_content_full_data'][i]['contenttype'], this.data['file_content_full_data'][i]['count'], this.data['file_content_full_data'][i]['percent']]); 
+    for (let i = 0; i < this.data['file_content_full_data'].length - 1; i += 1) {
+      const entry = this.data['file_content_full_data'][i];
+
+      const rawType = entry['type'];
+      const typeKey = fileTranslationMap[rawType] || rawType;
+      const translatedType = this.translocoService.translate(typeKey);
+    
+      worksheet_file.addRow([
+        translatedType,
+        entry ['contentType'],
+        entry['count'],
+        entry['percent']
+      ]);
     }
 
     workbook.xlsx.writeBuffer().then((buffer: any) => {
