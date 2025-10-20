@@ -1,0 +1,68 @@
+<div style="height: 600px; width: 700px; padding: 20px 40px; overflow-y: auto; box-sizing: border-box;">
+
+    <!-- Close Button -->
+    <button class="close-button"
+            (click)="closeDialog()"
+            style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 24px; cursor: pointer;"
+            aria-label="Fermer le dialogue">
+      &#x2715;
+    </button>
+  
+    <h1 style="font-size: 32px; font-weight: bold; margin-top: 40px;">FAQ</h1>
+  
+    <h3><strong>Où sont collectées ces données ?</strong></h3>
+    <p>
+      Les données sont collectées par l’intermédiaire des statistiques API du Dataverse. Pour plus d’informations, consultez :
+      <a href="https://guides.dataverse.org/en/latest/api/metrics.html" target="_blank">
+        guides.dataverse.org/en/latest/api/metrics.html
+      </a>
+    </p>
+  
+    <h3><strong>Qu’est-ce que Borealis (Tous) ?</strong></h3>
+    <p>
+      “Borealis (Tous)” désigne l’ensemble de Borealis, c’est-à-dire que les données représentent l’ensemble des données et des collections hébergées dans Borealis.
+    </p>
+  
+    <h3><strong>Pourquoi le Dataverse X n’est-il pas inclus dans le rapport ?</strong></h3>
+    <p>
+      Il peut s’écouler un certain temps avant qu’une nouvelle collection soit reflétée dans les données sources. De plus, seules les collections publiées (et non celles en mode brouillon) sont incluses.
+    </p>
+  
+    <h3><strong>Pourquoi ma collection n’est-elle pas affichée en français/anglais ?</strong></h3>
+    <p>
+      Les collections sont affichées dans leur langue originale de publication. Tandis que l’interface s’adapte à la langue choisie par l’utilisateur, ce n’est pas le cas pour les données des collections.
+    </p>
+  
+    <h3><strong>Que signifie « Legacy » pour le téléchargement des données ?</strong></h3>
+    <p>
+      L’option de téléchargement Legacy procure une exportation structurée des données qui étaient hébergées dans la version précédente du rapport des statistiques Borealis. Ces données peuvent être formatées différemment des autres formats d’exportation disponibles, comme Make Data Count.
+    </p>
+  
+    <h3><strong>Qu’est-ce que Make Data Count ?</strong></h3>
+    <p>
+      Make Data Count est une initiative communautaire menée par un tiers, visant à développer des statistiques de données ouvertes afin d’évaluer de manière pertinente l’utilisation et l’impact des données. Son objectif est d’établir des statistiques standardisées telles que les vues, les téléchargements et les citations, applicables à un large éventail d’ensembles de données et de plateformes de dépôt, afin d’encourager la collaboration et le partage des données.
+    </p>
+    <p>
+      Make Data Count fait partie d’une initiative plus large menée par le groupe de travail sur les statistiques d’utilisation de données de la Research Data Alliance, en collaboration avec DataCite. Make Data Count se distingue par son attention portée aux standards pilotés par la communauté et par son engagement envers des statistiques ouvertes pour favoriser les collaborations étendues dans l’écosystème des données de recherche.
+    </p>
+    <p>
+      Make Data Count a élaboré le COUNTER Code of Practice for Research Data, la norme utilisée pour le suivi des vues et des téléchargements dans le rapport des statistiques Borealis. Le rapport des statistiques Borealis utilise également le corpus de citation de DataCite, co-développé par DataCite et Make Data Count, pour fournir des statistiques sur les citations de données dans Borealis.
+    </p>
+  
+    <h3><strong>C’est le premier jour du mois — Pourquoi les données de ce mois n’apparaissent-elles pas dans le rapport ?</strong></h3>
+    <p>
+      Cela peut prendre quelques jours (en général de 3 à 5 jours) pour que le mois en cours apparaisse dans les statistiques.
+    </p>
+  
+    <h3><strong>Pourquoi ne puis-je pas accéder aux statistiques propres à mon institution pour la collection Odesi ?</strong></h3>
+    <p>
+      À la suite de la refonte et de la migration d’Odesi de Nesstar vers Borealis en 2023, la majorité des données d’Odesi sont désormais en accès libre. Dans le cadre de cette transition, nous ne collectons et ne diffusons plus de statistiques Odesi au niveau institutionnel.
+    </p>
+  
+    <h3><strong>Qui puis-je contacter pour toute question, suggestion d’amélioration, signalement d’anomalie ou demande de fonctionnalité ?</strong></h3>
+    <p>
+      Veuillez nous écrire à <a href="mailto:info&#64;borealisdata.ca">info&#64;borealisdata.ca</a> ou à utiliser l’onglet Contact. Un membre de notre équipe se fera un plaisir de vous aider.
+    </p>
+  
+  </div>
+  

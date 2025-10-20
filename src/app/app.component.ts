@@ -739,7 +739,12 @@ export class AppComponent implements AfterViewInit, OnInit{
   } 
 
   openAboutDialog() {
-    this.dialog.open(AboutDialog);
+    const lang = this.getLanguage();
+    if (lang === 'fr') {
+      this.dialog.open(AboutDialogFr);
+    } else {
+      this.dialog.open(AboutDialogEn);
+    }
   }
 
   openTOCDialog() {
@@ -752,11 +757,21 @@ export class AppComponent implements AfterViewInit, OnInit{
   }
 
   openContactDialog(){
-    this.dialog.open(ContactDialog);
+    const lang = this.getLanguage();
+    if (lang === 'fr') {
+      this.dialog.open(ContactDialogFr);
+    } else {
+      this.dialog.open(ContactDialogEn);
+    }
   }
 
   openFAQDialog() {
-    this.dialog.open(FAQDialog);
+    const lang = this.getLanguage();
+    if (lang === 'fr') {
+      this.dialog.open(FAQDialogFr);
+    } else {
+      this.dialog.open(FAQDialogEn);
+    }
   }  
 
   subjectToggle() {
@@ -771,12 +786,25 @@ export class AppComponent implements AfterViewInit, OnInit{
 }
 
 @Component({
-  selector: 'about-dialog-popup',
-  templateUrl: 'about-dialog-popup.html',
+  selector: 'about-dialog-popup-en',
+  templateUrl: 'about-dialog-popup-en.html',
 })
 
-export class AboutDialog {
-  constructor(private dialogRef: MatDialogRef<AboutDialog>) {}
+export class AboutDialogEn {
+  constructor(private dialogRef: MatDialogRef<AboutDialogEn>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+}
+
+@Component({
+  selector: 'about-dialog-popup-fr',
+  templateUrl: 'about-dialog-popup-fr.html',
+})
+
+export class AboutDialogFr {
+  constructor(private dialogRef: MatDialogRef<AboutDialogFr>) {}
 
   closeDialog(): void {
     this.dialogRef.close();
@@ -809,41 +837,49 @@ export class TOCDialogFr {
 }
 
 @Component({
-  selector: 'contact-dialog-popup',
-  standalone: true,
-  templateUrl: 'contact-dialog-popup.html',
-  imports: [
-    FormsModule,          
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatSelectModule
-  ]
+  selector: 'contact-dialog-popup-en',
+  templateUrl: 'contact-dialog-popup-en.html',
 })
-export class ContactDialog {
-  constructor(private dialogRef: MatDialogRef<ContactDialog>) {}
+export class ContactDialogEn {
+  constructor(private dialogRef: MatDialogRef<ContactDialogEn>) {}
 
   closeDialog(): void {
     this.dialogRef.close();
   }
+}
 
-  submitFeedback(form: NgForm): void {
-    if (form.valid) {
-      const feedbackData = form.value;
-      console.log('Feedback submitted:', feedbackData);
-      // TODO: Send to backend or service
-      this.dialogRef.close(feedbackData);
-    }
+@Component({
+  selector: 'contact-dialog-popup-fr',
+  templateUrl: 'contact-dialog-popup-fr.html',
+})
+export class ContactDialogFr {
+  constructor(private dialogRef: MatDialogRef<ContactDialogFr>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
   }
 }
 
 @Component({
-  selector: 'faq-dialog-popup',
-  templateUrl: 'faq-dialog-popup.html',
+  selector: 'faq-dialog-popup-en',
+  templateUrl: 'faq-dialog-popup-en.html',
 })
 
-export class FAQDialog {
-  constructor(private dialogRef: MatDialogRef<FAQDialog>) {}
+export class FAQDialogEn {
+  constructor(private dialogRef: MatDialogRef<FAQDialogEn>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+}
+
+@Component({
+  selector: 'faq-dialog-popup-fr',
+  templateUrl: 'faq-dialog-popup-fr.html',
+})
+
+export class FAQDialogFr {
+  constructor(private dialogRef: MatDialogRef<FAQDialogFr>) {}
 
   closeDialog(): void {
     this.dialogRef.close();

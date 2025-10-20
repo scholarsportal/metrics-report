@@ -324,17 +324,41 @@ export class DownloadComponent implements OnInit {
     const cardHeight = 15;
     const cardY = currentY;
   
-    const cardTitles = [this.translocoService.translate('Collections'), this.translocoService.translate('Datasets'), this.translocoService.translate('Files'), this.translocoService.translate('Downloads'), 
+    const cardTitles = [this.translocoService.translate('Collections'), this.translocoService.translate('DatasetsSF'), this.translocoService.translate('Files'), this.translocoService.translate('Downloads'), 
     this.translocoService.translate('Users'), this.translocoService.translate('Storage')];
+    
+    const locale = this.translocoService.getActiveLang() === 'fr' ? 'fr-FR' : 'en-US';
+
+    const sanitizeNumber = (num: number, isDecimal = false): string => {
+      const options = isDecimal
+        ? { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+        : { maximumFractionDigits: 0 };
+
+      return new Intl.NumberFormat(locale, options)
+        .format(num)
+        .replace(/\u202F|\u00A0/g, ' '); // Replace narrow/regular NBSP with normal space
+    };
+
+    const isEnglish = this.translocoService.getActiveLang() === 'en';
+
+    const rawStorage = this.data['size_graph_data']?.at(-1) ?? 0;
+    const formattedStorage = sanitizeNumber(rawStorage, true);
+
+    // Get the localized unit for GB, fallback to 'GB' if translation missing
+    const gbUnit = this.translocoService.translate('GB') || 'GB';
+
+    // Append the localized unit for both languages
+    const cleanedStorage = `${formattedStorage} ${gbUnit}`;
+
     const cardCounts = [
-      document.getElementById('total_collections_num')?.textContent ?? '',
-      document.getElementById('total_datasets_num')?.textContent ?? '',
-      document.getElementById('total_files_num')?.textContent ?? '',
-      document.getElementById('total_downloads_num')?.textContent ?? '',
-      document.getElementById('total_users_num')?.textContent ?? '',
-      document.getElementById('total_size_num')?.textContent ?? ''
+      sanitizeNumber(this.data['name_dropdown_data']?.length ?? 0),
+      sanitizeNumber(this.data['datasets_graph_data']?.at(-1) ?? 0),
+      sanitizeNumber(this.data['files_graph_data']?.at(-1) ?? 0),
+      sanitizeNumber(this.data['downloads_graph_data']?.at(-1) ?? 0),
+      sanitizeNumber(this.data['users_graph_data']?.at(-1) ?? 0),
+      cleanedStorage
     ];
-  
+
     for (let i = 0; i < cardCount; i++) {
       const cardX = marginX + i * (cardWidth + gap);
       this.drawCard(pdf, cardTitles[i], cardCounts[i], cardX, cardY, cardWidth, cardHeight);
@@ -487,6 +511,20 @@ export class DownloadComponent implements OnInit {
     const countY = y + height - paddingBottom;
   
     pdf.text(count, countX, countY); // ⬇️ Bottom-right
+  }
+
+  private sanitizeText(text: string): string {
+    const lang = this.translocoService.getActiveLang();
+    
+    if (lang === 'fr') {
+      return text
+        .replace(/\u00A0/g, ' ')  // Replace non-breaking space with regular space
+        .replace(/\//g, '-')      // Optional: Replace slashes with dashes
+        .trim();
+    }
+  
+    // No changes for other languages
+    return text.trim();
   }
 
   generateSubject() {

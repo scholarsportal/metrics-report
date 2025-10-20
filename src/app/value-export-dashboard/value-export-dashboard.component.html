@@ -16,8 +16,8 @@
       align-items: center;      
       gap: 8px;                    
       text-align: left;" 
-      matTooltip= "Export of previous metrics App" href="https://borealisdata.ca/metricsbackend/api/metrics/report"> <mat-icon> download </mat-icon> {{ 'Legacy' | transloco }} </a>
-      <span style="display: inline-block;" matTooltip = "Expected for future release" [matTooltipDisabled]="false">
+      [matTooltip]="'LegacyToolTip' | transloco" href="https://borealisdata.ca/metricsbackend/api/metrics/report"> <mat-icon> download </mat-icon> {{ 'Legacy' | transloco }} </a>
+      <span style="display: inline-block;" [matTooltip]="'MDCToolTip' | transloco" [matTooltipDisabled]="false">
       <button mat-button [disabled]="true" class="mat-small" style="border-width: 1px; font-size: 9px; border-style: solid; width: 122px; height: 25px; display: flex;  justify-content: flex-start;
       align-items: center;      
       gap: 8px;                    
