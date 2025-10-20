@@ -1,7 +1,9 @@
-.transparent .mat-mdc-dialog-container {
-    --mdc-dialog-container-color: rgba(0, 0, 0, 0.0);
-}
-
-.transparent .mat-mdc-dialog-surface {
-    box-shadow: none !important;
-}
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3); /* semi-transparent background */
+    z-index: 9999; /* Ensure it's on top of everything */
+  }

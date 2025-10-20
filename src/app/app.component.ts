@@ -1,22 +1,22 @@
-import {AfterViewInit, Component, ViewChild, NgModule, ChangeDetectionStrategy, ViewEncapsulation, ElementRef,OnInit, inject,} from '@angular/core';
+import {AfterViewInit, Component, ViewChild, NgModule, ChangeDetectionStrategy, ViewEncapsulation, ElementRef,OnInit, inject, signal} from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import {JsonPipe, AsyncPipe, CommonModule} from '@angular/common';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
-import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, FormBuilder, NgForm} from '@angular/forms';
 import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
 import {Observable} from 'rxjs';
-import {map, startWith} from 'rxjs/operators';
+import {map, startWith, take} from 'rxjs/operators';
 import {MatInputModule} from '@angular/material/input';
-import {MatSelectChange, MatSelectModule} from '@angular/material/select';
-import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSelect, MatSelectChange, MatSelectModule} from '@angular/material/select';
+import {MatFormFieldControl, MatFormFieldModule} from '@angular/material/form-field';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {LineGraphComponent} from './line-graph/line-graph.component';
 import {HorizontalBarGraphComponent } from './horizontal-bar-graph/horizontal-bar-graph.component';
 import { PieGraphComponent } from './pie-graph/pie-graph.component';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {MatButtonModule} from '@angular/material/button';
-import {provideNativeDateAdapter} from '@angular/material/core';
+import {MatOption, provideNativeDateAdapter} from '@angular/material/core';
 import {MatIconModule} from '@angular/material/icon';
 import {MatSort, Sort, MatSortModule} from '@angular/material/sort';
 import {LiveAnnouncer} from '@angular/cdk/a11y';
@@ -27,19 +27,31 @@ import {DataTableDatasetComponent} from './data-table-dataset/data-table-dataset
 import {DataTableFileComponent} from './data-table-file/data-table-file.component'; 
 import {MatDatepickerModule, MatDatepicker} from '@angular/material/datepicker';
 import { PostsComponent } from './posts/posts.component';
+import { TreeComponent } from './tree/tree.component';
 import {MatCardModule} from '@angular/material/card';
 import {MatDialog} from '@angular/material/dialog';
 import { GenericTableComponent } from './generic-table/generic-table.component';
-import {TranslateModule, TranslateService, TranslateStore} from '@ngx-translate/core';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {DownloadComponent} from './download/download.component'; 
 import {MatMenuModule} from '@angular/material/menu';
 import html2canvas from 'html2canvas';
-import { TranslocoModule } from '@ngneat/transloco';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import { TranslocoModule, TranslocoService } from '@ngneat/transloco';
+import { ChartData } from 'chart.js';
 import { LanguageService } from './language.service';
+import { MatListModule } from '@angular/material/list';
+import { ChangeDetectorRef } from '@angular/core';
+import { GraphDashboardComponent } from './graph-dashboard/graph-dashboard.component';
+import { ValueExportDashboardComponent } from './value-export-dashboard/value-export-dashboard.component';
+import { MatDialogRef } from '@angular/material/dialog';
+import { LoadingService } from './loading.service';
+import { debounceTime } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
+
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
 import {default as _rollupMoment, Moment} from 'moment';
+import { MatProgressBar } from "@angular/material/progress-bar";
 
 registerAllModules();
 
@@ -56,15 +68,20 @@ export const MY_FORMATS = {
   },
 };
 
+interface SearchGroup {
+  letter: string;
+  names: string[];
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
   providers: [provideMomentDateAdapter(MY_FORMATS)],
   imports: [
     MatTabsModule,
-    MatFormFieldModule, 
+    MatFormFieldModule,
     MatSelectModule,
-    MatInputModule, 
+    MatInputModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
     FormsModule,
@@ -86,33 +103,43 @@ export const MY_FORMATS = {
     ReactiveFormsModule,
     MatDatepickerModule,
     MatDatepicker,
+    MatMenuModule,
     RouterModule,
     RouterOutlet,
     PostsComponent,
+    TreeComponent,
     CommonModule,
     MatCardModule,
     GenericTableComponent,
-    MatCheckboxModule, 
+    MatCheckboxModule,
     DownloadComponent,
-    TranslocoModule
-    ],
+    MatTooltipModule,
+    TranslocoModule,
+    MatListModule,
+    GraphDashboardComponent,
+    ValueExportDashboardComponent,
+    MatProgressBar,
+    FormsModule
+],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent implements AfterViewInit, OnInit{
 
+  private _formBuilder = inject(FormBuilder);
+
   start_on: boolean = false;
-  date_start = new FormControl(moment());
-  date_end = new FormControl(moment());
+  minDate = new Date(new Date().setMonth(new Date().getDate() < 7 ? new Date().getMonth() - 1 : new Date().getMonth()));
+  maxDate = new Date(new Date().setMonth(new Date().getDate() < 7 ? new Date().getMonth() - 1 : new Date().getMonth()));
+  date_start = new FormControl(moment().date() < 7 ? moment().subtract(1, 'month') : moment());
+  date_end = new FormControl(moment().date() < 7 ? moment().subtract(1, 'month') : moment());
   date_String: String = this.dateStringFormat();  
   date_start_activate: string = "";
   date_end_activate: string = "";
   date_select_on = false; 
-  todayDate:Date = new Date();
-  minDate: Date = new Date("2016-02-01");
+  todayDate = new Date(new Date().setMonth(new Date().getDate() < 7 ? new Date().getMonth() - 1 : new Date().getMonth()));
   bad_range: boolean = false;
-
 
   setStartMonthAndYear(normalizedMonthAndYear: Moment, datepicker: MatDatepicker<Moment>) {
     this.date_start = new FormControl(moment());    const ctrlValue = this.date_start.value ?? moment();
@@ -140,12 +167,14 @@ export class AppComponent implements AfterViewInit, OnInit{
 
     if (!this.start_on){
       this.date_start_activate = "";
+      console.log(this.date_start_activate)
     }
 
     this.bad_range = false;
 
     if (this.start_on && date_s > date_e){
       this.bad_range = true;
+      this.date_select_on = false; 
     }
 
     if (this.start_on && !this.bad_range){
@@ -161,39 +190,70 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   }
 
-  dateStringFormat(): String{
+  isStartTimeAfterEndTime(): boolean {
+    const start = this.date_start.value;
+    const end = this.date_end.value;
 
-    var monthNames = ["January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"];
+    if (!start || !end) return true;
 
-    var dateString = ""; 
-
-  if (this.start_on){
-    const ctrlValue_s = this.date_start.value ?? moment();
-    const year_s = ctrlValue_s.format('YYYY');
-    const month_s = ctrlValue_s.format('MM');
-    console.log(ctrlValue_s.format('YYYY'), ctrlValue_s.format('MM')) 
-    const str_s = monthNames[parseInt(month_s)-1] + " " + year_s
-    dateString = str_s; 
+    return moment(end).isBefore(moment(start)) && this.start_on;
   }
 
-  const ctrlValue_e = this.date_end.value ?? moment();
-  const year_e = ctrlValue_e.format('YYYY');
-  const month_e = ctrlValue_e.format('MM');
-  console.log(ctrlValue_e.format('YYYY'), ctrlValue_e.format('MM')) 
-  const str_e = monthNames[parseInt(month_e)-1] + " " + year_e
+  dateStringFormat(): string {
+    // Prevent crash if translations aren't loaded yet
+    if (!this.monthTranslations || Object.keys(this.monthTranslations).length === 0) {
+      return '';
+    }
   
-  return(dateString = dateString + " - " + str_e);
-
+    const ctrlValue_e = this.date_end.value ?? moment();
+    const year_e = ctrlValue_e.format('YYYY');
+    const month_e = parseInt(ctrlValue_e.format('MM'));
+    const endMonthName = this.monthTranslations[month_e.toString()] || '';
+  
+    const end_date = `${endMonthName} ${year_e}`;
+  
+    if (this.start_on) {
+      const ctrlValue_s = this.date_start.value ?? moment();
+      const year_s = ctrlValue_s.format('YYYY');
+      const month_s = parseInt(ctrlValue_s.format('MM'));
+      const startMonthName = this.monthTranslations[month_s.toString()] || '';
+  
+      const start_date = `${startMonthName} ${year_s}`;
+      return `${start_date} - ${end_date}`;
+    }
+  
+    return `- ${end_date}`;
   }
+  
 
   @ViewChild('input') input: ElementRef<HTMLInputElement>;
   myControl = new FormControl('');
-  options: string[] = ["(All)"];
+  options: string[] = [];
   filteredOptions: string[];
   selectedOption: string = "(All)";
 
-  table_data = [];
+  searchForm = this._formBuilder.group({
+    searchGroup: '',
+  });
+
+  searchGroups: SearchGroup[] = [
+    {
+      letter: 'Default',
+      names: ["(All)"],
+    },
+    {
+      letter: 'Sub Dataverses',
+      names: [],
+    },
+    {
+      letter: 'Collections',
+      names: [],
+    }
+  ]
+
+  searchGroupOptions: Observable<SearchGroup[]>;
+
+  table_data: Array<any> = [];;
   alias_data = [];
   raw_table_data = {};
   subject_table = [];
@@ -204,21 +264,42 @@ export class AppComponent implements AfterViewInit, OnInit{
   users_graph_data: Array<any> = [];
   size_graph_data: Array<any> = [];
   name_dropdown_data: Array<any> = [];
+  creation_date: Array<any> = [];
+
 
   barChartDataDownloads_data: Array<number> = [];
-  barChartDataDownloads:Array<any> = [];
+  barChartDataDownloads: ChartData<'bar'> = {
+    labels: [],
+    datasets: []
+  };
 
   barChartDataDatasets_data: Array<number> = [];
-  barChartDataDatasets:Array<any> = [];
+  barChartDataDatasets: ChartData<'bar'> = {
+    labels: [],
+    datasets: []
+  };
   
   barChartDataFiles_data: Array<number> = [];
-  barChartDataFiles:Array<any> = [];
+  barChartDataFiles: ChartData<'bar'> = {
+    labels: [],
+    datasets: []
+  };
 
   barChartDataUsers_data: Array<number> = [];
-  barChartDataUsers:Array<any> = [];
+  barChartDataUsers: ChartData<'bar'> = {
+    labels: [],
+    datasets: []
+  };
 
   barChartDataSize_data: Array<number> = [];
-  barChartDataSize:Array<any> = [];
+  barChartDataSize: ChartData<'bar'> = {
+    labels: [],
+    datasets: []
+  };
+
+  subject_columns:Array<any> = [];
+
+  file_content_columns:Array<any> = [];
 
   months = [];
 
@@ -239,8 +320,9 @@ export class AppComponent implements AfterViewInit, OnInit{
   selectedCollection_Current: string = "(All)";
   selectedCollection_Activate: string = "(All)";
   selectedCollection_Current_Name: string = "(All)";
-  selectedCollection_Activate_Name:String = "(All)";
+  selectedCollection_Activate_Name: string = "(All)";
 
+  translatedText$: ""
 
   total_collections_num: String = "-";
   total_dataverses_num: String = "-";
@@ -257,27 +339,25 @@ export class AppComponent implements AfterViewInit, OnInit{
   total_users_change: String = "-";
   total_size_change: String = "-"
 
+  downloads_labels = [this.translocoService.selectTranslate('MonthlyFileDownloads'), this.translocoService.selectTranslate('CumulativeFileDownloads')];
+  datasets_labels = [this.translocoService.selectTranslate('MonthlyDatasetsPublished'), this.translocoService.selectTranslate('CumulativeDatasetsPublished')];
+  file_labels = [this.translocoService.selectTranslate('MonthlyFilePublished'), this.translocoService.selectTranslate('CumulativeFilePublished')];
+  user_labels = [this.translocoService.selectTranslate('MonthlyUsersJoined'), this.translocoService.selectTranslate('CumulativeUsersJoined')];
+  storage_usage = [this.translocoService.selectTranslate('MonthlyStorageUsed'), this.translocoService.selectTranslate('CumulativeStorageUsed')];
+
   dataset_table_data = [];
   file_table_data = [];
 
   subjectTableOn = false;
   fileContentTableOn = false; 
 
-  generic_columns: any[] = [
-    {data: "name", readOnly: "true", title: "Collection / Dataverses"},
-  ]
-  subject_columns: any[] = [
-    {data: "subject", readOnly: "true", title: "Subject"},
-    {data: "count", readOnly: "true", title: "Count"},
-    {data: "percent", readOnly: "true", title: "Distribution"},
-  ]
+  receivedCollectionFromTree:Array<String> = [];
+  
+  isOpen = false;
 
-  file_content_columns: any[] = [
-    {data: "type", readOnly: "true", title: "File Type"},
-    {data: "contenttype", readOnly: "true", title: "Specific File Type"},
-    {data: "count", readOnly: "true", title: "Count"},
-    {data: "percent", readOnly: "true", title: "Distribution"},
-  ]
+  isLoading = false;
+
+  error_flag = false;
 
   getData(newItem: any) {
     this.raw_table_data = newItem["DataverseTabData"];
@@ -289,19 +369,19 @@ export class AppComponent implements AfterViewInit, OnInit{
     
     this.options = this.options.concat(newItem["DataverseTabData"]['name_dropdown_data'].sort());
 
-    this.months = newItem["DataverseTabData"]['months'];
-    
-    this.barChartDataDownloads_data = newItem["DataverseTabData"]['downloads_graph_data'];
-    this.barChartDataDatasets_data = newItem["DataverseTabData"]['datasets_graph_data'];
-    this.barChartDataFiles_data = newItem["DataverseTabData"]['files_graph_data'];
-    this.barChartDataUsers_data = newItem["DataverseTabData"]['users_graph_data'];
-    this.barChartDataSize_data = newItem["DataverseTabData"]['size_graph_data'];
+    this.searchGroups[2].names = this.options;
+    if (this.selectedCollection_Current == "(All)"){
+      this.searchGroups[1].names = [];
+    }
+    else {
+      this.searchGroups[1].names = this.table_data.map(a => a.name);
+    }
 
-    this.barChartDataDownloadsAgg_data = newItem["DataverseTabData"]['downloads_graph_agg_data']
-    this.barChartDataDatasetsAgg_data = newItem["DataverseTabData"]['datasets_graph_agg_data']
-    this.barChartDataFiles_Aggdata = newItem["DataverseTabData"]['files_graph_agg_data']
-    this.barChartDataUsers_Aggdata = newItem["DataverseTabData"]['users_graph_agg_data']
-    this.barChartDataSize_Aggdata = newItem["DataverseTabData"]['size_graph_agg_data']
+    console.log(this.searchGroups); 
+  
+    this.months = newItem["DataverseTabData"]['months'];
+    this.creation_date = newItem["DataverseTabData"]['creation_date'];
+    this.error_flag = newItem["DataverseTabData"]['error_flag'];
 
     this.pieChartLabelsSubject = newItem["DataverseTabData"]['subject_label_data'];
     this.pieChartDataSubject_data = newItem["DataverseTabData"]['subject_data'];
@@ -310,7 +390,12 @@ export class AppComponent implements AfterViewInit, OnInit{
     this.pieChartDataFile_data = newItem["DataverseTabData"]['file_content_data'];
 
     this.total_collections_num = newItem["DataverseTabData"]['name_dropdown_data'].length.toString(); 
-    this.total_dataverses_num = (newItem["DataverseTabData"]['dataverse_count'] - newItem["DataverseTabData"]['name_dropdown_data'].length).toString();
+    if (this.selectedCollection_Activate_Name == "(All)"){
+      this.total_dataverses_num = (newItem["DataverseTabData"]['dataverse_count'] - newItem["DataverseTabData"]['name_dropdown_data'].length).toString();
+    }
+    else {
+      this.total_dataverses_num = newItem["DataverseTabData"]['dataverse_count']
+    }
     if (this.date_start_activate!=""){
       console.log("ds is activated here")
       this.total_datasets_num = this.barChartDataDatasetsAgg_data.reduce((a, b) => a + b, 0).toLocaleString();
@@ -320,11 +405,11 @@ export class AppComponent implements AfterViewInit, OnInit{
       this.total_size_num = this.barChartDataSize_Aggdata.reduce((a, b) => a + b, 0).toFixed(2).toLocaleString(); + "GB";
     }
     else{
-      this.total_datasets_num = this.barChartDataDatasets_data[0].toLocaleString();
-      this.total_files_num = this.barChartDataFiles_data[0].toLocaleString();
-      this.total_downloads_num = this.barChartDataDownloads_data[0].toLocaleString();
-      this.total_users_num = this.barChartDataUsers_data[0].toLocaleString();
-      this.total_size_num = this.barChartDataSize_data[0].toFixed(2).toLocaleString() + "GB"; 
+      this.total_datasets_num = this.barChartDataDatasets_data[this.barChartDataDatasetsAgg_data.length - 1].toLocaleString();
+      this.total_files_num = this.barChartDataFiles_data[this.barChartDataDatasets_data.length - 1].toLocaleString();
+      this.total_downloads_num = this.barChartDataDownloads_data[this.barChartDataDownloads_data.length - 1].toLocaleString();
+      this.total_users_num = this.barChartDataUsers_data[this.barChartDataUsers_data.length - 1].toLocaleString();
+      this.total_size_num = this.barChartDataSize_data[this.barChartDataSize_data.length - 1].toFixed(2).toLocaleString() + "GB"; 
     }
 
     this.total_collections_change = (((this.barChartDataDatasets_data[0] - this.barChartDataDatasets_data[1]) / this.barChartDataDatasets_data[1]) * 100).toFixed(2).toString() + "%"
@@ -334,132 +419,155 @@ export class AppComponent implements AfterViewInit, OnInit{
     //total_users_change: String = "-";
     //total_size_change: String = "-"
 
+    type Translations = {
+      [key: string]: string;
+    };
+
+    type TranslationsMap = { [key: string]: string };
+
+    this.translocoService.selectTranslateObject([
+      "Subject",
+      "Count",
+      "Distribution",
+      "FileType",
+      "SpecificFileType"
+    ]).subscribe(([
+      Subject,
+      Count,
+      Distribution,
+      FileType,
+      SpecificFileType
+    ]) => {
+      
+      // Your labels array (e.g. months reversed)
+      const barChartLabels = this.months
+
+      // Your bar chart data with labels + datasets
+      this.barChartDataDownloads = {
+        labels: barChartLabels,
+        datasets: [
+          {
+            data: this.barChartDataDownloadsAgg_data,
+            label: 'Monthly File Downloads',
+            backgroundColor: 'rgba(102, 0, 102, 0.5)',
+            borderColor: 'rgba(102, 0, 102, 0.5)',
+            hoverBackgroundColor: 'rgba(102, 0, 102, 0.7)',
+            hoverBorderColor: 'rgba(102, 0, 102, 0.7)'
+          },
+          {
+            data: this.barChartDataDownloads_data,
+            label: 'Cumulative File Downloads',
+            backgroundColor: 'rgba(0, 100, 255, 0.5)',
+            borderColor: 'rgba(0, 100, 255, 0.5)',
+            hoverBackgroundColor: 'rgba(0, 100, 255, 0.7)',
+            hoverBorderColor: 'rgba(0, 100, 255, 0.7)'
+          }
+        ]
+      };
+
+      this.barChartDataDatasets = {
+        labels: barChartLabels,
+        datasets: [
+          {
+            data: this.barChartDataDatasetsAgg_data,
+            label: 'Monthly Datasets Published',
+            backgroundColor: 'rgba(102, 0, 102, 0.5)',
+            borderColor: 'rgba(102, 0, 102, 0.5)',
+            hoverBackgroundColor: 'rgba(102, 0, 102, 0.7)',
+            hoverBorderColor: 'rgba(102, 0, 102, 0.7)'
+          },
+          {
+            data: this.barChartDataDatasets_data,
+            label: 'Cumulative Datasets Published',
+            backgroundColor: 'rgba(0, 100, 255, 0.5)',
+            borderColor: 'rgba(0, 100, 255, 0.5)',
+            hoverBackgroundColor: 'rgba(0, 100, 255, 0.7)',
+            hoverBorderColor: 'rgba(0, 100, 255, 0.7)'
+          }
+        ]
+      };
+
+      this.barChartDataFiles = {
+        labels: barChartLabels,
+        datasets: [
+          {
+            data: this.barChartDataFiles_Aggdata,
+            label: 'Monthly File Published',
+            backgroundColor: 'rgba(102, 0, 102, 0.5)',
+            borderColor: 'rgba(102, 0, 102, 0.5)',
+            hoverBackgroundColor: 'rgba(102, 0, 102, 0.7)',
+            hoverBorderColor: 'rgba(102, 0, 102, 0.7)'
+          },
+          {
+            data: this.barChartDataFiles_data,
+            label: 'Cumulative File Published',
+            backgroundColor: 'rgba(0, 100, 255, 0.5)',
+            borderColor: 'rgba(0, 100, 255, 0.5)',
+            hoverBackgroundColor: 'rgba(0, 100, 255, 0.7)',
+            hoverBorderColor: 'rgba(0, 100, 255, 0.7)'
+          }
+        ]
+      };
+
+      this.barChartDataUsers = {
+        labels: barChartLabels,
+        datasets: [
+          {
+            data: this.barChartDataUsers_Aggdata,
+            label: 'Monthly Users Joined',
+            backgroundColor: 'rgba(102, 0, 102, 0.5)',
+            borderColor: 'rgba(102, 0, 102, 0.5)',
+            hoverBackgroundColor: 'rgba(102, 0, 102, 0.7)',
+            hoverBorderColor: 'rgba(102, 0, 102, 0.7)'
+          },
+          {
+            data: this.barChartDataUsers_data,
+            label: 'Cumulative Users Joined',
+            backgroundColor: 'rgba(0, 100, 255, 0.5)',
+            borderColor: 'rgba(0, 100, 255, 0.5)',
+            hoverBackgroundColor: 'rgba(0, 100, 255, 0.7)',
+            hoverBorderColor: 'rgba(0, 100, 255, 0.7)'
+          }
+        ]
+      };
+
+      this.barChartDataSize = {
+        labels: barChartLabels,
+        datasets: [
+          {
+            data: this.barChartDataSize_Aggdata,
+            label: 'Monthly Storage Used',
+            backgroundColor: 'rgba(102, 0, 102, 0.5)',
+            borderColor: 'rgba(102, 0, 102, 0.5)',
+            hoverBackgroundColor: 'rgba(102, 0, 102, 0.7)',
+            hoverBorderColor: 'rgba(102, 0, 102, 0.7)'
+          },
+          {
+            data: this.barChartDataSize_data,
+            label: 'Cumulative Storage Used',
+            backgroundColor: 'rgba(0, 100, 255, 0.5)',
+            borderColor: 'rgba(0, 100, 255, 0.5)',
+            hoverBackgroundColor: 'rgba(0, 100, 255, 0.7)',
+            hoverBorderColor: 'rgba(0, 100, 255, 0.7)'
+          }
+        ]
+      };
 
 
-    this.barChartDataDownloads = [
-      { // grey
-        data: this.barChartDataDownloadsAgg_data.reverse(),
-        label: 'Monthly File Downloads',
-        tension: 0,
-        backgroundColor: 'rgb(102, 0, 102, 0.5)',
-        borderColor: 'rgb(102, 0, 102, 0.5)',
-        pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
-      },
-      { // grey
-        data: this.barChartDataDownloads_data.reverse(),
-        label: 'Cumulative File Downloads',
-        tension: 0,
-        backgroundColor: 'rgb(0, 100, 255, 0.5)',
-        borderColor: 'rgb(0, 100, 255, 0.5)',
-        pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
-      }
-    ];
-
-    this.barChartDataDatasets = [
-      { // grey
-        data: this.barChartDataDatasetsAgg_data.reverse(),
-        label: 'Monthly Datasets Published',
-        tension: 0,
-        backgroundColor: 'rgb(102, 0, 102, 0.5)',
-        borderColor: 'rgb(102, 0, 102, 0.5)',
-        pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
-      },
-      { // grey
-        data: this.barChartDataDatasets_data.reverse(),
-        label: 'Cumulative Datasets Published',
-        tension: 0,
-        backgroundColor: 'rgb(0, 100, 255, 0.5)',
-        borderColor: 'rgb(0, 100, 255, 0.5)',
-        pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
-      }
-    ];
-
-    this.barChartDataFiles = [
-      { // grey
-        data: this.barChartDataFiles_Aggdata.reverse(),
-        label: 'Monthly Files Published',
-        tension: 0,
-        backgroundColor: 'rgb(102, 0, 102, 0.5)',
-        borderColor: 'rgb(102, 0, 102, 0.5)',
-        pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
-      },
-      { // grey
-        data: this.barChartDataFiles_data.reverse(),
-        label: 'Cumulative Files Published',
-        tension: 0,
-        backgroundColor: 'rgb(0, 100, 255, 0.5)',
-        borderColor: 'rgb(0, 100, 255, 0.5)',
-        pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
-      }
-    ];
-
-    this.barChartDataUsers = [
-      { // grey
-        data: this.barChartDataUsers_Aggdata.reverse(),
-        label: 'Monthly Users Joined',
-        tension: 0,
-        backgroundColor: 'rgb(102, 0, 102, 0.5)',
-        borderColor: 'rgb(102, 0, 102, 0.5)',
-        pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
-      },
-      { // grey
-        data: this.barChartDataUsers_data.reverse(),
-        label: 'Cumulative Users Joined',
-        tension: 0,
-        backgroundColor: 'rgb(0, 100, 255, 0.5)',
-        borderColor: 'rgb(0, 100, 255, 0.5)',
-        pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
-      }
-    ];
-
-    this.barChartDataSize = [
-      { // grey
-        data: this.barChartDataSize_Aggdata.reverse(),
-        label: 'Monthly Storage Used (GB)',
-        tension: 0,
-        backgroundColor: 'rgb(102, 0, 102, 0.5)',
-        borderColor: 'rgb(102, 0, 102, 0.5)',
-        pointBackgroundColor: 'rgb(102, 0, 102, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(102, 0, 102, 0.5)'
-      },
-      { // grey
-        data: this.barChartDataSize_data.reverse(),
-        label: 'Cumulative Storage Used (GB)',
-        tension: 0,
-        backgroundColor: 'rgb(0, 100, 255, 0.5)',
-        borderColor: 'rgb(0, 100, 255, 0.5)',
-        pointBackgroundColor: 'rgb(0, 100, 255, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(0, 100, 255, 0.5)'
-      }
-    ];
+      this.subject_columns = [
+        {data: "subject", readOnly: "true", title: Subject},
+        {data: "count", readOnly: "true", title: Count},
+        {data: "percent", readOnly: "true", title: Distribution},
+      ]
+    
+      this.file_content_columns= [
+        {data: "type", readOnly: "true", title: FileType},
+        {data: "contenttype", readOnly: "true", title: SpecificFileType},
+        {data: "count", readOnly: "true", title: Count},
+        {data: "percent", readOnly: "true", title: Distribution},
+      ]
+    });
+    
 
     this.pieChartDataSubject = [
         {
@@ -479,15 +587,36 @@ export class AppComponent implements AfterViewInit, OnInit{
     
   }
 
+  monthTranslations: { [key: string]: string } = {};
+
   ngOnInit(): void {
-    
+
+    this.translocoService.selectTranslateObject('months').subscribe(translations => {
+      this.monthTranslations = translations;
+      this.date_String = this.dateStringFormat(); 
+    });
+
+    this.searchGroupOptions = this.searchForm.get('searchGroup')!.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filterGroup(value || '')),
+    );
   }
 
-  private _filter(value: string): string[] {
+  private _filterGroup(value: string): SearchGroup[] {
+    if (value) {
+      return this.searchGroups
+        .map(group => ({letter: group.letter, names: this._filter(group.names, value)}))
+        .filter(group => group.names.length > 0);
+    }
+
+    return this.searchGroups;
+  }
+
+  _filter = (opt: string[], value: string): string[] => {
     const filterValue = value.toLowerCase();
-
-    return this.options.filter(option => option.toLowerCase().includes(filterValue));
-  }
+  
+    return opt.filter(item => item.toLowerCase().includes(filterValue));
+  };
 
   selectedCollection(event: MatSelectChange) {
     this.selectedCollection_Current_Name = event.value;
@@ -504,14 +633,34 @@ export class AppComponent implements AfterViewInit, OnInit{
     console.log(event.value);
   }
 
+  getCollectionFromTree(list: string[]) {
+    if (list.includes("(All)")){
+      this.selectedCollection_Activate = "(All)"
+      this.selectedCollection_Activate_Name = "(All)"
+    }
+
+    else {
+    this.receivedCollectionFromTree = list;
+    console.log(list)
+    this.selectedCollection_Current = list[1]
+      this.selectedCollection_Current_Name = list[0]
+    this.selectedCollection_Activate = this.selectedCollection_Current; 
+    this.selectedCollection_Activate_Name = this.selectedCollection_Current_Name;
+    }
+    this.submitDate();
+    this.date_String = this.dateStringFormat();  
+}
+
   selectedDate(eventData: any, dp?:any) {
     console.log(eventData);
     console.log(dp)
   }
 
   CollectionDataButtonActivate(){
-    console.log(this.selectedOption)
-    console.log(this.alias_data)
+    console.log(this.date_end < this.date_start)
+    //console.log(this.searchForm.get('searchGroup')?.value);
+    //this.selectedOption = this.searchForm.get('searchGroup')?.value as string; 
+    this.selectedOption = this.selectedCollection_Current_Name;
     var acceptable_collection = false;
     if (this.selectedOption == "(All)" ){
       this.selectedCollection_Current = "(All)"
@@ -541,9 +690,13 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   displayedColumns: string[] = ['name', 'views', 'downloads', 'citations'];
   title = 'metrics-app';
+  
 
-  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, private languageService: LanguageService) {
+  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, private languageService: LanguageService, private translocoService: TranslocoService, private cdr: ChangeDetectorRef, private loadingService: LoadingService) {
     this.filteredOptions = this.options.slice();
+    this.loadingService.isLoading$.subscribe((loading) => {
+      this.isLoading = loading;
+    });
   }
 
   filter(): void {
@@ -553,10 +706,14 @@ export class AppComponent implements AfterViewInit, OnInit{
 
   switchLanguage(language: string) {
     this.languageService.switchLanguage(language);
+    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   getLanguage(){
     return this.languageService.getLanguage();
+    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   ngAfterViewInit() {
@@ -582,8 +739,40 @@ export class AppComponent implements AfterViewInit, OnInit{
   } 
 
   openAboutDialog() {
-    this.dialog.open(AboutDialog);
+    const lang = this.getLanguage();
+    if (lang === 'fr') {
+      this.dialog.open(AboutDialogFr);
+    } else {
+      this.dialog.open(AboutDialogEn);
+    }
   }
+
+  openTOCDialog() {
+    const lang = this.getLanguage();
+  if (lang === 'fr') {
+    this.dialog.open(TOCDialogFr);
+  } else {
+    this.dialog.open(TOCDialogEn);
+  }
+  }
+
+  openContactDialog(){
+    const lang = this.getLanguage();
+    if (lang === 'fr') {
+      this.dialog.open(ContactDialogFr);
+    } else {
+      this.dialog.open(ContactDialogEn);
+    }
+  }
+
+  openFAQDialog() {
+    const lang = this.getLanguage();
+    if (lang === 'fr') {
+      this.dialog.open(FAQDialogFr);
+    } else {
+      this.dialog.open(FAQDialogEn);
+    }
+  }  
 
   subjectToggle() {
     if (this.subjectTableOn){this.subjectTableOn = false}
@@ -597,8 +786,102 @@ export class AppComponent implements AfterViewInit, OnInit{
 }
 
 @Component({
-  selector: 'about-dialog-popup',
-  templateUrl: 'about-dialog-popup.html',
+  selector: 'about-dialog-popup-en',
+  templateUrl: 'about-dialog-popup-en.html',
 })
 
-export class AboutDialog {}
+export class AboutDialogEn {
+  constructor(private dialogRef: MatDialogRef<AboutDialogEn>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+}
+
+@Component({
+  selector: 'about-dialog-popup-fr',
+  templateUrl: 'about-dialog-popup-fr.html',
+})
+
+export class AboutDialogFr {
+  constructor(private dialogRef: MatDialogRef<AboutDialogFr>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+}
+
+@Component({
+  selector: 'toc-dialog-popup-en',
+  templateUrl: 'toc-dialog-popup-en.html',
+})
+export class TOCDialogEn {
+  constructor(private dialogRef: MatDialogRef<TOCDialogEn>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+}
+
+
+@Component({
+  selector: 'toc-dialog-popup-fr',
+  templateUrl: 'toc-dialog-popup-fr.html',
+})
+export class TOCDialogFr {
+  constructor(private dialogRef: MatDialogRef<TOCDialogFr>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+}
+
+@Component({
+  selector: 'contact-dialog-popup-en',
+  templateUrl: 'contact-dialog-popup-en.html',
+})
+export class ContactDialogEn {
+  constructor(private dialogRef: MatDialogRef<ContactDialogEn>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+}
+
+@Component({
+  selector: 'contact-dialog-popup-fr',
+  templateUrl: 'contact-dialog-popup-fr.html',
+})
+export class ContactDialogFr {
+  constructor(private dialogRef: MatDialogRef<ContactDialogFr>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+}
+
+@Component({
+  selector: 'faq-dialog-popup-en',
+  templateUrl: 'faq-dialog-popup-en.html',
+})
+
+export class FAQDialogEn {
+  constructor(private dialogRef: MatDialogRef<FAQDialogEn>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+}
+
+@Component({
+  selector: 'faq-dialog-popup-fr',
+  templateUrl: 'faq-dialog-popup-fr.html',
+})
+
+export class FAQDialogFr {
+  constructor(private dialogRef: MatDialogRef<FAQDialogFr>) {}
+
+  closeDialog(): void {
+    this.dialogRef.close();
+  }
+}

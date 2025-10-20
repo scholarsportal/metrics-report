@@ -1,330 +1,324 @@
-import { HttpClient, HttpClientModule, HttpHeaders} from '@angular/common/http';
-import { BrowserModule } from '@angular/platform-browser';
-import { CommonModule} from '@angular/common';  
-import { Component, inject, EventEmitter, Output, Input} from '@angular/core';
-import { IntervalHistogram } from 'perf_hooks';
+import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';  
+import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { forkJoin } from 'rxjs';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { LoadingService } from '../loading.service';
+import { ApiService } from '../api.service';
 
 @Component({
   selector: 'app-posts',
   standalone: true,
-  imports: [HttpClientModule, MatProgressSpinnerModule, CommonModule],
+  imports: [HttpClientModule, MatProgressSpinnerModule, CommonModule, MatProgressBarModule],
   templateUrl: './posts.component.html',
   styleUrl: './posts.component.css'
 })
 export class PostsComponent {
+  // --- Inputs ---
   @Input() collectionSelected: string = "";
+  @Input() collectionSelectedName: string = ""; 
   @Input() start_on: boolean = false;
   @Input() startDate: string = "";
   @Input() endDate: string = "";
 
-  httpClient = inject(HttpClient);
-  public data: Array<any> = [];
-  public months: Array<any> = [];
-  public monthsDate: Array<any> = [];
-  
+  // --- Constructor ---
+  constructor(private apiService: ApiService, private loadingService: LoadingService) {}
 
-  public dataverseCollectionsURL: string = '';
-  public monthsDownloadsDateURLS: string = '';
-  public monthsDatasetsDateURLS: string = '';
-  public monthsFilesDateURLS: string = '';
-  public monthsUsersDateURLS: string = '';
-  public dataverseCountURL: string = '';
-  public parentAlias: String = "";
-
+  // --- Data from API responses ---
   public data_rsp: any;
-  public downloads_rsp: Array<any> = [];
-  public datasets_rsp: Array<any> = [];
-  public files_rsp: Array<any> = [];
-  public users_rsp: Array<any> = [];
-  public subject_rsp: Array<any> = [];
-  public filecontent_rsp: Array<any> = [];
-  public filecontent_rsp_date_range: Array<any> = [];
+  public downloads_rsp: any[] = [];
+  public datasets_rsp: any[] = [];
+  public files_rsp: any[] = [];
+  public users_rsp: any[] = [];
+  public subject_rsp: any[] = [];
+  public filecontent_rsp: any[] = [];
+  public filecontent_rsp_date_range: any[] = [];
   public dataverse_rsp: any;
+  public authors_rsp: any;
+  public creation_date_rs: any; 
 
-  public table_dataset_rsp: any= {};
-  public table_file_rsp: any= {};
+  // --- Processed Data Collections ---
+  public data: any[] = [];
+  public dataversesDataTree: any[] = [];
+  public dataverseCollections: Array<{name: string}> = [];
+  public dataverseAlias: Array<{alias: string, name: string}> = [];
+  public dataverseCollectionsDropDown: string[] = [];
 
-  public dataverseCount: number;
+  // --- Table Data ---
+  public table_dataset_rsp: Record<string, any> = {};
+  public table_file_rsp: Record<string, any> = {};
 
+  // --- Count Variables ---
+  public dataverseCount: number = 0;
+
+  // --- URLs ---
   public datasetURL: string = '';
-  public datasetsContents: Array<any> = [];
-  public datasets: Array<any> = []; 
-
   public fileURL: string = '';
-  public filesContents: Array<any> = [];
-  public files: Array<any> = []; 
-
   public subjectURL: string = '';
-  public subjectContents: Array<any> = []; 
-  public subjectLabels: Array<any> = []; 
-  public subjectData: Array<any> = []; 
-  public subjectContentFullData: Array<any> = []; 
-
   public fileContentURL: string = '';
-  public fileContentHash: any = {}; 
-  public fileContentDetailHash: any = {}; 
-  public fileContentLabels: Array<any> = []; 
-  public fileContentData: Array<any> = []; 
-  public fileContentFullData: Array<any> = []; 
-  
-  public monthlyDownloads: Array<any> = []; 
-  public monthlyDatasets: Array<any> = []; 
-  public monthlyFiles: Array<any> = [];
-  public monthlyUsers: Array<any> = []; 
 
-  public fileSizeHash: any = {}; 
-  public sizeLabels: Array<any> = []; 
-  public monthlySize: Array<any> = []; 
-  public monthlyAggSize: Array<any> = [];
+  // --- Contents & Datasets ---
+  public datasetsContents: any[] = [];
+  public datasets: any[] = []; 
+  public filesContents: any[] = [];
+  public files: any[] = []; 
+  public subjectContents: any[] = []; 
 
-  public monthlyAggDownloads: Array<any> = []; 
-  public monthlyAggDatasets: Array<any> = []; 
-  public monthlyAggFiles: Array<any> = [];
-  public monthlyAggUsers: Array<any> = [];
+  // --- Subject-related Data for Charts ---
+  public subjectLabels: string[] = []; 
+  public subjectData: number[] = []; 
+  public subjectContentFullData: Array<{subject: string, count: number, percent: string}> = []; 
 
-  public observables: Array<any> = [];
+  // --- File Content-related Data ---
+  public fileContentHash: Record<string, number> = {}; 
+  public fileContentDetailHash: Record<string, number> = {}; 
+  public fileContentLabels: string[] = []; 
+  public fileContentData: number[] = []; 
+  public fileContentFullData: Array<{type: string, contenttype: string, count: number, percent: string}> = []; 
 
-  public dataversesDataTree: Array<any> = [];
-  public dataverseCollections: Array<any> = [];
+  // --- Monthly Aggregated Metrics ---
+  public months: string[] = [];
+  public monthsDate: Date[] = [];
 
-  public dataverseCollectionsDropDown: Array<any> = [];
-  public dataverseAlias: Array<any> = [];
+  public monthlyDownloads: number[] = []; 
+  public monthlyDatasets: number[] = []; 
+  public monthlyFiles: number[] = [];
+  public monthlyUsers: number[] = []; 
 
-  public isLoading = false;
+  public monthlyAggDownloads: number[] = []; 
+  public monthlyAggDatasets: number[] = []; 
+  public monthlyAggFiles: number[] = [];
+  public monthlyAggUsers: number[] = [];
 
-  public firstAPIGet = true;
+  // --- File Size Metrics ---
+  public fileSizeHash: Record<string, number> = {}; 
+  public sizeLabels: string[] = []; 
+  public monthlySize: number[] = []; 
+  public monthlyAggSize: number[] = [];
 
-  public dateRangeOn = false; 
+  // --- Others ---
+  public observables: any[] = [];
+
+  /// -- Creation Date --- 
+  public creationDate: string;
+
+  // --- Flags ---
+  public isLoading: boolean = false;
+  public firstAPIGet: boolean = true;
+  public dateRangeOn: boolean = false;
+
+  // --- Errors ---
+  errorFlag: boolean = false;
+
     
   ngOnChanges() {
-
-    if (!this.firstAPIGet){
+    if (!this.firstAPIGet) {
       this.cleanTempData();
+      console.log('Clean Up Time');
     }
-
-    console.log("date", this.dateRangeOn, this.startDate, this.endDate)
-
-    //get number of months
-
-
-    this.dataverseCollectionsURL = 'https://borealisdata.ca/api/info/metrics/tree'; 
-    this.populateMonths();
-    console.log(this.months) 
-    if (this.collectionSelected != "(All)"){
-      this.parentAlias = "?parentAlias=" + this.collectionSelected;
-    }
-    else {
-      this.parentAlias = "";
-    }
-    
-    this.monthsDownloadsDateURLS = 'https://borealisdata.ca/api/info/metrics/downloads/monthly/' + this.parentAlias
-    this.monthsDatasetsDateURLS = 'https://borealisdata.ca/api/info/metrics/datasets/monthly/' + this.parentAlias
-    this.monthsFilesDateURLS = 'https://borealisdata.ca/api/info/metrics/files/monthly/' + this.parentAlias
-    this.monthsUsersDateURLS = 'https://borealisdata.ca/api/info/metrics/accounts/monthly/'
-    
-    this.subjectURL = 'https://borealisdata.ca/api/info/metrics/datasets/bySubject/toMonth/' + this.months[0] + this.parentAlias
-    this.fileContentURL = 'https://borealisdata.ca/api/info/metrics/files/byType/monthly/' + this.parentAlias
-
-    this.dataverseCountURL = 'https://borealisdata.ca/api/info/metrics/dataverses/toMonth/' + this.months[0] + this.parentAlias
-
-    this.observables.push(this.httpClient.get<[]>(this.dataverseCollectionsURL));
-    this.observables.push(this.httpClient.get<[]>(this.monthsDownloadsDateURLS))
-    this.observables.push(this.httpClient.get<[]>(this.monthsDatasetsDateURLS))
-    this.observables.push(this.httpClient.get<[]>(this.monthsFilesDateURLS))
-    this.observables.push(this.httpClient.get<[]>(this.monthsUsersDateURLS))
-    this.observables.push(this.httpClient.get<[]>(this.subjectURL))
-    this.observables.push(this.httpClient.get<[]>(this.fileContentURL))
-    this.observables.push(this.httpClient.get<[]>(this.dataverseCountURL))
-
-    /*
-    const httpHeaders: HttpHeaders = new HttpHeaders({
-      'X-Dataverse-key': 'fd4c70ad-9384-463d-a0f9-c83c1c0c6d7c'
-    });
-    //this.observables.push(this.httpClient.get<[]>("https://borealisdata.ca/api/dataverses/macewan/storagesize", { headers: httpHeaders}))
-    */
-
-    console.log(this.observables)
-
-    forkJoin(this.observables).subscribe(
-      (rep) => {
-          this.isLoading = true;
-          const responses = rep as any as any[];
-          console.log('raw responses,', responses); 
-          
-          this.data_rsp = responses[0]['data'];
-          this.downloads_rsp = responses[1]['data'];
-          this.datasets_rsp = responses[2]['data'];
-          this.files_rsp  = responses[3]['data'];
-          this.users_rsp = responses[4]['data'];
-          this.subject_rsp = responses[5]['data'];
-          this.filecontent_rsp = responses[6]['data'];
-          this.dataverse_rsp = responses[7]['data'];
-
-          this.dataversesDataTree = this.data_rsp['children']
-          if (this.collectionSelected != "(All)"){
-              console.log("HAHAHAHA", this.dataversesDataTree, this.collectionSelected)
-              let aliasRow = this.findAliasRow(this.dataversesDataTree , this.collectionSelected)
-              let tempDataTree = this.dataversesDataTree [aliasRow]
-              if (tempDataTree.hasOwnProperty("children")) {
-                this.dataversesDataTree = this.dataversesDataTree[aliasRow]['children']
-              }
-              else{
-                this.dataversesDataTree = [];
-              }
-          }
-
-          for (let i = 0; i < this.dataversesDataTree.length; i++){
-            this.dataverseCollections.push(
-              {name: this.dataversesDataTree[i]['name']
-              }
-            )
-            console.log(this.dataverseCollections);
-            if (!this.firstAPIGet){
-            this.dataverseAlias.push(
-              {
-                alias: this.dataversesDataTree[i]['alias'],
-                name: this.dataversesDataTree[i]['name']
-              }
-            )
-            this.dataverseCollectionsDropDown.push(this.dataversesDataTree[i]['name'])
-            }
-          }
-          
-          console.log("look at the months,", this.months)
-          
-          for (let i = 0; i <= this.months.length - 2 ; i++){
-            this.monthlyDownloads.push(this.downloads_rsp.find(x=>x.date==this.months[i])['count']);
-            this.monthlyAggDownloads.push(this.downloads_rsp.find(x=>x.date==this.months[i])['count'] - this.downloads_rsp.find(x=>x.date==this.months[i+1])['count']);
-        
-            this.monthlyDatasets.push(this.datasets_rsp.find(x=>x.date==this.months[i])['count']);
-            this.monthlyAggDatasets.push(this.datasets_rsp.find(x=>x.date==this.months[i])['count'] - this.datasets_rsp.find(x=>x.date==this.months[i+1])['count']);
-        
-            this.monthlyFiles.push(this.files_rsp.find(x=>x.date==this.months[i])['count']);
-            this.monthlyAggFiles.push(this.files_rsp.find(x=>x.date==this.months[i])['count'] - this.files_rsp.find(x=>x.date==this.months[i+1])['count']);
-        
-            this.monthlyUsers.push(this.users_rsp.find(x=>x.date==this.months[i])['count']);
-            this.monthlyAggUsers.push(this.users_rsp.find(x=>x.date==this.months[i])['count'] - this.users_rsp.find(x=>x.date==this.months[i+1])['count']);
-          }
-
-          console.log(responses[5])
-          console.log(this.filecontent_rsp)
-          
-          let subject_overall_count = 0;
-          for (let i = 0; i < this.subject_rsp.length; i++){
-            subject_overall_count += this.subject_rsp[i]['count']
-          }
-          for (let i = 0; i < this.subject_rsp.length; i++){
-            this.subjectContentFullData.push({subject: this.subject_rsp[i]['subject'], count: this.subject_rsp[i]['count'], percent: (this.subject_rsp[i]['count'] / subject_overall_count).toFixed(4)})
-          }
-
-          this.subjectLabels = this.subject_rsp.map((x: { subject: any; }) => x.subject);
-          this.subjectData = this.subject_rsp.map((x: { count: any; }) => x.count);
-          
-          let filecount_overall_count = 0;
-          for (let i = 0; i < this.filecontent_rsp.length; i++){
-            filecount_overall_count += this.filecontent_rsp[i]['count']
-          }
-
-          for (let i = 0; i < this.filecontent_rsp.length; i++){
-            let date = this.filecontent_rsp[i]['date']
-            if (this.fileSizeHash.hasOwnProperty(date)){
-              this.fileSizeHash[date] += parseFloat((this.filecontent_rsp[i]['size'] / Math.pow(1024, 3)).toFixed(4));
-            }
-            else{
-              this.fileSizeHash[date] = parseFloat((this.filecontent_rsp[i]['size'] / Math.pow(1024, 3)).toFixed(4));
-            }
-          }
-          
-          var fileSizeArrayAll = Object.keys(this.fileSizeHash).map((key) => [key, this.fileSizeHash[key]]);
-          var fileSizeArray: Array<any> = []; 
-          for (var i = 0; i < fileSizeArrayAll.length; i++){
-            if (this.months.includes(fileSizeArrayAll[i][0])){
-              fileSizeArray.push(fileSizeArrayAll[i])
-            }
-          }
-
-          for (var i = 0; i < fileSizeArray.length - 1; i++){
-            this.sizeLabels.push(fileSizeArray[i][0]);
-            this.monthlySize.push(fileSizeArray[i][1]);
-            this.monthlyAggSize.push(fileSizeArray[i+1][1] - fileSizeArray[i][1]);
-          }
-          this.monthlySize = this.monthlySize.reverse();
-          this.monthlyAggSize = this.monthlyAggSize.reverse();
-          console.log("size stuff", this.monthlySize, this.monthlyAggSize)
-
-          this.dataverseCount = this.dataverse_rsp['count'];
-
-          //this.monthlyAggFiles.push(this.files_rsp.find(x=>x.date==this.months[i])['count'] - this.files_rsp.find(x=>x.date==this.months[i+1])['count']);
-          
-          if (this.start_on){
-          for (let i = 0; i < this.filecontent_rsp.length; i++){
-            if (this.months.slice(0, -1).includes(this.filecontent_rsp[i]['date'])){
-              console.log(this.months, this.filecontent_rsp[i]['date'])
-              this.filecontent_rsp_date_range.push(this.filecontent_rsp[i])
-            }
-          }
-          }
-          else {
-            this.filecontent_rsp_date_range = this.filecontent_rsp
-          }
-          
-          console.log(this.filecontent_rsp_date_range)
-          
-          for (let i = 0; i < this.filecontent_rsp_date_range.length; i++){
-
-            //this.fileContentFullData.push({contenttype: this.filecontent_rsp_date_range[i]['contenttype'], count: this.filecontent_rsp_date_range[i]['count'], percent: (this.filecontent_rsp_date_range[i]['count'] / filecount_overall_count).toFixed(4)})
-
-            let contentType = (this.filecontent_rsp_date_range[i]['contenttype'].split('/')[0]); 
-            let count = this.filecontent_rsp_date_range[i]['count']; 
-            if (this.fileContentHash.hasOwnProperty(contentType)){
-              this.fileContentHash[contentType] = this.fileContentHash[contentType] + count;
-            }
-            else {
-              this.fileContentHash[contentType] = count
-            }
-
-            let contentDetailType = (this.filecontent_rsp_date_range[i]['contenttype']); 
-            let countDetail = this.filecontent_rsp_date_range[i]['count']; 
-            if (this.fileContentDetailHash.hasOwnProperty(contentDetailType)){
-              this.fileContentDetailHash[contentDetailType] = this.fileContentDetailHash[contentDetailType] + countDetail;
-            }
-            else {
-              this.fileContentDetailHash[contentDetailType] = countDetail
-            }
-          }
-
-          let date_range_sum = 0
-          for (var key in this.fileContentHash){
-            date_range_sum += this.fileContentHash[key];
-          }
-          console.log('count', date_range_sum)
-
-          for (var key in this.fileContentDetailHash){
-            let main_type = key.split('/')[0];
-            this.fileContentFullData.push({type: main_type, contenttype: key, count: this.fileContentDetailHash[key], percent: (this.fileContentHash[main_type] / date_range_sum).toFixed(4)})
-          }
-
-          console.log(this.fileContentHash);
-          console.log(this.fileContentDetailHash);
-        
-          for (var key in this.fileContentHash){
-            this.fileContentLabels.push(key)
-            this.fileContentData.push(this.fileContentHash[key]);
-          }
-
-        
-          
-          this.months.pop()
-          this.sendData();
-      },
-      err => console.error(err)
-   );
-
-   this.isLoading = false;
-   this.firstAPIGet = false;
   
+    this.populateMonths();
+    console.log(this.months);
+    console.log("date", this.dateRangeOn, this.startDate, this.endDate);
+  
+    this.apiService.getAllMetrics(this.cleanedParentAlias, this.months[0]).subscribe(
+      ({ data: rep, errorOccurredFlag }) => {
+        this.loadingService.hide();
+    
+        console.log('raw responses,', rep);
+        this.errorFlag = errorOccurredFlag;
+    
+        // your existing logic using rep (which is an array of results) continues unchanged
+        
+        [
+          this.data_rsp,
+          this.downloads_rsp,
+          this.datasets_rsp,
+          this.files_rsp,
+          this.users_rsp,
+          this.subject_rsp,
+          this.filecontent_rsp,
+          this.dataverse_rsp,
+          this.creation_date_rs
+        ] = rep.map((r, idx) => {
+          if (r && typeof r.data === 'object' && Object.keys(r.data).length === 0) {
+            if ([0, 7, 8].includes(idx)) {
+              return {};
+            }
+            return [];
+          }
+          return r.data;
+        });
+
+        console.log(this.creation_date_rs)
+
+        if (this.creation_date_rs?.date) {
+          this.creationDate = this.creation_date_rs.date;
+        }
+  
+        this.dataversesDataTree = Array.isArray(this.data_rsp?.children) ? this.data_rsp.children : [];
+  
+        // Populate dataverseCollections and dataverseAlias arrays
+        this.dataverseCollections = this.dataversesDataTree.map(item => ({ name: item.name }));
+  
+        if (!this.firstAPIGet) {
+          this.dataverseAlias = this.dataversesDataTree.map(item => ({
+            alias: item.alias,
+            name: item.name
+          }));
+          this.dataverseCollectionsDropDown = this.dataversesDataTree.map(item => item.name);
+        }
+  
+        console.log("look at the months,", this.months);
+  
+        if (!Array.isArray(this.downloads_rsp) || this.downloads_rsp.length < this.months.length) {
+          this.months = Array.isArray(this.downloads_rsp) ? this.downloads_rsp.map(item => item.date).reverse() : this.months;
+        }
+  
+        // Prepare monthly arrays
+        for (let i = 0; i < this.months.length - 1; i++) {
+          const currDate = this.months[i];
+          const nextDate = this.months[i + 1];
+  
+          const findByDate = (arr: any[]) => (date: string) => arr.find(x => x.date === date)?.count ?? 0;
+  
+          const downloadsCount = Array.isArray(this.downloads_rsp) ? findByDate(this.downloads_rsp) : () => 0;
+          const datasetsCount = Array.isArray(this.datasets_rsp) ? findByDate(this.datasets_rsp) : () => 0;
+          const filesCount = Array.isArray(this.files_rsp) ? findByDate(this.files_rsp) : () => 0;
+          const usersCount = Array.isArray(this.users_rsp) ? findByDate(this.users_rsp) : () => 0;
+  
+          this.monthlyDownloads.push(downloadsCount(currDate));
+          this.monthlyAggDownloads.push(downloadsCount(currDate) - downloadsCount(nextDate));
+  
+          this.monthlyDatasets.push(datasetsCount(currDate));
+          this.monthlyAggDatasets.push(datasetsCount(currDate) - datasetsCount(nextDate));
+  
+          this.monthlyFiles.push(filesCount(currDate));
+          this.monthlyAggFiles.push(filesCount(currDate) - filesCount(nextDate));
+  
+          this.monthlyUsers.push(usersCount(currDate));
+          this.monthlyAggUsers.push(usersCount(currDate) - usersCount(nextDate));
+        }
+  
+        // Subject counts & percentages
+        const subjectOverallCount = Array.isArray(this.subject_rsp) ? this.subject_rsp.reduce((acc, cur) => acc + cur.count, 0) : 0;
+        this.subjectContentFullData = this.subject_rsp.map(s => ({
+          subject: s.subject,
+          count: s.count,
+          percent: subjectOverallCount > 0
+            ? (s.count / subjectOverallCount).toFixed(4)
+            : "0.0000"
+        }));
+        this.subjectLabels = Array.isArray(this.subject_rsp) ? this.subject_rsp.map(x => x.subject) : [];
+        this.subjectData = Array.isArray(this.subject_rsp) ? this.subject_rsp.map(x => x.count) : [];
+  
+        // File content size aggregation
+        const fileCountOverallCount = Array.isArray(this.filecontent_rsp) ? this.filecontent_rsp.reduce((acc, cur) => acc + cur.count, 0) : 0;
+  
+        this.fileSizeHash = Array.isArray(this.filecontent_rsp) ? this.filecontent_rsp.reduce((acc, item) => {
+          const date = item.date;
+          const sizeGB = parseFloat((item.size / Math.pow(1024, 3)).toFixed(4));
+          acc[date] = (acc[date] || 0) + sizeGB;
+          return acc;
+        }, {} as Record<string, number>) : {};
+  
+        const fileSizeArrayAll = Object.entries(this.fileSizeHash);
+        const fileSizeArray = fileSizeArrayAll.filter(([key]) => this.months.includes(String(key)));
+  
+        this.sizeLabels = [];
+        this.monthlySize = [];
+        this.monthlyAggSize = [];
+  
+        for (let i = 0; i < fileSizeArray.length - 1; i++) {
+          this.sizeLabels.push(fileSizeArray[i][0]);
+          this.monthlySize.push(fileSizeArray[i][1]);
+          this.monthlyAggSize.push(fileSizeArray[i + 1][1] - fileSizeArray[i][1]);
+        }
+  
+        this.monthlySize.reverse();
+        this.monthlyAggSize.reverse();
+        console.log("size stuff", this.monthlySize, this.monthlyAggSize);
+  
+        this.dataverseCount = this.dataverse_rsp?.count ?? 0;
+  
+        if (this.start_on) {
+          this.filecontent_rsp_date_range = Array.isArray(this.filecontent_rsp) ? this.filecontent_rsp.filter(item => this.months.slice(0, -1).includes(item.date)) : [];
+        } else {
+          this.filecontent_rsp_date_range = Array.isArray(this.filecontent_rsp) ? this.filecontent_rsp : [];
+        }
+  
+        console.log(this.filecontent_rsp_date_range);
+  
+        this.fileContentHash = {};
+        this.fileContentDetailHash = {};
+  
+        this.filecontent_rsp_date_range.forEach(item => {
+          const contentType = item.contenttype?.split('/')[0] ?? '';
+          const count = item.count ?? 0;
+  
+          if (item.date === this.months[0]) {
+            this.fileContentHash[contentType] = (this.fileContentHash[contentType] || 0) + count;
+  
+            this.fileContentDetailHash[item.contenttype] = (this.fileContentDetailHash[item.contenttype] || 0) + count;
+          }
+        });
+  
+        const dateRangeSum = Object.values(this.fileContentHash).reduce((acc, val) => acc + val, 0);
+        console.log('count', dateRangeSum);
+  
+        this.fileContentFullData = Object.entries(this.fileContentDetailHash).map(([key, value]) => {
+          const mainType = key.split('/')[0];
+          return {
+            type: mainType,
+            contenttype: key,
+            count: value,
+            percent: dateRangeSum > 0 ? (this.fileContentHash[mainType] / dateRangeSum).toFixed(4) : "0"
+          };
+        });
+  
+        console.log(this.fileContentHash);
+        console.log(this.fileContentDetailHash);
+  
+        this.fileContentLabels = Object.keys(this.fileContentHash);
+        this.fileContentData = Object.values(this.fileContentHash);
+
+        this.monthlyDownloads.reverse();
+        this.monthlyDatasets.reverse();
+        this.monthlyFiles.reverse();
+        this.monthlyUsers.reverse();
+        this.monthlySize.reverse();
+        this.monthlyAggDownloads.reverse();
+        this.monthlyAggDatasets.reverse();
+        this.monthlyAggFiles.reverse();
+        this.monthlyAggUsers.reverse();
+        this.monthlyAggSize.reverse();
+        this.months.reverse();
+  
+        this.months.shift();
+        this.sendData();
+      },
+      (error) => {
+        // This is a fallback for the unlikely case the entire forkJoin fails (very rare if you catch errors inside)
+        console.error('API Error:', error);
+    
+        this.data_rsp = {};
+        this.downloads_rsp = [];
+        this.datasets_rsp = [];
+        this.files_rsp = [];
+        this.users_rsp = [];
+        this.subject_rsp = [];
+        this.filecontent_rsp = [];
+        this.dataverse_rsp = {};
+        this.authors_rsp = {};
+    
+        this.loadingService.show();
+        this.firstAPIGet = false;
+      }
+    );
+  
+    this.loadingService.show();
+    this.firstAPIGet = false;
   }
 
   @Output() messageEvent = new EventEmitter<any>();
@@ -350,148 +344,141 @@ export class PostsComponent {
         file_content_label_data: this.fileContentLabels,
         file_content_data: this.fileContentData,
         file_content_full_data: this.fileContentFullData,
-        name_dropdown_data: this.dataverseCollectionsDropDown,     
-        months: this.months
+        name_dropdown_data: this.dataverseCollectionsDropDown, 
+        creation_date: this.creationDate,
+        months: this.months,
+        error_flag: this.errorFlag
     }
     console.log(DataverseTabData)
     this.messageEvent.emit({"DataverseTabData": DataverseTabData});
   }
 
-  populateMonths(){
-
-    let date_diff = 24
-
-    console.log("this is the start", this.startDate, this.endDate)
-
-    if (this.start_on && this.startDate != ""){
-      
-      date_diff = monthDifference(this.startDate, this.endDate);
-      console.log("this is date_diff", date_diff)
-
+  populateMonths() {
+    this.months = [];
+    let dateDiff = 24;
+  
+    // If startDate and endDate are provided, calculate the month difference
+    if (this.start_on && this.startDate && this.endDate) {
+      dateDiff = this.monthAmount(this.startDate, this.endDate);
     }
-
-    var upperDate = new Date();
-    
-    if (this.endDate != ""){
-      let timestamp = Date.parse(this.endDate.concat("-02"));
-      console.log(timestamp);
-      var upperDate = new Date(timestamp);
-      console.log("this is the upper date?", upperDate)
+  
+    // Determine the starting point for the month loop
+    let upperDate = this.endDate ? new Date(Date.parse(this.endDate + "-02")) : new Date();
+    console.log("months", upperDate, this.startDate, this.endDate)
+  
+    // If today is in the first week of the month, move the starting date back by a month
+    if (new Date().getDate() < 7 && !this.start_on) {
+      upperDate.setMonth(upperDate.getMonth() - 1);
     }
-    
-    let mm = upperDate.getMonth() + 1;
-    let yyyy = upperDate.getFullYear()
+    console.log("months", upperDate)
+  
+    let foundStartMonth = false;
 
-    console.log(mm, yyyy);
-
-    for (let i = 0; i <=date_diff + 2; i++){
-      if (i != 0){
+    console.log("months diff", dateDiff, this.startDate, this.endDate)
+  
+    // Loop through the months from the endDate to startDate (if provided)
+    for (let i = 0; i <= dateDiff; i++) {
+      const mm = upperDate.getMonth() + 1; // Get the month (1-12)
+      const yyyy = upperDate.getFullYear(); // Get the year
+      const dateStr = `${yyyy}-${String(mm).padStart(2, '0')}`; // Format the date as YYYY-MM
       
-        mm = mm - 1;
-
-      if (mm == 0){
-        yyyy = yyyy - 1;
-        mm = 12; 
+      console.log("months one by one", dateStr, i)
+      this.months.push(dateStr);
+      console.log(this.months)
+  
+      // If start_on is active and we've hit the startDate, flag it
+      if (this.start_on && dateStr === this.startDate) {
+        foundStartMonth = true;
       }
-
+  
+      // Move to the previous month
+      upperDate.setMonth(upperDate.getMonth() - 1);
     }
-
-      var mm_s = String(mm).padStart(2, '0');
-      var yyyy_s = String(yyyy);
-      let date = yyyy_s + '-' + mm_s;
-      console.log(date)
-
-      console.log('here is the', date)
-      this.months.push(date); 
-
-      if (this.start_on){ 
-        if (date === this.startDate){
-          if (i == date_diff + 2){
-            break;
-          }
-          else{
-            i = date_diff + 1
-          }
-        }
-      } 
-    }
-    //temp 
-    //this.months.shift(); 
-
-    function monthDifference(s1: string, s2: string){
-      let timestamp_s = Date.parse(s1);
-      var lowerDate = new Date(timestamp_s);
-
-      let timestamp_e = Date.parse(s2);
-      var upperDate = new Date(timestamp_e);
-
-      console.log(upperDate, lowerDate)
-
-      var months;
-      months = (upperDate.getFullYear() - lowerDate.getFullYear()) * 12;
-      months += Math.abs(upperDate.getMonth() - lowerDate.getMonth());
-      return months; 
-    } 
-
+  
+    // Sort the months in reverse chronological order
+    this.months.sort((a, b) => (a < b ? 1 : -1));
   }
+  
+  
+  // Helper method moved outside populateMonths for clarity
+  monthAmount(s1: string, s2: string): number {
+    const lowerDate = new Date(Date.parse(s1 + "-01"));  // Add a dummy day to avoid time issues
+    const upperDate = new Date(Date.parse(s2 + "-01"));  // Add a dummy day to avoid time issues
 
-  cleanTempData(){
-    
+    let monthsDifference = (upperDate.getFullYear() - lowerDate.getFullYear()) * 12 + (upperDate.getMonth() - lowerDate.getMonth());
+    if (monthsDifference === 0) {
+        return 1;
+    }
+    if (monthsDifference === 1) {
+        return 2;
+    }
+    return Math.abs(monthsDifference) + 1;
+}
+
+  cleanTempData() {
+    // Collections and dropdown data
     this.dataverseCollectionsDropDown = [];
-
-    this.dataverseCollectionsURL = '';
-    this.monthsDownloadsDateURLS = '';
-    this.monthsDatasetsDateURLS = '';
-    this.monthsFilesDateURLS = '';
-    this.monthsUsersDateURLS = '';
-    this.dataverseCountURL = '';
-
-    this.monthlyDownloads = []; 
-    this.monthlyDatasets = []; 
-    this.monthlyFiles = [];
-    this.monthlyUsers = []; 
-    this.monthlySize = []; 
-    this.dataverse_rsp = [];
-    this.observables = [];
-
-    this.dataversesDataTree = [];
     this.dataverseCollections = [];
-
-    this.dataverseCount = 0;
-
-    this.datasetURL = '';
-    this.datasetsContents = [];
-    this.datasets = []; 
-
-    this.subjectURL = '';
-    this.subjectContents = []; 
-    this.subjectLabels = []; 
-    this.subjectData = []; 
-
-    this.fileContentURL = '';
-    this.fileContentHash= {}; 
-    this.fileSizeHash = {};
-    this.fileContentDetailHash= {}; 
-    this.fileContentLabels= []; 
-    this.fileContentData = []; 
+    this.dataverseAlias = [];
+    this.dataversesDataTree = [];
+  
+    // API response placeholders
+    this.dataverse_rsp = [];
     this.filecontent_rsp = [];
     this.filecontent_rsp_date_range = [];
-
-    this.monthlyAggDownloads = []; 
-    this.monthlyAggDatasets = []; 
+    this.observables = [];
+  
+    // Monthly data arrays
+    this.monthlyDownloads = [];
+    this.monthlyDatasets = [];
+    this.monthlyFiles = [];
+    this.monthlyUsers = [];
+    this.monthlySize = [];
+  
+    this.monthlyAggDownloads = [];
+    this.monthlyAggDatasets = [];
     this.monthlyAggFiles = [];
-    this.monthlyAggUsers = []; 
-    this.monthlyAggSize = []; 
-
+    this.monthlyAggUsers = [];
+    this.monthlyAggSize = [];
+  
+    // Dataset-related
+    this.datasetURL = '';
+    this.datasetsContents = [];
+    this.datasets = [];
+  
+    // Subject-related
+    this.subjectURL = '';
+    this.subjectContents = [];
+    this.subjectLabels = [];
+    this.subjectData = [];
     this.subjectContentFullData = [];
+  
+    // File content-related
+    this.fileContentURL = '';
+    this.fileContentHash = {};
+    this.fileSizeHash = {};
+    this.fileContentDetailHash = {};
+    this.fileContentLabels = [];
+    this.fileContentData = [];
     this.fileContentFullData = [];
-
+  
+    // Counters and flags
+    this.dataverseCount = 0;
+  
+    // Other
     this.months = [];
+    this.creation_date_rs = "";
+    this.creationDate = ""; 
+    this.errorFlag = false;
+  }
+
+  get cleanedParentAlias(): string {
+    return this.collectionSelected === '(All)' ? '' : this.collectionSelected;
   }
 
   findAliasRow(arr: Array<any>, target: String){
     for (let i = 0; i <= arr.length; i++){
-      if (arr[i]['alias'] == target){
+      if (arr[i] && arr[i]['alias'] === target){
         return(i)
       }
     }

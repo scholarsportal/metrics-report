@@ -1,301 +1,187 @@
-<app-posts (messageEvent)="getData($event)" [collectionSelected]="selectedCollection_Activate" [startDate]="date_start_activate" [endDate]="date_end_activate" [start_on]="start_on"></app-posts>
-
 <div>
-<h2 style="padding:20px;"> 
-  <div style="float: left">
-  <img style="max-width: 100%; height:30px; position: absolute;" src="assets/logo.png" alt="image">
-  <div style="position: relative; left:35px"> {{ 'Title' | transloco }} </div>
-  </div>
-  <div style="float:right; align-items: center;">
-    <div style="float:right; position: relative;">
-      <button mat-button (click)="switchLanguage('en')" [disabled]="getLanguage()=='en'"> English </button>
-      |
-      <button mat-button (click)="switchLanguage('fr')" [disabled]="getLanguage()=='fr'"> Français </button>
+  <h2 style="padding:20px;"> 
+    <div style="float: left">
+      <img style="max-width: 100%; height:30px; position: absolute;" src="assets/logo.png" alt="image">
+      <div style="position: relative; left:35px"> {{ 'Title' | transloco }} </div>
     </div>
-    <div  style="clear:both;">
-      <button (click)="openAboutDialog()" style="min-width: 1%;" class="mat-small" mat-button> About </button>
-      | 
-      <button style="min-width: 1%;" class="mat-small" mat-button> Terms of Conditions </button>
-      |
-      <button style="min-width: 1%;" class="mat-small" mat-button> FAQ </button>
+    <div style="float:right; align-items: center;">
+      <div style="float:right; position: relative;">
+        <button mat-button (click)="switchLanguage('en')" [disabled]="getLanguage()=='en'"> English </button>
+        |
+        <button mat-button (click)="switchLanguage('fr')" [disabled]="getLanguage()=='fr'"> Français </button>
+      </div>
+      <div  style="clear:both;">
+        <button (click)="openAboutDialog()" style="min-width: 1%;" class="mat-small" mat-button> {{ 'About' | transloco }} </button>
+        | 
+        <button (click)="openTOCDialog()" style="min-width: 1%;" class="mat-small" mat-button> {{ 'TermsofUse' | transloco }} </button>
+        |
+        <button (click)="openContactDialog()" style="min-width: 1%;" class="mat-small" mat-button> {{ 'Contact' | transloco }} </button>
+        |
+        <button (click)="openFAQDialog()" style="min-width: 1%;" class="mat-small" mat-button> {{ 'FAQ' | transloco }} </button>
+      </div>
     </div>
-  </div>
-</h2>
+  </h2>
 </div>
 
+<mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
+<div class="loading-overlay" *ngIf="isLoading"></div>
+
+<app-posts (messageEvent)="getData($event)" [collectionSelected]="selectedCollection_Activate" [collectionSelectedName]="selectedCollection_Current_Name" [startDate]="date_start_activate" [endDate]="date_end_activate" [start_on]="date_select_on"></app-posts>
+
+<!-- Content BELOW, inside your fit-content container -->
 <div style="
-  padding:60px;
-  top:10px; 
   max-width: fit-content;
   margin-left: auto;
   margin-right: auto;
-  padding-bottom: 0.2cm;
-  ">
+">
 
-<mat-form-field appearance="outline" style="margin-left: 10px; width:400px;">
-  <mat-label >Collection</mat-label>
-    <input #input panelWidth="400px" 
-    type="text"
-    placeholder=""
-           matInput
-           [(ngModel)]="selectedOption"
-           type="text"
-           placeholder="Pick one"
-           [matAutocomplete]="auto"
-           (input)="filter()"
-           (focus)="filter()">
-    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-      @for (option of filteredOptions; track option) {
-        <mat-option [value]="option">{{option}}</mat-option>
-      }
-    </mat-autocomplete>
-</mat-form-field>
+  <div style="clear:both;">
+    <app-download #download [data]="raw_table_data" [name]="selectedOption"></app-download>
+    <ng-template [ngIf]="true">
 
-<mat-form-field appearance="outline" style="margin-left: 10px;"> 
-  <mat-label>Start Date</mat-label>
-  <input matInput *ngIf="!start_on" disabled> 
-  <input matInput *ngIf="start_on"[matDatepicker]="dp_s" [formControl]="date_start" [min]="minDate" [max]="todayDate"> 
-  <mat-datepicker-toggle *ngIf="start_on" matIconSuffix [for]="dp_s"> </mat-datepicker-toggle>
-  <mat-datepicker #dp_s 
-                  startView="multi-year"
-                  (monthSelected)="setStartMonthAndYear($event, dp_s)"
-                  panelClass="example-month-picker">
-  </mat-datepicker>
-</mat-form-field>
+      <!-- Title + Date Container -->
+  <div class="title-container" style="">
+    <div *ngIf="selectedCollection_Activate === '(All)'" id="pdf_name">
+      <h1 id="responsive-title" class="responsive-title">{{ 'All' | transloco }}</h1>
+    </div>
 
+    <div *ngIf="selectedCollection_Activate !== '(All)'" id="pdf_name">
+      <h4 style="color: purple;"><b> • Collection Selected • </b></h4>
+      <h1 id="responsive-title" class="responsive-title">{{ selectedCollection_Activate_Name }}</h1>
+    </div>
 
-<mat-checkbox [ngModel]="!start_on" (ngModelChange)="start_on = !$event" style="margin-left: 10px;"> All-Time </mat-checkbox>
+    <div id="pdf_date" style="margin-bottom: 4px;">
+      <p><i>{{ date_String }}</i></p>
+    </div>
 
-<mat-form-field appearance="outline"style="margin-left: 10px;"> 
-  <mat-label>End Date</mat-label>
-  <input matInput [matDatepicker]="dp_e" [formControl]="date_end" [min]="minDate" [max]="todayDate">
-  <mat-datepicker-toggle matIconSuffix [for]="dp_e"></mat-datepicker-toggle>
-  <mat-datepicker #dp_e
-                  startView="multi-year"
-                  (monthSelected)="setEndMonthAndYear($event, dp_e)"
-                  panelClass="example-month-picker">
-  </mat-datepicker>
-</mat-form-field>
-
-  <button (click)="CollectionDataButtonActivate()" mat-button extended style="margin-left: 10px;"> SUBMIT </button>
+    <div *ngIf="error_flag" style="
+    margin-bottom: 4px; 
+    margin-left: 5px; 
+    color: red; 
+    border: 1px solid red; 
+    border-radius: 8px; 
+    background-color: #ffe5e5; 
+    padding: 10px 10px 0px 10px; 
+    max-width: 300px;
+    line-height: 1;
+    ">
+  <p><i>{{ 'ErrorMessage1' | transloco }} </i></p> 
 </div>
+  </div>
 
-<div *ngIf="bad_range==true"> <h4 style="color:red; text-align: center;"> Invalid Date Range </h4> </div>
+      <hr style="border: none; height: 1px; background-color: #ccc; margin: 16px 0;">
 
-<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-  <app-download #download [data]="raw_table_data" [name]="selectedOption"></app-download>
-  <mat-tab label="Overview"> 
-    <ng-template matTabContent>
+      <div style="margin: auto; width: 100%; display: flex;">
+        <div style="vertical-align:top;">
+          <div id="main_meteris">
 
-      <div style="position:absolute; top:10px; right:150px;">
-      <button class="mat-small"  (click)="download.generateExcel()" 
-        mat-button extended > 
-         EXCEL <mat-icon> download </mat-icon> </button> | 
+            <mat-card class="example-card hide-scrollbar" appearance="outlined" style="min-width: 350px; max-width: 350px; margin-bottom: 10px; margin-left: 5px; margin-top: 10px; max-height: 500px; overflow-y: auto; font-size: 12px;">
+              <mat-card-header>
+                <mat-card-title-group>
+                  <mat-card-title> {{ 'DateRange' | transloco }} </mat-card-title>
+                  <mat-card-subtitle> </mat-card-subtitle>
+                </mat-card-title-group>
+              </mat-card-header>
+              <mat-card-content style="margin-top: 10px; margin-left: 17px">
+                <div style="display: flex; flex-direction: row;">
+                  <!-- Start Date -->
+                  <mat-form-field appearance="outline" class="compact-form-field" style="margin-left: 10px;" disableRipple>
+                    <mat-label>{{ 'StartDate' | transloco }}</mat-label>
 
-      <button class="mat-small" 
-        mat-button extended (click)="download.generatePDF()"> 
-         PDF <mat-icon> download </mat-icon> </button>
-      </div>
+                    <input matInput *ngIf="!start_on" disabled>
 
-      <div style="margin: auto;
-      width: 75%; 
-      display: flex;">
+                    <input matInput *ngIf="start_on"
+                           [matDatepicker]="dp_s"
+                           [formControl]="date_start"
+                           [min]="this.creation_date"
+                           [max]="todayDate">
 
-      <div style="vertical-align:top; margin-top: 50px; margin-left: -10px;">
-        
-        <div style="vertical-align:top; margin-left: 20px;">
-          <div *ngIf="selectedCollection_Activate=='(All)'" id="title_download"> <h1 style="font-size: 32px; font-weight: bold;">Borealis&nbsp;(All)</h1></div>
-          <div *ngIf="selectedCollection_Activate!='(All)'" id="title_download"><h1 style="font-size: 32px; font-weight: bold;">{{selectedCollection_Activate_Name}}</h1></div>
-          <div style="margin-top: -5px; font-size: 18px;" id="title_date"><p><i>{{date_String}}</i></p></div>
-        </div>
-        
-        <div id="main_meteris">
-        
-        <div>
-        <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
-          <mat-card-header>
-            <mat-card-title-group>
-              <mat-card-title> <div *ngIf="selectedCollection_Activate=='(All)'"> Collections </div> 
-                <div *ngIf="selectedCollection_Activate!='(All)'"> Sub Collections </div> </mat-card-title>
-            </mat-card-title-group>
-          </mat-card-header>
-          <mat-card-content>
-            <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_collections_num}}</b> </h1>
-          </mat-card-content>
-        </mat-card>
+                    <mat-datepicker-toggle *ngIf="start_on"
+                                           matIconSuffix
+                                           [for]="dp_s"
+                                           class="custom-toggle"
+                                           [disableRipple]="true">
+                      <mat-icon matDatepickerToggleIcon class="small-datepicker-icon">event</mat-icon>
+                    </mat-datepicker-toggle>
 
-        <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
-          <mat-card-header>
-            <mat-card-title-group>
-              <mat-card-title> <div *ngIf="selectedCollection_Activate=='(All)'"> Sub Collections </div> 
-                <div *ngIf="selectedCollection_Activate!='(All)'"> Sub Dataverses </div> </mat-card-title>
-            </mat-card-title-group>
-          </mat-card-header>
-          <mat-card-content>
-            <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_dataverses_num}}</b> </h1>
-          </mat-card-content>
-        </mat-card>
+                    <mat-datepicker #dp_s
+                                    startView="multi-year"
+                                    (monthSelected)="setStartMonthAndYear($event, dp_s)"
+                                    panelClass="example-month-picker">
+                    </mat-datepicker>
+                  </mat-form-field>
 
-          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
-            <mat-card-header>
-              <mat-card-title-group>
-                <mat-card-title> Datasets </mat-card-title>
-                <mat-card-subtitle> </mat-card-subtitle>
-              </mat-card-title-group>
-            </mat-card-header>
-            <mat-card-content>
-              <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_datasets_num}}</b> </h1>
-            </mat-card-content>
-          </mat-card>
-        </div>
+                  <!-- End Date -->
+                  <mat-form-field appearance="outline" class="compact-form-field" style="margin-left: 10px;" disableRipple>
+                    <mat-label>{{ 'EndDate' | transloco }}</mat-label>
 
-          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
-            <mat-card-header>
-              <mat-card-title-group>
-                <mat-card-title> Files </mat-card-title>
-                <mat-card-subtitle> </mat-card-subtitle>
-              </mat-card-title-group>
-            </mat-card-header>
-            <mat-card-content>
-              <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_files_num}}</b> </h1>
-            </mat-card-content>
-          </mat-card>
+                    <input matInput
+                           [matDatepicker]="dp_e"
+                           [formControl]="date_end"
+                           [min]="this.creation_date"
+                           [max]="maxDate">
 
-          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
-            <mat-card-header>
-              <mat-card-title-group>
-                <mat-card-title> Downloads </mat-card-title>
-                <mat-card-subtitle> </mat-card-subtitle>
-              </mat-card-title-group>
-            </mat-card-header>
-            <mat-card-content>
-              <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_downloads_num}}</b> </h1>
-            </mat-card-content>
-          </mat-card>
+                    <mat-datepicker-toggle matIconSuffix
+                                           [for]="dp_e"
+                                           class="custom-toggle"
+                                           [disableRipple]="true">
+                      <mat-icon matDatepickerToggleIcon class="small-datepicker-icon">event</mat-icon>
+                    </mat-datepicker-toggle>
 
-          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
-            <mat-card-header>
-              <mat-card-title-group>
-                <mat-card-title> Users </mat-card-title>
-                <mat-card-subtitle> </mat-card-subtitle>
-              </mat-card-title-group>
-            </mat-card-header>
-            <mat-card-content>
-              <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_users_num}}</b> </h1>
-            </mat-card-content>
-          </mat-card>
+                    <mat-datepicker #dp_e
+                                    startView="multi-year"
+                                    (monthSelected)="setEndMonthAndYear($event, dp_e)"
+                                    panelClass="example-month-picker">
+                    </mat-datepicker>
+                  </mat-form-field>
+                </div>
 
-          <mat-card class="example-card" appearance="outlined" style="min-width: 400px; max-width: 400px; margin-bottom: 8px; margin-left: 10px; margin-top: 10px;">
-            <mat-card-header>
-              <mat-card-title-group>
-                <mat-card-title> Storage Usage </mat-card-title>
-                <mat-card-subtitle> </mat-card-subtitle>
-              </mat-card-title-group>
-            </mat-card-header>
-            <mat-card-content>
-              <h1 style="text-align: right; color:DimGray; font-size: 32px;"> <b>{{total_size_num}}</b> </h1>
-            </mat-card-content>
-          </mat-card>
-          </div>
+                <div style="display: flex; align-items: center; margin-top: -20px; margin-left: 12px; margin-right: 20px;">
+                  <mat-checkbox 
+                    matTooltip="Generates metrics from creation, visual displays last 24 months"
+                    [ngModel]="!start_on"
+                    (ngModelChange)="start_on = !$event"
+                    style="font-size: 16px; transform: scale(0.9); transform-origin: left top; margin-left: 8px;">
+                    {{ 'AllTime' | transloco }}
+                  </mat-checkbox>
 
-          
-          <div id="hot" style="margin-left: 10px; margin-top: 10px; ">
-          <!---
-          <app-generic-table
-          [data]="table_data"
-          [colHeaders]="true"
-          [colWidths]="[335]"
-          [rowHeaders]="true"
-          [height]="1500"
-          [columnSorting]="true"
-          [columns]="generic_columns"
-          [dropdownMenu]="[]"
-          [filters]="false"
-          licenseKey="non-commercial-and-evaluation"> 
-          </app-generic-table>
-          <!-->
-          </div>
+                  <div style="margin-left: auto; margin-right: 10px;">
+                    <button (click)="CollectionDataButtonActivate()"
+                            [disabled]="isStartTimeAfterEndTime()"
+                            mat-button
+                            style="border: 1px solid; font-size: 12px; width: 125px; height: 25px;">
+                      {{ 'Submit' | transloco }}
+                    </button>
+                  </div>
+                </div>
 
-      </div> 
-            
-      <div style="display: inline-block; height:200px; padding: 30px; padding-top: 100px; font-size: 18px;">
-            <div id="contentToConvert">
-            Number of Downloads
-            <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataDownloads"></app-horizontal-bar-graph>   
-            Number of Datasets 
-            <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataDatasets"></app-horizontal-bar-graph> 
-            Number of Files
-            <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataFiles"></app-horizontal-bar-graph>
-            Number of Users
-            <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataUsers"></app-horizontal-bar-graph>
-            Storage Usage
-            <app-horizontal-bar-graph [barChartLabels]= "months.reverse()" [barChartData]= "barChartDataSize"></app-horizontal-bar-graph>
-            </div>
-      </div>
-            
-      </div>
-
-      <div style="padding-top: 1550px; height: 1000px">
-      
-      <div id="subject_convert" style="margin-top: 50px; margin: auto; width: 65%;">
-        Subject Breakdown
-            <div style="margin-top: 5px;">
-            <mat-card class="example-card" appearance="outlined" style="min-width: 550px; max-width: 550px; min-height: 333px; max-height: 333px;
-            justify-content: center; float: left;">
-              <mat-card-content>
-                <app-pie-graph [pieChartLabels]= "pieChartLabelsSubject" [pieChartData]= "pieChartDataSubject" width=510 height=200></app-pie-graph>
               </mat-card-content>
             </mat-card>
-            </div>
 
-            <div id="hot" style="margin-left: -10px">
-              <app-generic-table 
-              [data]="subject_table"
-              [colHeaders]="true"
-              [colWidths]="[200, 60, 100]"
-              [rowHeaders]="true"
-              [height]="333"
-              [columnSorting]="true"
-              [columns]="subject_columns"
-              [filters]="false"
-              licenseKey="non-commercial-and-evaluation"> 
-              </app-generic-table>
-            </div>
-          
+            <mat-card class="example-card hide-scrollbar" appearance="outlined" style="min-width: 350px; max-width: 350px; margin-left: 5px; max-height: 3165px; overflow-y: auto; font-size: 12px;">
+              <mat-card-header>
+                <mat-card-title-group>
+                  <mat-card-title> {{ 'CollectionTree' | transloco }} </mat-card-title>
+                  <mat-card-subtitle> </mat-card-subtitle>
+                </mat-card-title-group>
+              </mat-card-header>
+              <mat-card-content>
+                <app-tree [data]="raw_table_data" [current_active]="selectedCollection_Activate_Name" (dataEvent)="getCollectionFromTree($event)"> </app-tree>
+              </mat-card-content>
+            </mat-card>
+
+          </div>
+        </div> 
+        
+        <app-graph-dashboard [data]="raw_table_data" [selectedCollection_Activate_Name]="selectedCollection_Activate_Name"></app-graph-dashboard>
+
+        <app-value-export-dashboard [data]="raw_table_data" [selectedCollection_Activate_Name]="selectedCollection_Activate_Name" [date_start_on]="date_start_activate"></app-value-export-dashboard>
+
       </div>
-
-      <div style="padding-top: 50px"> </div>
-      
-      <div id="file_convert" style="margin-top: 50px; margin: auto; width: 65%;">
-        File Content Breakdown
-          <div style="margin-top: 5px;">
-          <mat-card class="example-card" appearance="outlined" style="min-width: 550px; max-width: 550px; min-height: 333px; max-height: 333px;; margin-bottom: 8px; 
-          justify-content: center; float: left;">
-            <mat-card-content>
-              <app-pie-graph [pieChartLabels]= "pieChartLabelsFile" [pieChartData]= "pieChartDataFile" width=380 height=200></app-pie-graph>
-            </mat-card-content>
-          </mat-card>
-          </div>
-
-          <div id="hot" style="">
-            <app-generic-table 
-            [data]="file_content_table"
-            [colHeaders]="true"
-            [colWidths]="[80, 190, 60, 80]"
-            [rowHeaders]="false"
-            [height]="333"
-            [columnSorting]="true"
-            [columns]="file_content_columns"
-            [filters]="false"
-            licenseKey="non-commercial-and-evaluation"> 
-            </app-generic-table>
-          </div>
-                          
-    </div>
-      
+            
+      <div style="padding-top: 1200px; height: 1000px">
       </div>
     
     </ng-template>
-    </mat-tab>
 
-</mat-tab-group>
+</div>

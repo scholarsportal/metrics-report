@@ -31,3 +31,46 @@ body .handsontable .even{
 .example-month-picker .mat-calendar-arrow {
   display: none;
 }
+
+.mat-mdc-menu-item span{
+  font-size: 12px !important;
+}
+
+.compact-form-field {
+  width: 125px !important;
+  max-width: 125px !important;
+}
+
+/* Datepicker toggle icon size */
+.small-datepicker-icon {
+  font-size: 16px !important;
+  height: 22px !important;
+  width: 22px !important;
+  line-height: 22px !important;
+}
+
+/* Datepicker toggle button */
+::ng-deep .custom-toggle {
+  border-radius: 4px;
+  padding: 2px !important; /* smaller padding for tighter toggle */
+}
+
+/* Remove hover shadow and background */
+::ng-deep .custom-toggle:hover {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Remove focus shadow/outline */
+::ng-deep .custom-toggle.mat-focus-indicator:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-infix {
+  font-size: 14px !important;
+}
+
+input.mat-mdc-input-element {
+  font-size: 14px !important;
+}

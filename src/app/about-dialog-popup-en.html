@@ -1,0 +1,85 @@
+<div class="dialog-container" style="position: relative; height: 600px; width: 700px; padding: 20px 40px; overflow-y: auto; box-sizing: border-box;">
+
+  <!-- Close Button -->
+  <button class="close-button"
+          (click)="closeDialog()"
+          style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 24px; cursor: pointer;"
+          aria-label="Close dialog">
+    &#x2715;
+  </button>
+
+  <!-- Dialog Title -->
+  <h1 mat-dialog-title style="font-size: 32px; font-weight: bold; margin-top: 40px;">About</h1>
+
+  <!-- Dialog Content -->
+  <p>
+    <strong>Borealis</strong>, the Canadian Dataverse Repository, is a bilingual, multidisciplinary, secure, Canadian research data repository, supported by academic libraries and research institutions across Canada. Borealis supports open discovery, management, sharing, and preservation of Canadian research data.
+  </p>
+
+  <p>
+    The Borealis Metrics Report allows users to curate and analyze usage data across the entire platform and within specific collections. The interface is available in English or <em>en français</em>. Please note that Collection names and data are represented in their original language, as are the corresponding metadata.
+  </p>
+
+  <p>
+    Below is an overview of the features available in the Borealis Metrics Report, as well as a description of categories and filters users may choose to apply.
+  </p>
+
+  <h3><i>Left-hand Panel</i></h3>
+
+  <h4><strong>Collections Tree</strong></h4>
+  <p>
+    The Collections Tree is a configuration tool that allows users to navigate and search over 1,500 collections in their intended, hierarchical data structure. Collections and subcollections follow a nested structure, with reports available for the collection as a whole or for specific subcollections.
+  </p>
+  <p>
+    To view metrics for a specific collection or subcollection, click the <strong>“Full Report”</strong> button in the nested tree structure.
+  </p>
+
+  <h4><strong>Date Range</strong></h4>
+  <p>
+    Users can examine data within any specific timeframe, from its creation to the most recent month.
+  </p>
+
+  <h3><i>Centre and Right-hand Panel</i></h3>
+
+  <h4><strong>Graph Dashboard</strong></h4>
+  <p>
+    Graphs are generated when the <strong>“Monthly”</strong> and/or <strong>“Cumulative”</strong> metrics are selected at the top of bar graphs or from the legend next to pie graphs. Graph data ranges will adjust based on the selected dates and collections.
+  </p>
+
+  <h4><strong>Exports</strong></h4>
+  <p>The Borealis Metrics Report currently supports four export options:</p>
+  <ul>
+    <li><strong>Excel</strong> – Exports data from the selected collection and date range into a multi-sheet XLSX file.</li>
+    <li><strong>PDF</strong> – Exports the graphs and right-hand panel metrics for the selected collections and date range into a single organized PDF.</li>
+    <li><strong>Legacy</strong> – Structured data export from a previous version of the Borealis Metrics Report. Data in this export may be formatted differently than other export formats.</li>
+    <li><strong>Make Data Count</strong> – Exports usage metrics compliant with Make Data Count standards for research data metrics.</li>
+  </ul>
+
+  <h4><strong>Collections</strong></h4>
+  <p>The number of collections currently hosted on Borealis. This metric does not update based on date or selected collection as it is representative of current Borealis holdings.</p>
+
+  <h4><strong>Datasets</strong></h4>
+  <p>The number of datasets within a selected collection.</p>
+
+  <h4><strong>Files</strong></h4>
+  <p>The number of files within a selected collection.</p>
+
+  <h4><strong>Downloads</strong></h4>
+  <p>Number of downloaded files from a selected collection.</p>
+
+  <h4><strong>Users</strong></h4>
+  <p>The number of user accounts in Borealis. </p>
+
+  <h4><strong>Authors</strong></h4>
+  <p>The number of authors with published contributions in a selected collection.</p>
+
+  <h4><strong>Storage Usage</strong></h4>
+  <p>Total file size for a selected dataverse.</p>
+
+  <h4><strong>Subject Breakdown</strong></h4>
+  <p>Breakdown of assigned subjects for datasets and their distribution within a selected collection.</p>
+
+  <h4><strong>File Breakdown</strong></h4>
+  <p>Breakdown of file types and extensions of files within a selected collection, as well as their distribution.</p>
+
+</div>

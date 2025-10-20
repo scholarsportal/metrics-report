@@ -2,3 +2,13 @@
   font-family: Verdana, Helvetica, Arial, FreeSans, sans-serif important!;
   font-size: 12px important!;
 }
+
+.hide-scrollbar {
+  overflow: auto;
+  scrollbar-width: none;           /* Firefox */
+  -ms-overflow-style: none;        /* IE 10+ */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;                   /* Chrome, Safari, Opera */
+}

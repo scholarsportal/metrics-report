@@ -1,0 +1,86 @@
+<div class="dialog-container" style="position: relative; height: 600px; width: 700px; padding: 20px 40px; overflow-y: auto; box-sizing: border-box;">
+
+    <!-- Close Button -->
+    <button class="close-button"
+            (click)="closeDialog()"
+            style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 24px; cursor: pointer;"
+            aria-label="Fermer le dialogue">
+      &#x2715;
+    </button>
+  
+    <!-- Dialog Title -->
+    <h1 mat-dialog-title style="font-size: 32px; font-weight: bold; margin-top: 40px;">À propos</h1>
+  
+    <!-- Dialog Content -->
+    <p>
+      <strong>Borealis</strong>, le dépôt Dataverse canadien, est un dépôt canadien de données de recherche bilingue, multidisciplinaire et sécurisé, soutenu par des bibliothèques universitaires et des établissements de recherche de partout au Canada. Borealis permet la découverte, la gestion, le partage et la préservation des données de recherche canadiennes.
+    </p>
+  
+    <p>
+      Le rapport des statistiques Borealis permet aux utilisateurs de gérer et d’analyser les données d’utilisation de l’ensemble de la plateforme ainsi que de collections spécifiques. L’interface est disponible en français ou <em>in english</em>. Veuillez noter que les noms des collections et les données sont présentés dans leur langue d’origine, de même que les métadonnées correspondantes.
+    </p>
+  
+    <p>
+      Vous trouverez ci-dessous un aperçu des fonctionnalités disponibles dans le rapport des statistiques Borealis, ainsi qu’une description des catégories et des filtres que les utilisateurs peuvent choisir d’appliquer.
+    </p>
+  
+    <h3><i>Panneau de gauche</i></h3>
+  
+    <h4><strong>Arborescence des collections</strong></h4>
+    <p>
+      L’arborescence des collections est un outil de configuration qui permet aux utilisateurs de naviguer et de rechercher parmi plus de 1 500 collections selon la hiérarchie préétablie des données. Les collections et sous-collections suivent une structure imbriquée, et il est possible de consulter des rapports pour l’ensemble d’une collection ou pour des sous-collections spécifiques.
+    </p>
+    <p>
+      Pour voir les statistiques d’une collection ou d’une sous-collection spécifique, cliquez sur le bouton <strong>« Rapport complet »</strong> dans l’arborescence.
+    </p>
+  
+    <h4><strong>Plage de dates</strong></h4>
+    <p>
+      Les utilisateurs peuvent consulter les données sur n’importe quelle période spécifique, de leur création jusqu’au mois le plus récent.
+    </p>
+  
+    <h3><i>Panneau du centre et de droite</i></h3>
+  
+    <h4><strong>Tableau de bord graphique</strong></h4>
+    <p>
+      Les graphiques sont générés lorsque les statistiques <strong>« mensuelles »</strong> et/ou <strong>« cumulatives »</strong> sont sélectionnées dans l’en-tête des graphiques à barres ou à partir de la légende à côté des graphiques circulaires. Les plages de données des graphiques s’ajustent en fonction des dates et des collections sélectionnées.
+    </p>
+  
+    <h4><strong>Exportations</strong></h4>
+    <p>Le rapport des statistiques Borealis prend en charge quatre options d’exportation :</p>
+    <ul>
+      <li><strong>Excel</strong> – Exporte les données de la collection et de la plage de dates sélectionnées dans un fichier XLSX à plusieurs feuilles de calcul.</li>
+      <li><strong>PDF</strong> – Exporte les graphiques et les métriques du panneau de droite pour les collections et la plage de dates sélectionnées dans un PDF unique et structuré.</li>
+      <li><strong>Legacy</strong> – Exportation de données structurées depuis une version précédente du rapport des statistiques Borealis. Les données de cet export peuvent être formatées différemment des autres formats.</li>
+      <li><strong>Make Data Count</strong> – Exporte les métriques d’utilisation conformes aux standards de Make Data Count pour les métriques de données de recherche.</li>
+    </ul>
+  
+    <h4><strong>Collections</strong></h4>
+    <p>Nombre de collections actuellement hébergées sur Borealis. Cette mesure ne se met pas à jour selon la date ou la collection sélectionnée, car elle reflète l’état actuel des dépôts dans Borealis.</p>
+  
+    <h4><strong>Ensembles de données</strong></h4>
+    <p>Le nombre d’ensembles de données dans la collection sélectionnée.</p>
+  
+    <h4><strong>Fichiers</strong></h4>
+    <p>Le nombre de fichiers dans la collection sélectionnée.</p>
+  
+    <h4><strong>Téléchargements</strong></h4>
+    <p>Le nombre de fichiers téléchargés à partir de la collection sélectionnée.</p>
+  
+    <h4><strong>Utilisateurs</strong></h4>
+    <p>Nombre de comptes utilisateurs dans Borealis.</p>
+  
+    <h4><strong>Auteurs</strong></h4>
+    <p>Nombre d’auteurs ayant publié du contenu dans la collection sélectionnée.</p>
+  
+    <h4><strong>Utilisation du stockage</strong></h4>
+    <p>Taille totale des fichiers dans la collection sélectionnée.</p>
+  
+    <h4><strong>Répartition par sujets</strong></h4>
+    <p>Détails concernant les sujets attribués aux ensembles de données dans la collection sélectionnée, ainsi que leur distribution.</p>
+  
+    <h4><strong>Détails sur les fichiers</strong></h4>
+    <p>Détails concernant les types et les extensions de fichiers publiés dans la collection sélectionnée, ainsi que leur distribution.</p>
+  
+  </div>
+  
