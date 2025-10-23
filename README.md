@@ -6,13 +6,11 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Beta Release
 
-https://scholarsportal.github.io/metrics-report/
+### https://scholarsportal.github.io/metrics-report/
 
 <br><br>
-<br><br>
-<br><br>
 
-![screenshot](imageFolder/screenshot.png)
+![screenshot](src/assets/README_beta_img.png)
 
   ## 📜 Description
 **Borealis**, the Canadian Dataverse Repository, is a bilingual, multidisciplinary, secure, Canadian research data repository, supported by academic libraries and research institutions across Canada. Borealis supports open discovery, management, sharing, and preservation of Canadian research data.
