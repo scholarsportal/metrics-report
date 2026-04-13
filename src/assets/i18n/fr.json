@@ -1,6 +1,6 @@
 {
     "Hello": "Bonjour", 
-    "Title": "Rapport De Mesures Borealis",
+    "Title": "Rapport des statistiques Borealis",
     "About": "À propos de",
     "TermsofUse": "Conditions d'utilisation",
     "Contact": "Contact",
@@ -31,6 +31,7 @@
     "Legacy": "Ancien",
     "MakeDataCountMetrics": "Métriques de Make Data Count",
     "Collections": "Collections",
+    "SubCollections": "Sous-collection",
     "Datasets": "Ensembles de données",
     "Files": "Fichiers",
     "Downloads": "Téléchargements",
@@ -115,5 +116,9 @@
     "FileTypeDef": "Type de fichier",
     "FileSpecficTypeDef": "Format spécifique des fichiers",
     "FileCountDef": "Nombre total d'ensemble de données avec ce type de fichier", 
-    "FilePercentDef": "Pourcentage d'ensembles de données avec ce type de fichier par rapport à tous les autres types de fichiers"
+    "FilePercentDef": "Pourcentage d'ensembles de données avec ce type de fichier par rapport à tous les autres types de fichiers",
+    "CollectionSelected": "Collection sélectionnée",
+    "DateRangeHelp":"Par défaut, les mesures couvrent la période depuis la création des statistiques (date de création – date actuelle), et les graphiques à barres affichent les 24 derniers mois. Pour une période spécifique, utilisez les options ci-dessous.",
+    "CollectionTreeHelp":"Les filtres se mettent à jour lorsque vous ouvrez une collection. Pour choisir une sous-collection, ouvrez d'abord la collection parente.",
+    "GraphHelp":"Cliquez sur les légendes cochées ou barrées pour afficher ou masquer les graphiques."
 }

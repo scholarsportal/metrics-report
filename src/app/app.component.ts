@@ -22,9 +22,6 @@ import {MatSort, Sort, MatSortModule} from '@angular/material/sort';
 import {LiveAnnouncer} from '@angular/cdk/a11y';
 import {HotTableModule } from '@handsontable/angular';
 import {registerAllModules } from 'handsontable/registry';
-import {DataTableComponent } from './data-table/data-table.component'; 
-import {DataTableDatasetComponent} from './data-table-dataset/data-table-dataset.component'; 
-import {DataTableFileComponent} from './data-table-file/data-table-file.component'; 
 import {MatDatepickerModule, MatDatepicker} from '@angular/material/datepicker';
 import { PostsComponent } from './posts/posts.component';
 import { TreeComponent } from './tree/tree.component';
@@ -97,9 +94,6 @@ interface SearchGroup {
     JsonPipe,
     AsyncPipe,
     FormsModule,
-    DataTableComponent,
-    DataTableDatasetComponent,
-    DataTableFileComponent,
     ReactiveFormsModule,
     MatDatepickerModule,
     MatDatepicker,
@@ -161,13 +155,11 @@ export class AppComponent implements AfterViewInit, OnInit{
   submitDate(){
     const ctrlValue_s = this.date_start.value ?? moment();
     const ctrlValue_e = this.date_end.value ?? moment();
-    console.log(ctrlValue_s, ctrlValue_e)
     const date_s = ctrlValue_s.format('YYYY-MM');
     const date_e = ctrlValue_e.format('YYYY-MM');
 
     if (!this.start_on){
       this.date_start_activate = "";
-      console.log(this.date_start_activate)
     }
 
     this.bad_range = false;
@@ -265,6 +257,7 @@ export class AppComponent implements AfterViewInit, OnInit{
   size_graph_data: Array<any> = [];
   name_dropdown_data: Array<any> = [];
   creation_date: Array<any> = [];
+  dataverse_description: "";
 
 
   barChartDataDownloads_data: Array<number> = [];
@@ -376,12 +369,12 @@ export class AppComponent implements AfterViewInit, OnInit{
     else {
       this.searchGroups[1].names = this.table_data.map(a => a.name);
     }
-
-    console.log(this.searchGroups); 
   
     this.months = newItem["DataverseTabData"]['months'];
     this.creation_date = newItem["DataverseTabData"]['creation_date'];
     this.error_flag = newItem["DataverseTabData"]['error_flag'];
+
+    this.dataverse_description = newItem["DataverseTabData"]['dataverse_description'];
 
     this.pieChartLabelsSubject = newItem["DataverseTabData"]['subject_label_data'];
     this.pieChartDataSubject_data = newItem["DataverseTabData"]['subject_data'];
@@ -396,21 +389,26 @@ export class AppComponent implements AfterViewInit, OnInit{
     else {
       this.total_dataverses_num = newItem["DataverseTabData"]['dataverse_count']
     }
-    if (this.date_start_activate!=""){
-      console.log("ds is activated here")
-      this.total_datasets_num = this.barChartDataDatasetsAgg_data.reduce((a, b) => a + b, 0).toLocaleString();
-      this.total_files_num = this.barChartDataFiles_Aggdata.reduce((a, b) => a + b, 0).toLocaleString();
-      this.total_downloads_num = this.barChartDataDownloadsAgg_data.reduce((a, b) => a + b, 0).toLocaleString();
-      this.total_users_num = this.barChartDataUsers_Aggdata.reduce((a, b) => a + b, 0).toLocaleString();
-      this.total_size_num = this.barChartDataSize_Aggdata.reduce((a, b) => a + b, 0).toFixed(2).toLocaleString(); + "GB";
-    }
-    else{
-      this.total_datasets_num = this.barChartDataDatasets_data[this.barChartDataDatasetsAgg_data.length - 1].toLocaleString();
-      this.total_files_num = this.barChartDataFiles_data[this.barChartDataDatasets_data.length - 1].toLocaleString();
-      this.total_downloads_num = this.barChartDataDownloads_data[this.barChartDataDownloads_data.length - 1].toLocaleString();
-      this.total_users_num = this.barChartDataUsers_data[this.barChartDataUsers_data.length - 1].toLocaleString();
-      this.total_size_num = this.barChartDataSize_data[this.barChartDataSize_data.length - 1].toFixed(2).toLocaleString() + "GB"; 
-    }
+    const last = (arr: any[]) => (arr && arr.length ? arr[arr.length - 1] : 0);
+
+  if (this.date_start_activate != "") {
+
+  this.total_datasets_num = (this.barChartDataDatasetsAgg_data?.reduce((a, b) => a + b, 0) ?? 0).toLocaleString();
+  this.total_files_num = (this.barChartDataFiles_Aggdata?.reduce((a, b) => a + b, 0) ?? 0).toLocaleString();
+  this.total_downloads_num = (this.barChartDataDownloadsAgg_data?.reduce((a, b) => a + b, 0) ?? 0).toLocaleString();
+  this.total_users_num = (this.barChartDataUsers_Aggdata?.reduce((a, b) => a + b, 0) ?? 0).toLocaleString();
+
+  this.total_size_num = ((this.barChartDataSize_Aggdata?.reduce((a, b) => a + b, 0) ?? 0)
+    .toFixed(2)).toLocaleString() + "GB";
+  }
+  else {
+  this.total_datasets_num = (last(this.barChartDataDatasets_data)).toLocaleString();
+  this.total_files_num = (last(this.barChartDataFiles_data)).toLocaleString();
+  this.total_downloads_num = (last(this.barChartDataDownloads_data)).toLocaleString();
+  this.total_users_num = (last(this.barChartDataUsers_data)).toLocaleString();
+
+  this.total_size_num = (Number(last(this.barChartDataSize_data)).toFixed(2)).toLocaleString() + "GB";
+  }
 
     this.total_collections_change = (((this.barChartDataDatasets_data[0] - this.barChartDataDatasets_data[1]) / this.barChartDataDatasets_data[1]) * 100).toFixed(2).toString() + "%"
     //total_datasets_change: String = "-";
@@ -582,8 +580,6 @@ export class AppComponent implements AfterViewInit, OnInit{
         label: 'File Content Breakdown'
       }
   ];
-
-    console.log(this.pieChartDataSubject);
     
   }
 
@@ -630,7 +626,6 @@ export class AppComponent implements AfterViewInit, OnInit{
       }
     }
     }
-    console.log(event.value);
   }
 
   getCollectionFromTree(list: string[]) {
@@ -641,7 +636,6 @@ export class AppComponent implements AfterViewInit, OnInit{
 
     else {
     this.receivedCollectionFromTree = list;
-    console.log(list)
     this.selectedCollection_Current = list[1]
       this.selectedCollection_Current_Name = list[0]
     this.selectedCollection_Activate = this.selectedCollection_Current; 
@@ -652,13 +646,9 @@ export class AppComponent implements AfterViewInit, OnInit{
 }
 
   selectedDate(eventData: any, dp?:any) {
-    console.log(eventData);
-    console.log(dp)
   }
 
   CollectionDataButtonActivate(){
-    console.log(this.date_end < this.date_start)
-    //console.log(this.searchForm.get('searchGroup')?.value);
     //this.selectedOption = this.searchForm.get('searchGroup')?.value as string; 
     this.selectedOption = this.selectedCollection_Current_Name;
     var acceptable_collection = false;
@@ -670,7 +660,6 @@ export class AppComponent implements AfterViewInit, OnInit{
     else{
     for (let i = 0; i < this.alias_data.length; i++){
       if (this.alias_data[i]['name'] === this.selectedOption){
-        console.log(this.alias_data[i]['alias'])
         this.selectedCollection_Current = this.alias_data[i]['alias'];
         this.selectedCollection_Current_Name = this.selectedOption;
         acceptable_collection = true;
@@ -682,7 +671,6 @@ export class AppComponent implements AfterViewInit, OnInit{
       this.selectedCollection_Activate_Name = this.selectedCollection_Current_Name;
       this.submitDate();
       this.date_String = this.dateStringFormat();  
-      console.log(this.selectedCollection_Activate);
     }
   }
 

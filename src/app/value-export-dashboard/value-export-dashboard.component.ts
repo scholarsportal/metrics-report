@@ -14,7 +14,10 @@ import { TranslocoModule, TranslocoService } from '@ngneat/transloco';
 import { DownloadComponent } from '../download/download.component';
 import { InteractionService } from '../shared/interaction.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
+import { ApiService } from '../api.service';
+import { FormsModule } from '@angular/forms';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; 
 
 @Component({
   selector: 'app-value-export-dashboard',
@@ -30,7 +33,9 @@ import { Subscription } from 'rxjs';
     MatIcon,
     MatButtonModule,
     TranslocoModule,
-    MatTooltipModule
+    MatTooltipModule,
+    FormsModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './value-export-dashboard.component.html',
   styleUrl: './value-export-dashboard.component.css',
@@ -42,6 +47,9 @@ export class ValueExportDashboardComponent implements OnInit, OnDestroy {
   @Input() date_start_on: string;
 
   private langSub: Subscription;
+
+  MDCdownloadloading: boolean = false;
+  private subscriptions: Subscription = new Subscription();
 
   barChartDataDownloads_data: Array<number> = [];
   barChartDataDatasets_data: Array<number> = [];
@@ -66,6 +74,7 @@ export class ValueExportDashboardComponent implements OnInit, OnDestroy {
   translatedText$: ""
 
   total_collections_num: String = "-";
+  total_subcollections_num: String = '-'
   total_dataverses_num: String = "-";
   total_datasets_num: String = "-";
   total_files_num: String = "-"; 
@@ -73,10 +82,20 @@ export class ValueExportDashboardComponent implements OnInit, OnDestroy {
   total_users_num: String = "-";
   total_size_num: String = "-";
 
+  // MDC
+  datasetDoi: string = '';
+  datasetName: string = 'example' 
+  mdcViewsTotal: number | null = null;
+  mdcDownloadsTotal: number | null = null;
+  mdcCitationsTotal: number | null = null;
+  mdcLoading: boolean = false;
+  mdcError: boolean = false;
+
   constructor(
     private translocoService: TranslocoService,
     private interactionService: InteractionService,
-    private decimalPipe: DecimalPipe
+    private apiService: ApiService,
+    private decimalPipe: DecimalPipe,
   ) {}
 
   ngOnInit() {
@@ -84,10 +103,11 @@ export class ValueExportDashboardComponent implements OnInit, OnDestroy {
     this.langSub = this.translocoService.langChanges$.subscribe(() => {
       this.processData(this.data);
     });
-  }
-
-  ngOnDestroy() {
-    this.langSub?.unsubscribe();
+    // Subscribe to MDC trigger to know when download is ready
+    const sub = this.interactionService.downloadMDCTriggered$.subscribe(() => {
+      this.MDCdownloadloading = false; // stop spinner when MDC is ready
+    });
+    this.subscriptions.add(sub);
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -127,8 +147,7 @@ export class ValueExportDashboardComponent implements OnInit, OnDestroy {
     this.total_collections_num = this.formatNumber(data['name_dropdown_data']?.length ?? 0);
 
     if (this.selectedCollection_Activate_Name === "(All)") {
-      const dataverses = data['dataverse_count'] - data['name_dropdown_data'].length;
-      this.total_dataverses_num = this.formatNumber(dataverses);
+      this.total_dataverses_num = this.total_collections_num;
     } else {
       this.total_dataverses_num = this.formatNumber(data['dataverse_count']);
     }
@@ -158,11 +177,53 @@ export class ValueExportDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  getMDCDatasetMetrics() {
+    if (!this.datasetDoi) return;
+  
+    this.mdcLoading = true;
+    this.mdcError = false;
+    this.mdcViewsTotal = null;
+    this.mdcDownloadsTotal = null;
+
+    this.mdcViewsTotal = 10;
+    this.mdcDownloadsTotal = 5;
+    this.mdcCitationsTotal = 1;
+    this.mdcLoading = false;
+    
+    /*
+    forkJoin({
+      views: this.apiService.getMDCViewsTotal(this.datasetDoi),
+      downloads: this.apiService.getMDCDownloadsTotal(this.datasetDoi)
+    }).subscribe({
+      next: (result) => {
+        this.mdcViewsTotal = result.views;
+        this.mdcDownloadsTotal = result.downloads;
+        this.mdcLoading = false;
+      },
+      error: (err) => {
+        console.error('MDC error', err);
+        this.mdcError = true;
+        this.mdcLoading = false;
+      }
+    });
+    */
+  }
+
+  ngOnDestroy() {
+    // Prevent memory leaks
+    this.subscriptions.unsubscribe();
+    this.langSub?.unsubscribe();
+  }
+
   downloadExcel() {
     this.interactionService.triggerGenerateExcel();
   }
 
   downloadPDF() {
     this.interactionService.triggerGeneratePDF();
+  }
+
+  downloadMDC() {
+    this.interactionService.triggerGenerateMDC();
   }
 }

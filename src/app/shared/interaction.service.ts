@@ -30,6 +30,12 @@ export class InteractionService {
     return this.downloadPDFTrigger.asObservable();
   }
 
+  private downloadMDCTrigger = new Subject<void>();
+
+  public get downloadMDCTriggered$(): Observable<void> {
+    return this.downloadMDCTrigger.asObservable();
+  }
+
   triggerGenerateSubject() {
     this.downloadSubjectTrigger.next();
   }
@@ -44,6 +50,10 @@ export class InteractionService {
 
   triggerGeneratePDF() {
     this.downloadPDFTrigger.next();
+  }
+
+  triggerGenerateMDC() {
+    this.downloadMDCTrigger.next();
   }
 
 }
