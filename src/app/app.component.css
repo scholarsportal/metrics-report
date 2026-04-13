@@ -32,6 +32,16 @@
   padding-left: 5px;      /* optional */
 }
 
+.responsive-description {
+  min-width: 0;
+  font-size: clamp(7px, 4vw, 14px);
+  white-space: normal;    /* allow wrapping */
+  overflow-wrap: break-word; /* wrap long words */
+  width: 100%; 
+  max-width: 90vw;
+  padding-left: 10px;      /* optional */
+}
+
 #pdf_name h1 {
   line-height: 1.2;  /* a bit taller than default */
   padding-bottom: 4px; /* add some space below */
@@ -64,4 +74,23 @@
   height: 100%;
   background: rgba(0, 0, 0, 0.3); /* semi-transparent background */
   z-index: 9999; /* Ensure it's on top of everything */
+}
+
+.help-card {
+  position: relative;   /* Important */
+}
+
+.help-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 16px;
+  height: 16px;
+  width: 16px;
+  cursor: pointer;
+  color: #757575;
+}
+
+.help-icon:hover {
+  color: #1976d2;
 }

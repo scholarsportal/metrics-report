@@ -1,10 +1,41 @@
 <div style="display: inline-block; height:200px; padding-top: 10px; font-size: 18px;">
 
+    <div 
+      *ngIf="selectedCollection_Activate_Name!='(All)'" 
+      id="pdf_name"
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        margin: 10px 0;
+      "
+    >
+      <h4 style="color: purple; margin-bottom: 3px;">
+        <b> • {{ 'CollectionSelected' | transloco }} • </b>
+      </h4>
+
+      <h5 
+        id="responsive-title"
+        style="
+          margin: 0;
+          max-width: 200px;       /* Adjust this width */
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        "
+        [title]="selectedCollection_Activate_Name"
+      >
+      {{ selectedCollection_Activate_Name }}
+      </h5>
+    </div>
+
     <div class="button-grid" style="display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 5px; /* space between buttons */
     max-width: 400px;">
-      <button mat-button class="mat-small" [ngStyle]="{ 'color': selectedCollection_Activate_Name!='(All)' ? 'purple' : 'black' }" style="border-width: 1px; font-size: 12px; border-style: solid; width: 122px; height: 25px;  display: flex;  justify-content: flex-start;
+      <button mat-button class="mat-small" [ngStyle]="{ 'color': selectedCollection_Activate_Name!='(All)' ? 'purple' : 'black', 'font-weight': selectedCollection_Activate_Name!='(All)' ? 'bold' : '=normal' }" style="border-width: 1px; font-size: 12px; border-style: solid; width: 122px; height: 25px;  display: flex;  justify-content: flex-start;
       align-items: center;      
       gap: 8px;                    
       text-align: left;" (click)="downloadExcel()"> <mat-icon> download </mat-icon> {{ 'Excel' | transloco }} </button>
@@ -18,11 +49,11 @@
       text-align: left;" 
       [matTooltip]="'LegacyToolTip' | transloco" href="https://borealisdata.ca/metricsbackend/api/metrics/report"> <mat-icon> download </mat-icon> {{ 'Legacy' | transloco }} </a>
       <span style="display: inline-block;" [matTooltip]="'MDCToolTip' | transloco" [matTooltipDisabled]="false">
-      <button mat-button [disabled]="true" class="mat-small" style="border-width: 1px; font-size: 9px; border-style: solid; width: 122px; height: 25px; display: flex;  justify-content: flex-start;
+      <button mat-button [disabled]="true" [ngStyle]="{ 'color': selectedCollection_Activate_Name!='(All)' ? 'purple' : 'black', 'font-weight': selectedCollection_Activate_Name!='(All)' ? 'bold' : '=normal' }" class="mat-small" style="border-width: 1px; font-size: 12px; border-style: solid; width: 122px; height: 25px; display: flex;  justify-content: flex-start;
       align-items: center;      
       gap: 8px;                    
-      text-align: left;"> 
-      <mat-icon> download </mat-icon> MakeDataCount </button> </span>
+      text-align: left;" (click)="downloadMDC()"> 
+      <mat-icon> download </mat-icon> MDC </button> </span>
     </div>
 
     <!-- 
@@ -37,16 +68,18 @@
     </div>
     -->
 
+    <div *ngIf="selectedCollection_Activate_Name!='(All)'">  </div>
+
     <mat-card class="example-card" appearance="outlined" style="min-width: 250px; max-width: 250px; margin-bottom: 8px; margin-top: 10px; background-color: white !important;
     box-shadow: none !important;" id="pdf_collections_num">
       <mat-card-header>
         <mat-card-title-group>
-          <mat-card-title> <div *ngIf="selectedCollection_Activate_Name=='(All)'"> {{ 'Collections' | transloco }} </div> 
-            <div *ngIf="selectedCollection_Activate_Name!='(All)'"> {{ 'Collections' | transloco }} </div> </mat-card-title>
+          <mat-card-title [ngStyle]="{ 'color': selectedCollection_Activate_Name!='(All)' ? 'purple' : 'black', 'font-weight': selectedCollection_Activate_Name!='(All)' ? 'bold' : '=normal' }"> <div *ngIf="selectedCollection_Activate_Name=='(All)'"> {{ 'Collections' | transloco }} </div> 
+            <div *ngIf="selectedCollection_Activate_Name!='(All)'"> {{ 'SubCollections' | transloco }} </div> </mat-card-title>
         </mat-card-title-group>
       </mat-card-header>
       <mat-card-content>
-        <h1 id="total_collections_num" style="text-align: right; color:black; font-size: 20px;"> <b>{{total_collections_num}}</b> </h1>
+        <h1 id="total_collections_num" style="text-align: right; color:black; font-size: 20px;"> <b>{{total_dataverses_num}}</b> </h1>
       </mat-card-content>
     </mat-card>
 
@@ -54,7 +87,7 @@
       box-shadow: none !important;" id="pdf_datasets_num">
         <mat-card-header>
           <mat-card-title-group>
-            <mat-card-title> {{ 'Datasets' | transloco }} </mat-card-title>
+            <mat-card-title [ngStyle]="{ 'color': selectedCollection_Activate_Name!='(All)' ? 'purple' : 'black', 'font-weight': selectedCollection_Activate_Name!='(All)' ? 'bold' : '=normal' }"> {{ 'Datasets' | transloco }} </mat-card-title>
             <mat-card-subtitle> </mat-card-subtitle>
           </mat-card-title-group>
         </mat-card-header>
@@ -67,7 +100,7 @@
       box-shadow: none !important;" id="pdf_files_num">
         <mat-card-header>
           <mat-card-title-group>
-            <mat-card-title> {{ 'Files' | transloco }} </mat-card-title>
+            <mat-card-title [ngStyle]="{ 'color': selectedCollection_Activate_Name!='(All)' ? 'purple' : 'black', 'font-weight': selectedCollection_Activate_Name!='(All)' ? 'bold' : '=normal' }"> {{ 'Files' | transloco }} </mat-card-title>
             <mat-card-subtitle> </mat-card-subtitle>
           </mat-card-title-group>
         </mat-card-header>
@@ -80,7 +113,7 @@
       box-shadow: none !important;" id="pdf_downloads_nums">
         <mat-card-header>
           <mat-card-title-group>
-            <mat-card-title> {{ 'Downloads' | transloco }} </mat-card-title>
+            <mat-card-title [ngStyle]="{ 'color': selectedCollection_Activate_Name!='(All)' ? 'purple' : 'black', 'font-weight': selectedCollection_Activate_Name!='(All)' ? 'bold' : '=normal' }"> {{ 'Downloads' | transloco }} </mat-card-title>
             <mat-card-subtitle> </mat-card-subtitle>
           </mat-card-title-group>
         </mat-card-header>
@@ -93,9 +126,8 @@
       box-shadow: none !important;" id="pdf_users_nums">
         <mat-card-header>
           <mat-card-title-group>
-            <mat-card-title>
-                <!-- {{ (selectedCollection_Activate_Name === '(All)' ? 'Users' : 'Authors') | transloco }} -->
-                {{ 'Users' | transloco }}
+            <mat-card-title [ngStyle]="{ 'color': selectedCollection_Activate_Name!='(All)' ? 'purple' : 'black', 'font-weight': selectedCollection_Activate_Name!='(All)' ? 'bold' : '=normal' }">
+                {{ (selectedCollection_Activate_Name === '(All)' ? 'Users' : 'Authors') | transloco }}
               </mat-card-title>
             <mat-card-subtitle> </mat-card-subtitle>
           </mat-card-title-group>
@@ -109,7 +141,7 @@
       box-shadow: none !important;" id="pdf_storage_nums">
         <mat-card-header>
           <mat-card-title-group>
-            <mat-card-title> {{ 'StorageUsage' | transloco }} </mat-card-title>
+            <mat-card-title [ngStyle]="{ 'color': selectedCollection_Activate_Name!='(All)' ? 'purple' : 'black', 'font-weight': selectedCollection_Activate_Name!='(All)' ? 'bold' : '=normal' }"> {{ 'StorageUsage' | transloco }} </mat-card-title>
             <mat-card-subtitle> </mat-card-subtitle>
           </mat-card-title-group>
         </mat-card-header>
@@ -117,6 +149,7 @@
           <h1 id="total_size_num"  style="text-align: right; color:black; font-size: 20px;"> <b>{{total_size_num}} {{ 'GB' | transloco }} </b> </h1>
         </mat-card-content>
       </mat-card>
+
       </div>
 
       <div>

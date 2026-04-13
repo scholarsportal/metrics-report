@@ -36,7 +36,7 @@ export class PostsComponent {
   public filecontent_rsp_date_range: any[] = [];
   public dataverse_rsp: any;
   public authors_rsp: any;
-  public creation_date_rs: any; 
+  public creation_info: any; 
 
   // --- Processed Data Collections ---
   public data: any[] = [];
@@ -103,6 +103,9 @@ export class PostsComponent {
   /// -- Creation Date --- 
   public creationDate: string;
 
+  //// -- Description --- 
+  public dataverseDescription: string;
+
   // --- Flags ---
   public isLoading: boolean = false;
   public firstAPIGet: boolean = true;
@@ -140,7 +143,8 @@ export class PostsComponent {
           this.subject_rsp,
           this.filecontent_rsp,
           this.dataverse_rsp,
-          this.creation_date_rs
+          this.creation_info,
+          this.authors_rsp
         ] = rep.map((r, idx) => {
           if (r && typeof r.data === 'object' && Object.keys(r.data).length === 0) {
             if ([0, 7, 8].includes(idx)) {
@@ -151,10 +155,14 @@ export class PostsComponent {
           return r.data;
         });
 
-        console.log(this.creation_date_rs)
+        console.log(this.creation_info)
 
-        if (this.creation_date_rs?.date) {
-          this.creationDate = this.creation_date_rs.date;
+        if (this.creation_info?.date) {
+          this.creationDate = this.creation_info.date;
+        }
+        
+        if (this.creation_info?.description) {
+          this.dataverseDescription = this.creation_info.description;
         }
   
         this.dataversesDataTree = Array.isArray(this.data_rsp?.children) ? this.data_rsp.children : [];
@@ -225,15 +233,18 @@ export class PostsComponent {
   
         const fileSizeArrayAll = Object.entries(this.fileSizeHash);
         const fileSizeArray = fileSizeArrayAll.filter(([key]) => this.months.includes(String(key)));
+
+        console.log("swag swag mag, ", fileSizeArray)
   
         this.sizeLabels = [];
         this.monthlySize = [];
         this.monthlyAggSize = [];
   
         for (let i = 0; i < fileSizeArray.length - 1; i++) {
-          this.sizeLabels.push(fileSizeArray[i][0]);
-          this.monthlySize.push(fileSizeArray[i][1]);
+          this.sizeLabels.push(fileSizeArray[i+1][0]);
+          this.monthlySize.push(fileSizeArray[i+1][1]);
           this.monthlyAggSize.push(fileSizeArray[i + 1][1] - fileSizeArray[i][1]);
+          console.log(fileSizeArray[i+1])
         }
   
         this.monthlySize.reverse();
@@ -346,10 +357,11 @@ export class PostsComponent {
         file_content_full_data: this.fileContentFullData,
         name_dropdown_data: this.dataverseCollectionsDropDown, 
         creation_date: this.creationDate,
+        dataverse_description: this.dataverseDescription,
         months: this.months,
         error_flag: this.errorFlag
     }
-    console.log(DataverseTabData)
+    console.log(DataverseTabData) 
     this.messageEvent.emit({"DataverseTabData": DataverseTabData});
   }
 
@@ -467,7 +479,8 @@ export class PostsComponent {
   
     // Other
     this.months = [];
-    this.creation_date_rs = "";
+    this.creation_info = [];
+    this.dataverseDescription = "";
     this.creationDate = ""; 
     this.errorFlag = false;
   }

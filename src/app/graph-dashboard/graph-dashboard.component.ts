@@ -7,8 +7,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { ChartData } from 'chart.js';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { DownloadComponent } from '../download/download.component';
 import { InteractionService } from '../shared/interaction.service';
+import * as pattern from 'patternomaly';
 
 @Component({
   selector: 'app-graph-dashboard',
@@ -21,7 +23,8 @@ import { InteractionService } from '../shared/interaction.service';
     MatCardModule,
     MatIconModule,
     GenericTableComponent,
-    DownloadComponent
+    DownloadComponent,
+    MatTooltipModule
   ],
   templateUrl: './graph-dashboard.component.html',
   styleUrls: ['./graph-dashboard.component.css']
@@ -52,6 +55,7 @@ export class GraphDashboardComponent {
   pieChartDataFile_data: Array<number> = [];
   pieChartLabelsFile: Array<string> = [];
   pieChartDataFile: Array<any> = [];
+  
 
   barChartDataDownloads_data: Array<number> = [];
   barChartDataDownloads: ChartData<'bar'> = {
@@ -97,6 +101,8 @@ export class GraphDashboardComponent {
 
   fileTranslations: { [key: string]: string } = {};
 
+  backgroundColors: Array<any> = [];
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['data']) {
       this.processData(this.data);
@@ -109,7 +115,6 @@ export class GraphDashboardComponent {
   ) {}
 
   processData(data: any) {
-    console.log('yoyoyo', data);
 
     this.barChartDataDownloads_data = data['downloads_graph_data'];
     this.barChartDataDatasets_data = data['datasets_graph_data'];
@@ -133,6 +138,29 @@ export class GraphDashboardComponent {
     this.file_content_table = data['file_content_full_data'];
 
     this.months = data['months'];
+
+    this.backgroundColors = [
+      "rgba(102, 0, 102, 0.5)",    // Purple
+      "rgba(0, 100, 255, 0.5)",   // Blue
+      "rgba(0, 102, 95, 0.5)",   // Green
+      "rgba(204, 102, 184, 0.5)",// Pink
+
+      // Next 4 - dot pattern
+      pattern.draw('dot', "rgba(102, 0, 102, 0.5)"),
+      pattern.draw('dot', "rgba(0, 100, 255, 0.5)"),
+      pattern.draw('dot', "rgba(0, 102, 95, 0.5)"),
+      pattern.draw('dot', "rgba(204, 102, 184, 0.5)"),
+
+      // Next 4 - dash pattern
+      pattern.draw('dash', "rgba(102, 0, 102, 0.5)"),
+      pattern.draw('dash', "rgba(0, 100, 255, 0.5)"),
+      pattern.draw('dash', "rgba(0, 102, 95, 0.5)"),
+      pattern.draw('dash', "rgba(204, 102, 184, 0.5)"),
+
+      // Last 2 - cross pattern
+      pattern.draw('cross', "rgba(102, 0, 102, 0.5)"),
+      pattern.draw('cross', "rgba(0, 51, 153, 0.5)")
+    ];
 
     this.translocoService
       .selectTranslateObject([
@@ -295,7 +323,8 @@ export class GraphDashboardComponent {
                 backgroundColor: 'rgba(102, 0, 102, 0.5)',
                 borderColor: 'rgba(102, 0, 102, 0.5)',
                 hoverBackgroundColor: 'rgba(102, 0, 102, 0.7)',
-                hoverBorderColor: 'rgba(102, 0, 102, 0.7)'
+                hoverBorderColor: 'rgba(102, 0, 102, 0.7)',
+                
               },
               {
                 data: this.barChartDataDownloads_data,
@@ -303,7 +332,8 @@ export class GraphDashboardComponent {
                 backgroundColor: 'rgba(0, 100, 255, 0.5)',
                 borderColor: 'rgba(0, 100, 255, 0.5)',
                 hoverBackgroundColor: 'rgba(0, 100, 255, 0.7)',
-                hoverBorderColor: 'rgba(0, 100, 255, 0.7)'
+                hoverBorderColor: 'rgba(0, 100, 255, 0.7)',
+                hidden: true
               }
             ]
           };
@@ -325,7 +355,8 @@ export class GraphDashboardComponent {
                 backgroundColor: 'rgba(0, 100, 255, 0.5)',
                 borderColor: 'rgba(0, 100, 255, 0.5)',
                 hoverBackgroundColor: 'rgba(0, 100, 255, 0.7)',
-                hoverBorderColor: 'rgba(0, 100, 255, 0.7)'
+                hoverBorderColor: 'rgba(0, 100, 255, 0.7)',
+                hidden: true
               }
             ]
           };
@@ -347,7 +378,8 @@ export class GraphDashboardComponent {
                 backgroundColor: 'rgba(0, 100, 255, 0.5)',
                 borderColor: 'rgba(0, 100, 255, 0.5)',
                 hoverBackgroundColor: 'rgba(0, 100, 255, 0.7)',
-                hoverBorderColor: 'rgba(0, 100, 255, 0.7)'
+                hoverBorderColor: 'rgba(0, 100, 255, 0.7)',
+                hidden: true
               }
             ]
           };
@@ -369,7 +401,8 @@ export class GraphDashboardComponent {
                 backgroundColor: 'rgba(0, 100, 255, 0.5)',
                 borderColor: 'rgba(0, 100, 255, 0.5)',
                 hoverBackgroundColor: 'rgba(0, 100, 255, 0.7)',
-                hoverBorderColor: 'rgba(0, 100, 255, 0.7)'
+                hoverBorderColor: 'rgba(0, 100, 255, 0.7)',
+                hidden: true
               }
             ]
           };
@@ -391,7 +424,8 @@ export class GraphDashboardComponent {
                 backgroundColor: 'rgba(0, 100, 255, 0.5)',
                 borderColor: 'rgba(0, 100, 255, 0.5)',
                 hoverBackgroundColor: 'rgba(0, 100, 255, 0.7)',
-                hoverBorderColor: 'rgba(0, 100, 255, 0.7)'
+                hoverBorderColor: 'rgba(0, 100, 255, 0.7)',
+                hidden: true
               }
             ]
           };
@@ -414,6 +448,7 @@ export class GraphDashboardComponent {
     this.pieChartDataSubject = [
       {
         data: this.pieChartDataSubject_data,
+        backgroundColor: this.backgroundColors.slice(0, this.pieChartDataSubject_data.length),
         label: 'Subject Breakdown'
       }
     ];
@@ -421,11 +456,11 @@ export class GraphDashboardComponent {
     this.pieChartDataFile = [
       {
         data: this.pieChartDataFile_data,
+        backgroundColor: this.backgroundColors.slice(0, this.pieChartDataFile_data.length),
         label: 'File Content Breakdown'
       }
     ];
 
-    console.log('yoyoyoyoyo', this.barChartDataDownloads);
   }
 
   downloadSubject() {

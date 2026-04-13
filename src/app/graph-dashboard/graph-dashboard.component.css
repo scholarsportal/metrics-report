@@ -1,0 +1,17 @@
+.graph-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  
+  .help-icon {
+    font-size: 18px;
+    cursor: pointer;
+    color: #757575;
+    margin-left: 10px;
+    transform: translate(6px, -6px); /* right, up */
+  }
+  
+  .help-icon:hover {
+    color: #1976d2;
+  }

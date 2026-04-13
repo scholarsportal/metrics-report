@@ -88,6 +88,7 @@
     "biosequence": "biosequence",
     "multipart": "multipart",
     "SpecificFileType": "Specific File Type",
+    "LegacyToolTip":"Export of previous metrics App",
     "MDCToolTip": "Expected for Future Release",
     "ErrorMessage1": "Error: There is missing data for this Dataverse",
     "DatasetsSF": "Datasets",

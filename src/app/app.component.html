@@ -33,6 +33,7 @@
   max-width: fit-content;
   margin-left: auto;
   margin-right: auto;
+  min-width: 0;
 ">
 
   <div style="clear:both;">
@@ -46,12 +47,16 @@
     </div>
 
     <div *ngIf="selectedCollection_Activate !== '(All)'" id="pdf_name">
-      <h4 style="color: purple;"><b> • Collection Selected • </b></h4>
+      <h4 style="color: purple;"><b> • {{ 'CollectionSelected' | transloco }} • </b></h4>
       <h1 id="responsive-title" class="responsive-title">{{ selectedCollection_Activate_Name }}</h1>
     </div>
 
     <div id="pdf_date" style="margin-bottom: 4px;">
       <p><i>{{ date_String }}</i></p>
+    </div>
+
+    <div *ngIf="dataverse_description !== ''" id="pdf_name">
+      <p class="responsive-description" [innerHTML]="dataverse_description"></p>
     </div>
 
     <div *ngIf="error_flag" style="
@@ -75,7 +80,13 @@
         <div style="vertical-align:top;">
           <div id="main_meteris">
 
-            <mat-card class="example-card hide-scrollbar" appearance="outlined" style="min-width: 350px; max-width: 350px; margin-bottom: 10px; margin-left: 5px; margin-top: 10px; max-height: 500px; overflow-y: auto; font-size: 12px;">
+            <mat-card class="example-card hide-scrollbar help-card" appearance="outlined" style="min-width: 350px; max-width: 350px; margin-bottom: 10px; margin-left: 5px; margin-top: 10px; max-height: 500px; overflow-y: auto; font-size: 12px;">
+              <mat-icon
+              class="help-icon"
+              [matTooltip]="'DateRangeHelp' | transloco"
+              matTooltipPosition="above">
+              help
+            </mat-icon>
               <mat-card-header>
                 <mat-card-title-group>
                   <mat-card-title> {{ 'DateRange' | transloco }} </mat-card-title>
@@ -136,12 +147,12 @@
                   </mat-form-field>
                 </div>
 
-                <div style="display: flex; align-items: center; margin-top: -20px; margin-left: 12px; margin-right: 20px;">
+                <div style="display: flex; align-items: center; margin-top: -20px; margin-left: 2px; margin-right: 20px;">
                   <mat-checkbox 
-                    matTooltip="Generates metrics from creation, visual displays last 24 months"
+                    matTooltip="Generates metrics from creation, bar graphs displays max 24 months"
                     [ngModel]="!start_on"
                     (ngModelChange)="start_on = !$event"
-                    style="font-size: 16px; transform: scale(0.9); transform-origin: left top; margin-left: 8px;">
+                    style="font-size: 5px; transform: scale(0.85); transform-origin: left top; margin-left: 12px;">
                     {{ 'AllTime' | transloco }}
                   </mat-checkbox>
 
@@ -158,16 +169,32 @@
               </mat-card-content>
             </mat-card>
 
-            <mat-card class="example-card hide-scrollbar" appearance="outlined" style="min-width: 350px; max-width: 350px; margin-left: 5px; max-height: 3165px; overflow-y: auto; font-size: 12px;">
-              <mat-card-header>
-                <mat-card-title-group>
-                  <mat-card-title> {{ 'CollectionTree' | transloco }} </mat-card-title>
-                  <mat-card-subtitle> </mat-card-subtitle>
-                </mat-card-title-group>
-              </mat-card-header>
-              <mat-card-content>
-                <app-tree [data]="raw_table_data" [current_active]="selectedCollection_Activate_Name" (dataEvent)="getCollectionFromTree($event)"> </app-tree>
-              </mat-card-content>
+            <mat-card class="example-card hide-scrollbar help-card"
+            appearance="outlined"
+            style="min-width: 350px; max-width: 350px; margin-left: 5px; max-height: 3165px; overflow-y: auto; font-size: 12px;">
+  
+            <!-- Top Right Help Icon -->
+            <mat-icon
+              class="help-icon"
+              [matTooltip]="'CollectionTreeHelp' | transloco"
+              matTooltipPosition="above">
+              help
+            </mat-icon>
+          
+            <mat-card-header>
+              <mat-card-title>
+                {{ 'CollectionTree' | transloco }}
+              </mat-card-title>
+            </mat-card-header>
+          
+            <mat-card-content>
+              <app-tree
+                [data]="raw_table_data"
+                [current_active]="selectedCollection_Activate_Name"
+                (dataEvent)="getCollectionFromTree($event)">
+              </app-tree>
+            </mat-card-content>
+
             </mat-card>
 
           </div>

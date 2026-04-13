@@ -7,7 +7,7 @@
     "FAQ": "FAQ",
     "DateRange": "Date Range",
     "StartDate": "Start Date",
-    "AllTime": "All-Time",
+    "AllTime": "Start At Creation",
     "EndDate": "End Date",
     "Submit": "Submit",
     "All": "Borealis (All)",
@@ -31,6 +31,7 @@
     "Legacy": "Legacy",
     "MakeDataCountMetrics": "Make Data Count Metrics",
     "Collections": "Collections",
+    "SubCollections": "Sub Collections",
     "Datasets": "Datasets",
     "Files": "Files",
     "Downloads": "Downloads",
@@ -88,7 +89,8 @@
     "biosequence": "biosequence",
     "multipart": "multipart",
     "SpecificFileType": "Specific File Type",
-    "MDCToolTip": "Expected for Future Release",
+    "LegacyToolTip": "Export of previous metrics App",
+    "MDCToolTip": "Make Data Count Metrics",
     "ErrorMessage1": "Error: There is missing data for this Dataverse",
     "DatasetsSF": "Datasets",
     "CumulCount": "Cumul count",
@@ -114,5 +116,11 @@
     "FileTypeDef": "type of file",
     "FileSpecficTypeDef": "specfic format of file",
     "FileCountDef": "Total count of datasets with assigned subject", 
-    "FilePercentDef": "Percent of datasets with file type over all other file types"
+    "FilePercentDef": "Percent of datasets with file type over all other file types",
+    "CollectionSelected": "Collection Selected",
+    "DateRangeHelp":"By default, all time metrics are displayed (Creation Date - Current Date), with bar graphs showing past 24 months, to see data in a specific range, toggle below",
+    "CollectionTreeHelp":"Filter updates as you open a collection. To choose a sub-collection, first open its parent collection",
+    "GraphHelp":"Click the checked or crossed legends to show or hide graphs"
+
+
 }

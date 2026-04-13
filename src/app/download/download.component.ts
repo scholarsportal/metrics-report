@@ -5,6 +5,8 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { InteractionService } from '../shared/interaction.service';
 import { TranslocoModule, TranslocoService } from '@ngneat/transloco';
+import { LoadingService } from '../loading.service';
+import { ApiService } from '../api.service';
 
 @Component({
   selector: 'app-download',
@@ -19,7 +21,7 @@ export class DownloadComponent implements OnInit {
   @Input() data: any; 
   @Input() name: string;
 
-  constructor(private interactionService: InteractionService, private translocoService: TranslocoService) {}
+  constructor(private interactionService: InteractionService, private translocoService: TranslocoService, private apiService: ApiService, private loadingService: LoadingService) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['name']) {
@@ -39,6 +41,9 @@ export class DownloadComponent implements OnInit {
     });
     this.interactionService.downloadPDFTriggered$.subscribe(() => {
       this.generatePDF();
+    });
+    this.interactionService.downloadMDCTriggered$.subscribe(() => {
+      this.generateMDC();
     });
   }
 
@@ -84,18 +89,18 @@ export class DownloadComponent implements OnInit {
     worksheet_readme.addRow([this.translocoService.translate('Storage'), "", ""]);
     worksheet_readme.addRow(["",this.translocoService.translate('Date'),""]);
     worksheet_readme.addRow(["", this.translocoService.translate('Count'), this.translocoService.translate('StorageCountDef')]);
-    worksheet_readme.addRow(["", this.translocoService.translate('Percent'), this.translocoService.translate('StorageCumulCountDef')]);
+    worksheet_readme.addRow(["", this.translocoService.translate('Distribution'), this.translocoService.translate('StorageCumulCountDef')]);
 
     worksheet_readme.addRow([this.translocoService.translate('SubjectBreakdown'), "", ""]);
     worksheet_readme.addRow(["",this.translocoService.translate('Subject'),this.translocoService.translate('SubjectDef')]);
     worksheet_readme.addRow(["", this.translocoService.translate('Count'), this.translocoService.translate('SubjectCountDef')]);
-    worksheet_readme.addRow(["", this.translocoService.translate('Percent'), this.translocoService.translate('SubjectPercentDef')]);
+    worksheet_readme.addRow(["", this.translocoService.translate('Distribution'), this.translocoService.translate('SubjectPercentDef')]);
 
     worksheet_readme.addRow([this.translocoService.translate('FileContentBreakdown'), "", ""]);
     worksheet_readme.addRow(["",this.translocoService.translate('Type'),this.translocoService.translate('FileTypeDef')]);
     worksheet_readme.addRow(["",this.translocoService.translate('SpecificFileType'),this.translocoService.translate('FileSpecficTypeDef')]);
     worksheet_readme.addRow(["", this.translocoService.translate('Count'), this.translocoService.translate('FileCountDef')]);
-    worksheet_readme.addRow(["", this.translocoService.translate('Percent'), this.translocoService.translate('FilePercentDef')]);
+    worksheet_readme.addRow(["", this.translocoService.translate('Distribution'), this.translocoService.translate('FilePercentDef')]);
 
     worksheet_readme.getColumn(1).width = 30;
     worksheet_readme.getColumn(2).width = 25;
@@ -142,21 +147,21 @@ export class DownloadComponent implements OnInit {
     worksheet_storage.getColumn(3).width = 15;
 
     const worksheet_subject = workbook.addWorksheet(this.translocoService.translate('SubjectBreakdown'));  
-    const headers_subject = Object.keys([this.translocoService.translate('Subject'), this.translocoService.translate('Count'), this.translocoService.translate('Percent')]);
-    worksheet_subject.addRow([this.translocoService.translate('Subject'), this.translocoService.translate('Count'), this.translocoService.translate('Percent')]);
+    const headers_subject = Object.keys([this.translocoService.translate('Subject'), this.translocoService.translate('Count'), this.translocoService.translate('Distribution')]);
+    worksheet_subject.addRow([this.translocoService.translate('Subject'), this.translocoService.translate('Count'), this.translocoService.translate('Distribution')]);
 
     worksheet_subject.getColumn(1).width = 30;
     worksheet_subject.getColumn(2).width = 15;
     worksheet_subject.getColumn(3).width = 15;
 
     const worksheet_file = workbook.addWorksheet(this.translocoService.translate('FileContentBreakdown'));  
-    const headers_file = Object.keys([this.translocoService.translate('FileType'), this.translocoService.translate('SpecificFileType'), this.translocoService.translate('Count'), this.translocoService.translate('Percent')]);
-    worksheet_file.addRow([this.translocoService.translate('Type'), this.translocoService.translate('SpecificFileType'), this.translocoService.translate('Count'), this.translocoService.translate('Percent')]);
+    const headers_file = Object.keys([this.translocoService.translate('FileType'), this.translocoService.translate('SpecificFileType'), this.translocoService.translate('Count'), this.translocoService.translate('Distribution')]);
+    worksheet_file.addRow([this.translocoService.translate('Type'), this.translocoService.translate('SpecificFileType'), this.translocoService.translate('Count'), this.translocoService.translate('Distribution')]);
 
     worksheet_file.getColumn(1).width = 20;
     worksheet_file.getColumn(2).width = 30;
     worksheet_file.getColumn(3).width = 15;
-    worksheet_file.getColumn(3).width = 15;
+    worksheet_file.getColumn(4).width = 15;
 
     for (let i = 0; i < months.length - 1; i+=1){
       worksheet_downloads.addRow([months[i],this.data['downloads_graph_agg_data'][i], downloads_graph_data_rev[i]]); 
@@ -324,8 +329,10 @@ export class DownloadComponent implements OnInit {
     const cardHeight = 15;
     const cardY = currentY;
   
-    const cardTitles = [this.translocoService.translate('Collections'), this.translocoService.translate('DatasetsSF'), this.translocoService.translate('Files'), this.translocoService.translate('Downloads'), 
-    this.translocoService.translate('Users'), this.translocoService.translate('Storage')];
+    const collectionsName = temp_title_name === "Borealis (All)" ? 'Collections': 'Sub Collections';
+    const UsersorAuthors = temp_title_name === "Borealis (All)" ? 'Users': 'Authors';
+    const cardTitles = [this.translocoService.translate(collectionsName), this.translocoService.translate('DatasetsSF'), this.translocoService.translate('Files'), this.translocoService.translate('Downloads'), 
+    this.translocoService.translate(UsersorAuthors), this.translocoService.translate('Storage')];
     
     const locale = this.translocoService.getActiveLang() === 'fr' ? 'fr-FR' : 'en-US';
 
@@ -350,8 +357,10 @@ export class DownloadComponent implements OnInit {
     // Append the localized unit for both languages
     const cleanedStorage = `${formattedStorage} ${gbUnit}`;
 
+    var total_dataverses_num = temp_title_name === "Borealis (All)" ? this.data['name_dropdown_data'].length : this.data['dataverse_count'];
+
     const cardCounts = [
-      sanitizeNumber(this.data['name_dropdown_data']?.length ?? 0),
+      sanitizeNumber(total_dataverses_num ?? 0),
       sanitizeNumber(this.data['datasets_graph_data']?.at(-1) ?? 0),
       sanitizeNumber(this.data['files_graph_data']?.at(-1) ?? 0),
       sanitizeNumber(this.data['downloads_graph_data']?.at(-1) ?? 0),
@@ -542,5 +551,44 @@ export class DownloadComponent implements OnInit {
     }
     this.exportToExcel(this.data, temp_name);
   }
+
+  generateMDC() {
+    var MDC_data: any;
+    this.apiService.getDatasetsWithDoiAndMetrics().subscribe(
+      (results) => {
+        this.loadingService.hide();
+        console.log('DOI metrics:', results);
+        MDC_data = results;
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet_mdc_dataset = workbook.addWorksheet(this.translocoService.translate('Dataset Metrics'));  
+        const headers_mdc_dataset = Object.keys(["DOI", "Dataset Name", "Dataverse", "Views", "Downloads", "Citations"]);
+        worksheet_mdc_dataset.addRow(["DOI", "Dataset Name", "Dataverse", "Views", "Downloads", "Citations"]);
+        for (let i = 0; i < MDC_data.length - 1; i+=1){
+          worksheet_mdc_dataset.addRow([MDC_data[i].doi, MDC_data[i].name, MDC_data[i].dataverse, MDC_data[i].views, MDC_data[i].downloads, ""]); 
+        }
+
+        worksheet_mdc_dataset.getColumn(1).width = 50;
+        worksheet_mdc_dataset.getColumn(2).width = 50;
+        worksheet_mdc_dataset.getColumn(3).width = 50;
+        worksheet_mdc_dataset.getColumn(5).width = 20;
+
+        var temp_name = "Borealis Report";
+        if (this.name != "(All)"){
+          temp_name = this.name + " - " + temp_name; 
+        }
+
+        workbook.xlsx.writeBuffer().then((buffer: any) => {
+          const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          saveAs(blob, `${temp_name}.xlsx`);
+        });
+      },
+      (error) => {
+        console.error('API Error:', error);
+      }
+    );
+
+  }  
+
 }
 
