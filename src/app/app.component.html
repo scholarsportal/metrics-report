@@ -1,3 +1,17 @@
+<div
+  *ngIf="networkErrorService.visible$ | async"
+  class="overlay"
+  role="alertdialog"
+  aria-modal="true"
+>
+  <div class="modal">
+    <div class="icon-wrap">
+    </div>
+    <p>Borealis Metrics App is temporarily out of service. Thank you for your patience.</p>
+    <p>Le rapport de mesures Borealis est temporairement indisponible. Merci de votre patience.</p>
+  </div>
+</div>
+
 <div>
   <h2 style="padding:20px;"> 
     <div style="float: left">

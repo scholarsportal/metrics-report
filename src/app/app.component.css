@@ -94,3 +94,43 @@
 .help-icon:hover {
   color: #1976d2;
 }
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem 2.5rem;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  text-align: center;
+  animation: pop-in 0.2s ease-out;
+}
+@keyframes pop-in {
+  from { transform: scale(0.9); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.icon-wrap { display: flex; justify-content: center; margin-bottom: 1rem; }
+.icon-wrap svg { width: 48px; height: 48px; color: #e53e3e; }
+.modal h2 { margin: 0 0 0.5rem; font-size: 1.25rem; font-weight: 700; color: #1a202c; }
+.modal p { margin: 0 0 1.5rem; font-size: 0.95rem; color: #4a5568; line-height: 1.5; }
+.actions { display: flex; gap: 0.75rem; justify-content: center; }
+.btn-retry {
+  padding: 0.5rem 1.5rem; border-radius: 6px; border: none;
+  background: #e53e3e; color: #fff; font-weight: 600; cursor: pointer;
+}
+.btn-retry:hover { background: #c53030; }
+.btn-dismiss {
+  padding: 0.5rem 1.5rem; border-radius: 6px;
+  border: 1px solid #cbd5e0; background: transparent; color: #4a5568; cursor: pointer;
+}
+.btn-dismiss:hover { background: #f7fafc; }
