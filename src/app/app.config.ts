@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideZoneChangeDetection, importProvidersFrom, isDevMode } from '@angular/core';
-import { HttpClient, provideHttpClient, withFetch } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
@@ -8,9 +8,18 @@ import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 import { provideTransloco } from '@ngneat/transloco';
 import { TranslocoHttpLoader } from '../transloco-loader';
+import { AppComponent } from './app.component';
+import { NetworkErrorInterceptor } from './network-error.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }), 
+    AppComponent, // makes it injectable into the interceptor
+    provideHttpClient(withInterceptorsFromDi()),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: NetworkErrorInterceptor,
+      multi: true,
+    },
     provideHttpClient(), 
     provideTransloco({
       config: {

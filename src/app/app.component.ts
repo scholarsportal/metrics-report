@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ViewChild, NgModule, ChangeDetectionStrategy, ViewEncapsulation, ElementRef,OnInit, inject, signal} from '@angular/core';
+import {AfterViewInit, Component, ViewChild, NgModule, ChangeDetectionStrategy, ViewEncapsulation, ElementRef,OnInit, inject, signal, Inject} from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import {JsonPipe, AsyncPipe, CommonModule} from '@angular/common';
 import {MatTabsModule} from '@angular/material/tabs';
@@ -6,7 +6,7 @@ import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, FormBuilder, NgForm} from '@angular/forms';
 import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
 import {Observable} from 'rxjs';
-import {map, startWith, take} from 'rxjs/operators';
+import {map, retry, startWith, take} from 'rxjs/operators';
 import {MatInputModule} from '@angular/material/input';
 import {MatSelect, MatSelectChange, MatSelectModule} from '@angular/material/select';
 import {MatFormFieldControl, MatFormFieldModule} from '@angular/material/form-field';
@@ -45,10 +45,12 @@ import { LoadingService } from './loading.service';
 import { debounceTime } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 
+
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
 import {default as _rollupMoment, Moment} from 'moment';
 import { MatProgressBar } from "@angular/material/progress-bar";
+import { NetworkErrorService } from './network-error.service';
 
 registerAllModules();
 
@@ -680,10 +682,17 @@ export class AppComponent implements AfterViewInit, OnInit{
   title = 'metrics-app';
   
 
-  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, private languageService: LanguageService, private translocoService: TranslocoService, private cdr: ChangeDetectorRef, private loadingService: LoadingService) {
+  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, private languageService: LanguageService, private translocoService: 
+    TranslocoService, private cdr: ChangeDetectorRef, private loadingService: LoadingService, public networkErrorService: NetworkErrorService
+
+    ) {
     this.filteredOptions = this.options.slice();
     this.loadingService.isLoading$.subscribe((loading) => {
       this.isLoading = loading;
+    });
+
+    this.networkErrorService.visible$.subscribe(() => {
+      this.cdr.markForCheck();
     });
   }
 
@@ -768,6 +777,11 @@ export class AppComponent implements AfterViewInit, OnInit{
   }
 
   defaultButton(){
+    window.location.reload();
+  }
+
+  retry(): void {
+    this.networkErrorService.dismiss();
     window.location.reload();
   }
 

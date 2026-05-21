@@ -52,7 +52,7 @@
       <button mat-button [disabled]="true" [ngStyle]="{ 'color': selectedCollection_Activate_Name!='(All)' ? 'purple' : 'black', 'font-weight': selectedCollection_Activate_Name!='(All)' ? 'bold' : '=normal' }" class="mat-small" style="border-width: 1px; font-size: 12px; border-style: solid; width: 122px; height: 25px; display: flex;  justify-content: flex-start;
       align-items: center;      
       gap: 8px;                    
-      text-align: left;" (click)="downloadMDC()"> 
+      text-align: left;" (click)="downloadMDC()" disabled> 
       <mat-icon> download </mat-icon> MDC </button> </span>
     </div>
 

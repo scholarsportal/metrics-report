@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, of, from } from 'rxjs';
 import { switchMap, map, catchError, mergeMap, toArray } from 'rxjs/operators';
+import { NetworkErrorService } from './network-error.service';
+
 
 interface DatasetItem {
   publicationDate?: string;
@@ -22,7 +24,7 @@ interface DatasetSummary {
 export class ApiService {
   private baseUrl = 'https://borealisdata.ca/api/info/metrics';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private networkErrorService: NetworkErrorService) {}
 
   getDataverseCollections(): Observable<any> {
     const url = `${this.baseUrl}/tree`;
@@ -73,7 +75,7 @@ export class ApiService {
   getDataverseInfo(alias: string = ''): Observable<{
     data: { date: string; description: string; name: string }
   }> {
-    const url = `https://borealisdata.ca/api/dataverses/${alias || ':root'}`;
+    const url = `https://demo.borealisdata.ca/api/dataverses/${alias || ':root'}`;
   
     return this.http.get<any>(url).pipe(
       map(response => {
@@ -107,7 +109,6 @@ export class ApiService {
       switchMap(res => {
         const creation = res?.data?.date;
   
-        // ✅ Guard: invalid or missing date
         if (!creation || isNaN(Date.parse(`${creation}-01T00:00:00Z`))) {
           return of({ data: [] });
         }
@@ -117,7 +118,6 @@ export class ApiService {
           ? new Date(`${endMonth}-01T00:00:00Z`)
           : new Date();
   
-        // ✅ Build month ranges
         const months: { label: string; from: string; to: string }[] = [];
         const cursor = new Date(start);
   
@@ -138,7 +138,6 @@ export class ApiService {
           return of({ data: [] });
         }
   
-        // ✅ Fetch authors per month (limited concurrency)
         return from(months).pipe(
           mergeMap(
             m =>
@@ -154,7 +153,6 @@ export class ApiService {
           toArray(),
   
           map(results => {
-            // ✅ Sort months
             results.sort((a, b) => a.label.localeCompare(b.label));
   
             const knownAuthors = new Set<string>();
@@ -195,7 +193,7 @@ export class ApiService {
     m: { from: string; to: string },
     parentAlias: string
   ): Observable<Set<string>> {
-    return this.http.get<any>('https://borealisdata.ca/api/search', {
+    return this.http.get<any>('https://demo.borealisdata.ca/api/search', {
       params: {
         q: '*',
         type: 'dataset',
@@ -209,7 +207,7 @@ export class ApiService {
         const totalCount = res?.data?.total_count ?? 0;
         const pages = Math.ceil(totalCount / 1000);
         const pageCalls = Array.from({ length: pages }, (_, i) =>
-          this.http.get<any>('https://borealisdata.ca/api/search', {
+          this.http.get<any>('https://demo.borealisdata.ca/api/search', {
             params: {
               q: '*',
               type: 'dataset',
@@ -278,7 +276,7 @@ export class ApiService {
       this.withErrorHandling(this.getSubjectData(toMonth, parentAlias), setError, 'getSubjectData'),
       this.withErrorHandling(this.getFileContentData(parentAlias), setError, 'getFileContentData'),
       this.withErrorHandling(this.getDataverseCount(toMonth, parentAlias), setError, 'getDataverseCount'),
-      this.withErrorHandling(this.getDataverseInfo(parentAlias), setError, 'getDataverseInfo')
+      this.withErrorHandling(this.getDataverseInfo(parentAlias), setError, 'getDataverseInfo'),
     ];
 
     return forkJoin(calls).pipe(
@@ -296,8 +294,9 @@ export class ApiService {
   ): Observable<T> {
     return obs$.pipe(
       catchError(err => {
-        console.error(` ERROR in ${label}`, err);
+        console.error(`ERROR in ${label}`, err);
         onError();
+        this.networkErrorService.show();
         return of({} as T);
       })
     );
@@ -305,7 +304,7 @@ export class ApiService {
 
   // Existing getDatasets unchanged
   getDatasets(parentAlias: string = '', start: number = 0, perPage: number = 1000): Observable<any> {
-    const url = `https://borealisdata.ca/api/search`;
+    const url = `https://demo.borealisdata.ca/api/search`;
     const params: any = {
       q: '*',
       type: 'dataset',
