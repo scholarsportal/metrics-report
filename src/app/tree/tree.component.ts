@@ -12,6 +12,7 @@ import {MatTreeModule} from '@angular/material/tree';
 import {MatCardModule} from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
 import { TranslocoModule } from '@ngneat/transloco';
+import { PROXY } from '../api.config';
 
 /** Flat node with expandable and level information */
 class DynamicFlatNode {
@@ -349,7 +350,7 @@ export class DynamicDataSource implements DataSource<DynamicFlatNode> {
       }
   
       // Expand logic
-      this.http.get(`https://borealisdata.ca/api/info/metrics/tree/?parentAlias=${alias}`)
+      this.http.get(`${PROXY}/info/metrics/tree/?parentAlias=${encodeURIComponent(alias)}`)
         .subscribe((response: any) => {
           const childrenNames = response?.data?.children?.map((c: any) => c.name) || [];
           const childrenAliases = response?.data?.children?.map((c: any) => c.alias) || [];
