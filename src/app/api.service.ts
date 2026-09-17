@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, of, from } from 'rxjs';
 import { switchMap, map, catchError, mergeMap, toArray } from 'rxjs/operators';
+import { PROXY } from './api.config';
 
 interface DatasetItem {
   publicationDate?: string;
@@ -20,7 +21,7 @@ interface DatasetSummary {
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'https://borealisdata.ca/api/info/metrics';
+  private baseUrl = `${PROXY}/info/metrics`;
 
   constructor(private http: HttpClient) {}
 
@@ -73,7 +74,7 @@ export class ApiService {
   getDataverseInfo(alias: string = ''): Observable<{
     data: { date: string; description: string; name: string }
   }> {
-    const url = `https://borealisdata.ca/api/dataverses/${alias || ':root'}`;
+    const url = `${PROXY}/dataverses/${alias || ':root'}`;
   
     return this.http.get<any>(url).pipe(
       map(response => {
@@ -195,7 +196,7 @@ export class ApiService {
     m: { from: string; to: string },
     parentAlias: string
   ): Observable<Set<string>> {
-    return this.http.get<any>('https://borealisdata.ca/api/search', {
+    return this.http.get<any>(`${PROXY}/search`, {
       params: {
         q: '*',
         type: 'dataset',
@@ -209,7 +210,7 @@ export class ApiService {
         const totalCount = res?.data?.total_count ?? 0;
         const pages = Math.ceil(totalCount / 1000);
         const pageCalls = Array.from({ length: pages }, (_, i) =>
-          this.http.get<any>('https://borealisdata.ca/api/search', {
+          this.http.get<any>(`${PROXY}/search`, {
             params: {
               q: '*',
               type: 'dataset',
@@ -305,7 +306,7 @@ export class ApiService {
 
   // Existing getDatasets unchanged
   getDatasets(parentAlias: string = '', start: number = 0, perPage: number = 1000): Observable<any> {
-    const url = `https://borealisdata.ca/api/search`;
+    const url = `${PROXY}/search`;
     const params: any = {
       q: '*',
       type: 'dataset',
@@ -354,7 +355,7 @@ export class ApiService {
     perPage: number = 1000
   ): Observable<DatasetSummary[]> {
 
-  const url = 'https://borealisdata.ca/api/search';
+  const url = `${PROXY}/search`;
   const params: any = {
     q: '*',
     type: 'dataset',
@@ -384,14 +385,14 @@ export class ApiService {
 }
 
 getMDCViewsTotal(doi: string): Observable<number> {
-  const url = `https://borealisdata.ca/api/datasets/:persistentId/makeDataCount/viewsTotal?persistentId=${encodeURIComponent(doi)}`;
+  const url = `${PROXY}/datasets/:persistentId/makeDataCount/viewsTotal?persistentId=${encodeURIComponent(doi)}`;
   return this.http.get<any>(url).pipe(
     map(res => res.data.viewsTotal ?? 0) // flatten to number
   );
 }
 
 getMDCDownloadsTotal(doi: string): Observable<number> {
-  const url = `https://borealisdata.ca/api/datasets/:persistentId/makeDataCount/downloadsTotal?persistentId=${encodeURIComponent(doi)}`;
+  const url = `${PROXY}/datasets/:persistentId/makeDataCount/downloadsTotal?persistentId=${encodeURIComponent(doi)}`;
   return this.http.get<any>(url).pipe(
     map(res => res.data.downloadsTotal ?? 0) // flatten to number
   );
@@ -402,5 +403,3 @@ getMDCDownloadsTotal(doi: string): Observable<number> {
     return Number.isFinite(n) ? n : 0;
   }
 }
-
-
